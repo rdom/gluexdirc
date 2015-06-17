@@ -1,0 +1,54 @@
+// -----------------------------------------
+// GlxHit.h
+//
+// Author  : R.Dzhygadlo at gsi.de
+// -----------------------------------------
+
+#ifndef GlxHit_h
+#define GlxHit_h 1
+
+#include <vector>
+
+#include "TObject.h"
+#include "TVector3.h"
+
+class GlxHit : public TObject {
+
+public:   
+ 
+  //Constructor
+  GlxHit();
+  ~GlxHit(){};
+ 
+  // Accessors 
+  Int_t GetTrb() { return fTrb;}
+  Int_t GetTdc() { return fTdc;}
+  Int_t GetChannel() { return fChannel;}
+  Int_t GetMcpId()       { return fMcpId; }
+  Int_t GetPixelId()     { return fPixelId; }
+  Double_t GetLeadTime() { return fLeadTime; } 
+  Double_t GetTotTime() { return fTotTime; } 
+    
+  // Mutators  
+  void SetTrb(Int_t val) { fTrb = val; }
+  void SetTdc(Int_t val) { fTdc = val; }
+  void SetChannel(Int_t val) { fChannel=val; }
+  void SetMcpId(Int_t val)   { fMcpId = val; }
+  void SetPixelId(Int_t val) { fPixelId = val; }
+  void SetLeadTime(Double_t val) { fLeadTime=val; } 
+  void SetTotTime(Double_t val) { fTotTime=val; } 
+
+protected:
+  
+  Int_t fTrb;
+  Int_t fTdc;
+  Int_t fChannel;
+  Int_t fMcpId;
+  Int_t fPixelId;
+  Double_t fLeadTime;    
+  Double_t fTotTime;  
+
+  ClassDef(GlxHit,0)
+};
+
+#endif

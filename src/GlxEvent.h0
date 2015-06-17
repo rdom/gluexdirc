@@ -1,0 +1,42 @@
+// -----------------------------------------
+// GlxEvent.h
+//
+// Author  : R.Dzhygadlo at gsi.de
+// -----------------------------------------
+
+#ifndef GlxEvent_h
+#define GlxEvent_h 1
+
+#include "TObject.h"
+#include "TString.h"
+
+#include <vector>
+#include "GlxHit.h"
+
+class GlxEvent: public TObject  {
+
+public:
+
+  GlxEvent();
+  ~GlxEvent(){}; 
+
+  void AddHit(GlxHit hit);
+  GlxHit GetHit(Int_t ind) { return fHitArray[ind]; }
+ 
+  // Accessors 
+  Long_t GetTime()   const { return fEventTime; }
+  UInt_t GetState() const { return fState; } 
+  UInt_t GetHitSize() const { return fHitArray.size(); }
+  
+  // Mutators
+  void SetTime(Long_t val)   { fEventTime = val; }
+  void SetState(UInt_t val) { fState = val; }
+
+private: 
+  Long_t fEventTime;
+  std::vector<GlxHit> fHitArray;
+  UInt_t fState; 
+ 
+  ClassDef(GlxEvent, 0);
+};
+#endif
