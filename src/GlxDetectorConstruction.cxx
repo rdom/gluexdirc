@@ -39,13 +39,16 @@ GlxDetectorConstruction::GlxDetectorConstruction()
   fNCol = 5;
   
   fHall[0] = 2000; fHall[1] = 500; fHall[2] = 6000;
+  
   fBar[0] = 17.25; fBar[1] = 35; fBar[2] =1225*4;
   fMirror[0] = 19.761; fMirror[1] = 34.493; fMirror[2] =1;
   fPrizm[0]=33.25; fPrizm[1]=91.0; fPrizm[2]=78.9929; fPrizm[3]=27.0;
   fBarBox[0]= 18; fBarBox[1]=425; fBarBox[2]=fMirror[2]+fBar[2]+fPrizm[1];
   fWindow[0]=150; fWindow[1]=425; fWindow[2]=9.6;
+  
   fTankBox[0]=582; fTankBox[1]=2205; fTankBox[2]=240; 
 
+  fMirror1[0]=197; fMirror1[1]=2200;  fMirror1[2]=1; 
 
   
   fMcpTotal[0] = fMcpTotal[1] = 53+6; fMcpTotal[2]=1;
@@ -98,9 +101,13 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   lWindow = new G4LogicalVolume(gWindow,BarMaterial,"lWindow",0,0,0);
   // The tank box
   G4Box* gTankBox = new G4Box("gBarBox",fTankBox[0]/2.,fTankBox[1]/2.,fTankBox[2]/2.);
-  lTankBox = new G4LogicalVolume(gTankBox,defaultMaterial,"lTankBox",0,0,0);
+  lTankBox = new G4LogicalVolume(gTankBox,OilMaterial,"lTankBox",0,0,0);
 
+  // Mirrors in tank
+  G4Box* gTankMirror1 = new G4Box("gTankMirr1",fMirror1[0]/2.,fMirror1[1]/2.,fMirror1[2]/2.);
+  G4LogicalVolume *lTankMirror1 = new G4LogicalVolume(gTankMirror1,MirrorMaterial,"lTankMirror1",0,0,0);
   
+
   for(Int_t i=0; i<12; i++){
     G4double yshift = (fBar[1]+0.15)*i - fBarBox[1]/2. + fBar[1]/2.;
     new G4PVPlacement(0,G4ThreeVector(0,yshift,0.5*(fBar[2]+fPrizm[1])),lMirror,"wMirror", lBarBox,false,1);
@@ -116,8 +123,12 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   new G4PVPlacement(0,G4ThreeVector(47.75, 365,0.5*(-fBarBox[2]-fWindow[2])),lWindow,"wWindow",lDirc,false,2);
   new G4PVPlacement(0,G4ThreeVector(0, 795,0),lBarBox,"wBarBox",lDirc,false,3);
   new G4PVPlacement(0,G4ThreeVector(47.75, 795,0.5*(-fBarBox[2]-fWindow[2])),lWindow,"wWindow",lDirc,false,3);
-  
-  new G4PVPlacement(0,G4ThreeVector(fTankBox[0]/2.-20,0,-fBar[2]/2.-fPrizm[1]-fTankBox[2]/2.),lTankBox,"wTankBox",lDirc,false,0);
+
+  Double_t redge = 0.5*fWindow[0]-47.75;
+  new G4PVPlacement(0,G4ThreeVector(0.5*fTankBox[0]-redge,0,-0.5*fBarBox[2]-fWindow[2]-0.5*fTankBox[2] ),lTankBox,"wTankBox",lDirc,false,0);
+  G4RotationMatrix* rotm= new G4RotationMatrix;
+  rotm->rotateY(90.*deg);
+  new G4PVPlacement(rotm,G4ThreeVector(redge-0.5*(fBar[0]+fMirror1[2]+fTankBox[0]),0,0),lTankMirror1,"wMirror1",lTankBox,false,0);
   
 	// <posXYZ volume="DCML" X_Y_Z="-270.0 -79.5 30.0" />
 	// <posXYZ volume="DCML" X_Y_Z="-270.0 -36.5 30.0" />
