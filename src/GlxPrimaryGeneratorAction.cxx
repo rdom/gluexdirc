@@ -107,6 +107,12 @@ void GlxPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     fParticleGun->SetParticlePosition(G4ThreeVector(-radiatorL/2. +0.1,0,5));
   }
 
+  if(GlxManager::Instance()->GetRunType() == 0){
+    G4ThreeVector vec(0,0,1);
+    vec.rotateY(M_PI/4.);
+    fParticleGun->SetParticleMomentumDirection(vec);
+  }
+  
   fParticleGun->GeneratePrimaryVertex(anEvent);
 
   G4ThreeVector dir = fParticleGun->GetParticleMomentumDirection();
