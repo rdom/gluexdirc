@@ -35,8 +35,8 @@ GlxDetectorConstruction::GlxDetectorConstruction()
   fGeomId = GlxManager::Instance()->GetGeometry();
   fMcpLayout = GlxManager::Instance()->GetMcpLayout();
  
-  fNRow = 3;
-  fNCol = 5;
+  fNRow = 5;
+  fNCol = 35;
   
   fHall[0] = 2000; fHall[1] = 500; fHall[2] = 6000;
   
@@ -46,10 +46,13 @@ GlxDetectorConstruction::GlxDetectorConstruction()
   fBarBox[0]= 18; fBarBox[1]=425; fBarBox[2]=fMirror[2]+fBar[2]+fPrizm[1];
   fWindow[0]=150; fWindow[1]=425; fWindow[2]=9.6;
   
-  fTankBox[0]=582; fTankBox[1]=2205; fTankBox[2]=240; 
+  fTankBox[0]=582; fTankBox[1]=2205; fTankBox[2]=300; //240 
 
   fMirror1[0]=197; fMirror1[1]=2200;  fMirror1[2]=1; 
+  fMirror2[0]=66.97; fMirror2[1]=2200;  fMirror2[2]=1;
+  fMirror3[0]=422.9; fMirror3[1]=2200;  fMirror3[2]=1;
 
+  fFdp[0]=312; fFdp[1]=2200;  fFdp[2]=1; 
   
   fMcpTotal[0] = fMcpTotal[1] = 53+6; fMcpTotal[2]=1;
   fMcpActive[0] = fMcpActive[1] = 53; fMcpActive[2]=1;
@@ -101,12 +104,24 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   lWindow = new G4LogicalVolume(gWindow,BarMaterial,"lWindow",0,0,0);
   // The tank box
   G4Box* gTankBox = new G4Box("gBarBox",fTankBox[0]/2.,fTankBox[1]/2.,fTankBox[2]/2.);
-  lTankBox = new G4LogicalVolume(gTankBox,OilMaterial,"lTankBox",0,0,0);
+  lTankBox = new G4LogicalVolume(gTankBox,OilMaterial,"lTankBox",0,0,0); //OilMaterial //BarMaterial
 
   // Mirrors in tank
   G4Box* gTankMirror1 = new G4Box("gTankMirr1",fMirror1[0]/2.,fMirror1[1]/2.,fMirror1[2]/2.);
   G4LogicalVolume *lTankMirror1 = new G4LogicalVolume(gTankMirror1,MirrorMaterial,"lTankMirror1",0,0,0);
+
+  G4Box* gTankMirror2 = new G4Box("gTankMirr2",fMirror2[0]/2.,fMirror2[1]/2.,fMirror2[2]/2.);
+  G4LogicalVolume *lTankMirror2 = new G4LogicalVolume(gTankMirror2,MirrorMaterial,"lTankMirror2",0,0,0);
+
+  G4Box* gTankMirror3 = new G4Box("gTankMirr3",fMirror3[0]/2.,fMirror3[1]/2.,fMirror3[2]/2.);
+  G4LogicalVolume *lTankMirror3 = new G4LogicalVolume(gTankMirror3,MirrorMaterial,"lTankMirror3",0,0,0);
+
+  G4Tubs* gFmirror = new G4Tubs("gFmirror",600, 601,1100, 90*deg,30*deg);
+  G4LogicalVolume *lFmirror = new G4LogicalVolume(gFmirror,MirrorMaterial,"lFmirror",0,0,0);
   
+  // The FD plane
+  G4Box* gFdp = new G4Box("gFdp",fFdp[0]/2.,fFdp[1]/2.,fFdp[2]/2.);
+  G4LogicalVolume* lFdp = new G4LogicalVolume(gFdp,BarMaterial,"lFdp",0,0,0);// BarMaterial
 
   for(Int_t i=0; i<12; i++){
     G4double yshift = (fBar[1]+0.15)*i - fBarBox[1]/2. + fBar[1]/2.;
@@ -124,18 +139,20 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   new G4PVPlacement(0,G4ThreeVector(0, 795,0),lBarBox,"wBarBox",lDirc,false,3);
   new G4PVPlacement(0,G4ThreeVector(47.75, 795,0.5*(-fBarBox[2]-fWindow[2])),lWindow,"wWindow",lDirc,false,3);
 
+  Double_t pi=4.*atan(1.);
+  
   Double_t redge = 0.5*fWindow[0]-47.75;
   new G4PVPlacement(0,G4ThreeVector(0.5*fTankBox[0]-redge,0,-0.5*fBarBox[2]-fWindow[2]-0.5*fTankBox[2] ),lTankBox,"wTankBox",lDirc,false,0);
-  G4RotationMatrix* rotm= new G4RotationMatrix;
-  rotm->rotateY(90.*deg);
-  new G4PVPlacement(rotm,G4ThreeVector(redge-0.5*(fBar[0]+fMirror1[2]+fTankBox[0]),0,0),lTankMirror1,"wMirror1",lTankBox,false,0);
+  G4RotationMatrix* rotm1= new G4RotationMatrix; rotm1->rotateY(90.*deg);
+  new G4PVPlacement(rotm1,G4ThreeVector(redge-0.5*(fBar[0]+fMirror1[2]+fTankBox[0]),0,0.5*(fTankBox[2]-fMirror1[0])-20),lTankMirror1,"wMirror1",lTankBox,false,0);
+  G4RotationMatrix* rotm2= new G4RotationMatrix; rotm2->rotateY(-60.*deg);
+  new G4PVPlacement(rotm2,G4ThreeVector(redge-0.5*(fBar[0]+fMirror2[2]+fTankBox[0])+130-0.5*fMirror2[0]*cos(60*pi/180.),0,0.5*fTankBox[2]-78+0.5*fMirror2[0]*sin(60*pi/180.)),lTankMirror2,"wMirror2",lTankBox,false,0);
+  G4RotationMatrix* rotm3= new G4RotationMatrix; rotm3->rotateY(0.*deg);
+  new G4PVPlacement(rotm3,G4ThreeVector(redge-0.5*(fBar[0]+fMirror3[2]+fTankBox[0]-fMirror3[0])+130,0,0.5*fTankBox[2]-78),lTankMirror3,"wMirror3",lTankBox,false,0);
   
-	// <posXYZ volume="DCML" X_Y_Z="-270.0 -79.5 30.0" />
-	// <posXYZ volume="DCML" X_Y_Z="-270.0 -36.5 30.0" />
-	// <posXYZ volume="DCML" X_Y_Z="-270.0 36.5  30.0" />
-	// <posXYZ volume="DCML" X_Y_Z="-270.0 79.5  30.0" />
-  
-  
+  G4RotationMatrix* rotm4= new G4RotationMatrix; rotm4->rotateX(90.*deg); 
+  new G4PVPlacement(rotm4,G4ThreeVector(28,0,450),lFmirror,"wFmirror",lTankBox,false,0);
+ 
   G4Box* gMcp;
   G4Box* gPixel;
 
@@ -152,6 +169,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   }
   gPixel = new G4Box("gPixel",fMcpActive[0]/(2*(double)mcpDimx),fMcpActive[1]/(2*(double)mcpDimy),fMcpActive[2]/20.);
   lPixel = new G4LogicalVolume(gPixel,BarMaterial,"lPixel",0,0,0);
+  
 
   int pixelId = 0;
   for(int i=0; i<mcpDimx; i++){
@@ -161,18 +179,20 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
       new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,0),lPixel,"wPixel", lMcp,false,64-pixelId++);      
     }
   }
- 
+
   int mcpId = 0;
-  for(int j=0; j<fNRow; j++){
-    for(int i=0; i<fNCol; i++){
-      double shiftx = i*(fMcpTotal[0]+14)-fPrizm[3]/2+fMcpActive[0]/2.+2.5; 
-      double shifty = (fMcpTotal[0]+3)*(j-1); 
-  
-      new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,-fBar[2]/2.-fPrizm[1]-fMcpActive[2]/2.),lMcp,"wMcp", lDirc,false,mcpId);
+  for(int j=0; j<fNCol; j++){
+    for(int i=0; i<fNRow; i++){
+      double shiftx = i*(fMcpTotal[0]+3)-fFdp[0]/2.+fMcpTotal[0]/2.; 
+      double shifty = (fMcpTotal[0]+3)*(j-1)-1000; 
+
+      new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,0),lMcp,"wMcp", lFdp,false,mcpId);
       mcpId++;
     }
   }
 
+  G4RotationMatrix* rotmm= new G4RotationMatrix; rotmm->rotateY(42.13*deg);
+  new G4PVPlacement(rotmm,G4ThreeVector(redge-0.5*(fBar[0]+fMirror3[2]+fTankBox[0]-2*fMirror3[0])+130-0.5*fFdp[0]*cos(42.13*deg),0,-32),lFdp,"wFdp", lTankBox,false,0);
 
   const G4int num = 36; 
   G4double WaveLength[num];
@@ -283,6 +303,10 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   
   MirrorOpSurface->SetMaterialPropertiesTable(MirrorMPT);
   new G4LogicalSkinSurface("MirrorSurface", lMirror,MirrorOpSurface);
+  new G4LogicalSkinSurface("MirrorSurface", lFmirror,MirrorOpSurface);
+  new G4LogicalSkinSurface("MirrorSurface", lTankMirror1,MirrorOpSurface);
+  new G4LogicalSkinSurface("MirrorSurface", lTankMirror2,MirrorOpSurface);
+  new G4LogicalSkinSurface("MirrorSurface", lTankMirror3,MirrorOpSurface);
 
 
   SetVisualization();
@@ -305,7 +329,10 @@ void GlxDetectorConstruction::DefineMaterials(){
   G4Element* Si = new G4Element("Silicon" ,symbol="Si", z= 14., a= 28.09*g/mole);
 
   G4Element* Al = new G4Element("Aluminum",symbol="Al",z=13.,a=26.98*g/mole);
-
+  
+  G4Material* H2O = new G4Material("Water",density=1.000*g/cm3,ncomponents=2);
+  H2O->AddElement(H, natoms=2);
+  H2O->AddElement(O, natoms=1);
 
   // quartz material = SiO2
   G4Material* SiO2 = new G4Material("quartz",density= 2.200*g/cm3, ncomponents=2);
@@ -350,7 +377,8 @@ void GlxDetectorConstruction::DefineMaterials(){
   else defaultMaterial = Air; //Vacuum // material of world
   frontMaterial = CarbonFiber; 
   BarMaterial = SiO2; // material of all Bars, Quartz and Window
-  OilMaterial = KamLandOil; // material of volume 1,2,3,4
+  
+  OilMaterial = H2O; //KamLandOil; // material of volume 1,2,3,4
   MirrorMaterial = Aluminum; // mirror material
   epotekMaterial = Epotek; // Epotek material - glue between bars
 
@@ -449,6 +477,16 @@ void GlxDetectorConstruction::DefineMaterials(){
 
   double Nlak33aRefractiveIndex[76]={1.73816,1.73836,1.73858,1.73881,1.73904,1.73928,1.73952,1.73976,1.74001,1.74026,1.74052,1.74078,1.74105,1.74132,1.7416,1.74189,1.74218,1.74249,1.74279,1.74311,1.74344,1.74378,1.74412,1.74448,1.74485,1.74522,1.74562,1.74602,1.74644,1.74687,1.74732,1.74779,1.74827,1.74878,1.7493,1.74985,1.75042,1.75101,1.75163,1.75228,1.75296,1.75368,1.75443,1.75521,1.75604,1.75692,1.75784,1.75882,1.75985,1.76095,1.76211,1.76335,1.76467,1.76608,1.76758,1.7692,1.77093,1.77279,1.7748,1.77698,1.77934,1.7819,1.7847,1.78775,1.79111,1.79481,1.79889,1.80343,1.8085,1.81419,1.82061,1.8279,1.83625,1.84589,1.85713,1.87039};
 
+  G4double MirrorReflectivity[num] = 
+    {0.99999999,0.99999999,0.99999999,0.99999999,0.99999999,
+     0.99999999,0.99999999,0.99999999,0.99999999,0.99999999,
+     0.99999999,0.99999999,0.99999999,0.99999999,0.99999999,
+     0.99999999,0.99999999,0.99999999,0.99999999,0.99999999,
+     0.99999999,0.99999999,0.99999999,0.99999999,0.99999999,
+      0.99999999,0.99999999,0.99999999,0.99999999,0.99999999,
+     0.99999999,0.99999999,0.99999999,0.99999999,0.99999999,0.99999999};
+ 
+  
   /* ASSIGNING REFRACTIVE AND ABSORPTION PROPERTIES TO THE GIVEN MATERIALS */
 
   // Quartz material => Si02
@@ -465,6 +503,14 @@ void GlxDetectorConstruction::DefineMaterials(){
   AirMPT->AddProperty("ABSLENGTH", PhotonEnergy, AirAbsorption,      num);
   //  assign this parameter table to the air 
   defaultMaterial->SetMaterialPropertiesTable(AirMPT);
+
+
+  // Mirror                                              
+  G4MaterialPropertiesTable* MirrorMPT = new G4MaterialPropertiesTable();
+  MirrorMPT->AddProperty("RINDEX", PhotonEnergy, KamLandOilRefractiveIndex, num);
+  MirrorMPT->AddProperty("REFLECTIVITY", PhotonEnergy, MirrorReflectivity, num);
+  MirrorMaterial->SetMaterialPropertiesTable(MirrorMPT);  
+
 
 
   // KamLandOil                                                

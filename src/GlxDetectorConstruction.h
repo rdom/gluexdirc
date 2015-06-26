@@ -72,6 +72,9 @@ private:
   G4double fTankBox[3];
   G4double fMirror[3];
   G4double fMirror1[3];
+  G4double fMirror2[3];
+  G4double fMirror3[3];
+  G4double fFdp[3];
 
   G4double fWindow[3];
   G4double fPrizm[4];

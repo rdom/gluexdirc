@@ -17,7 +17,6 @@ G4VParticleChange* GlxOpBoundaryProcess::PostStepDoIt(const G4Track& aTrack, con
   // int parentId = aTrack.GetParentID();
   // std::cout<<"parentId   "<<parentId <<std::endl;
   // if(parentId==1) particleChange->ProposeTrackStatus(fStopAndKill);
-  
 
   // ideal focusing
   if(GlxManager::Instance()->GetLens() == 10){
