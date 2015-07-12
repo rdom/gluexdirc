@@ -69,7 +69,7 @@ public:
   int GetRunType(){ return fRunType; }
   int GetPhysList(){ return fPhysList; }
   int GetGeometry(){ return fGeometry; }
-  int GetBeamDinsion(){ return fBeamDimension; }
+  int GetBeamDimension(){ return fBeamDimension; }
   int GetRadiator(){ return fRadiator; }
   int GetLens(){ return fLens; }
   int GetMcpLayout(){ return fMcpLayout; }

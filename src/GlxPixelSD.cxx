@@ -80,7 +80,7 @@ G4bool GlxPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist)
   G4ThreeVector globalpos = step->GetPostStepPoint()->GetPosition();
   G4ThreeVector localpos = touchable->GetHistory()->GetTopTransform().TransformPoint(globalpos);
   G4ThreeVector translation = touchable->GetHistory()->GetTopTransform().Inverse().TransformPoint(G4ThreeVector(0,0,0));
-  G4ThreeVector inPrismpos = touchable->GetHistory()->GetTransform( 1 ).TransformPoint(globalpos);
+  G4ThreeVector inPrismpos = touchable->GetHistory()->GetTransform( 3 ).TransformPoint(globalpos);
   G4ThreeVector g4mom = track->GetVertexMomentumDirection(); //track->GetMomentum();
   G4ThreeVector g4pos = track->GetVertexPosition();
  

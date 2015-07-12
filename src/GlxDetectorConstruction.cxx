@@ -38,7 +38,7 @@ GlxDetectorConstruction::GlxDetectorConstruction()
   fNRow = 5;
   fNCol = 35;
   
-  fHall[0] = 2000; fHall[1] = 500; fHall[2] = 6000;
+  fHall[0] = 3000; fHall[1] = 2000; fHall[2] = 6000;
   
   fBar[0] = 17.25; fBar[1] = 35; fBar[2] =1225*4;
   fMirror[0] = 19.761; fMirror[1] = 34.493; fMirror[2] =1;
@@ -46,11 +46,12 @@ GlxDetectorConstruction::GlxDetectorConstruction()
   fBarBox[0]= 18; fBarBox[1]=425; fBarBox[2]=fMirror[2]+fBar[2]+fPrizm[1];
   fWindow[0]=150; fWindow[1]=425; fWindow[2]=9.6;
   
-  fTankBox[0]=582; fTankBox[1]=2205; fTankBox[2]=300; //240 
+  fTankBox[0]=582; fTankBox[1]=2205+20; fTankBox[2]=300; //240 
 
   fMirror1[0]=197; fMirror1[1]=2200;  fMirror1[2]=1; 
   fMirror2[0]=66.97; fMirror2[1]=2200;  fMirror2[2]=1;
   fMirror3[0]=422.9; fMirror3[1]=2200;  fMirror3[2]=1;
+  fMirror4[0]=580;   fMirror4[1]=300;  fMirror4[2]=1;
 
   fFdp[0]=312; fFdp[1]=2200;  fFdp[2]=1; 
   
@@ -104,7 +105,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   lWindow = new G4LogicalVolume(gWindow,BarMaterial,"lWindow",0,0,0);
   // The tank box
   G4Box* gTankBox = new G4Box("gBarBox",fTankBox[0]/2.,fTankBox[1]/2.,fTankBox[2]/2.);
-  lTankBox = new G4LogicalVolume(gTankBox,OilMaterial,"lTankBox",0,0,0); //OilMaterial //BarMaterial
+  lTankBox = new G4LogicalVolume(gTankBox,BarMaterial,"lTankBox",0,0,0); //OilMaterial //BarMaterial
 
   // Mirrors in tank
   G4Box* gTankMirror1 = new G4Box("gTankMirr1",fMirror1[0]/2.,fMirror1[1]/2.,fMirror1[2]/2.);
@@ -115,6 +116,10 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
 
   G4Box* gTankMirror3 = new G4Box("gTankMirr3",fMirror3[0]/2.,fMirror3[1]/2.,fMirror3[2]/2.);
   G4LogicalVolume *lTankMirror3 = new G4LogicalVolume(gTankMirror3,MirrorMaterial,"lTankMirror3",0,0,0);
+
+  G4Box* gTankMirror4 = new G4Box("gTankMirr3",fMirror4[0]/2.,fMirror4[1]/2.,fMirror4[2]/2.);
+  G4LogicalVolume *lTankMirror4 = new G4LogicalVolume(gTankMirror4,MirrorMaterial,"lTankMirror4",0,0,0);
+
 
   G4Tubs* gFmirror = new G4Tubs("gFmirror",600, 601,1100, 90*deg,30*deg);
   G4LogicalVolume *lFmirror = new G4LogicalVolume(gFmirror,MirrorMaterial,"lFmirror",0,0,0);
@@ -149,9 +154,12 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   new G4PVPlacement(rotm2,G4ThreeVector(redge-0.5*(fBar[0]+fMirror2[2]+fTankBox[0])+130-0.5*fMirror2[0]*cos(60*pi/180.),0,0.5*fTankBox[2]-78+0.5*fMirror2[0]*sin(60*pi/180.)),lTankMirror2,"wMirror2",lTankBox,false,0);
   G4RotationMatrix* rotm3= new G4RotationMatrix; rotm3->rotateY(0.*deg);
   new G4PVPlacement(rotm3,G4ThreeVector(redge-0.5*(fBar[0]+fMirror3[2]+fTankBox[0]-fMirror3[0])+130,0,0.5*fTankBox[2]-78),lTankMirror3,"wMirror3",lTankBox,false,0);
+  G4RotationMatrix* rotm4= new G4RotationMatrix; rotm4->rotateX(90.*deg);
+  new G4PVPlacement(rotm4,G4ThreeVector(0, 0.5*fTankBox[1]-10,0),lTankMirror4,"wMirror3",lTankBox,false,0);
+  new G4PVPlacement(rotm4,G4ThreeVector(0,-0.5*fTankBox[1]+10,0),lTankMirror4,"wMirror3",lTankBox,false,0);
   
-  G4RotationMatrix* rotm4= new G4RotationMatrix; rotm4->rotateX(90.*deg); 
-  new G4PVPlacement(rotm4,G4ThreeVector(28,0,450),lFmirror,"wFmirror",lTankBox,false,0);
+  G4RotationMatrix* rotm5= new G4RotationMatrix; rotm5->rotateX(90.*deg); 
+  new G4PVPlacement(rotm5,G4ThreeVector(28,0,450),lFmirror,"wFmirror",lTankBox,false,0);
  
   G4Box* gMcp;
   G4Box* gPixel;
@@ -307,6 +315,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   new G4LogicalSkinSurface("MirrorSurface", lTankMirror1,MirrorOpSurface);
   new G4LogicalSkinSurface("MirrorSurface", lTankMirror2,MirrorOpSurface);
   new G4LogicalSkinSurface("MirrorSurface", lTankMirror3,MirrorOpSurface);
+  new G4LogicalSkinSurface("MirrorSurface", lTankMirror4,MirrorOpSurface);
 
 
   SetVisualization();

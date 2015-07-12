@@ -48,12 +48,9 @@ void GlxPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   G4double radiatorH = GlxManager::Instance()->GetRadiatorH();
   
   GlxManager::Instance()->AddEvent(GlxEvent());
-  if(GlxManager::Instance()->GetBeamDinsion() == -1){ // random momentum
-    fParticleGun->SetParticleMomentum(G4ThreeVector(0, 0, 4.0*GeV*G4UniformRand()));
-  }
 
-  if(GlxManager::Instance()->GetBeamDinsion() > 0){ // smearing and divergence
-    G4double sigma = GlxManager::Instance()->GetBeamDinsion()*mm;
+  if(GlxManager::Instance()->GetBeamDimension() > 0){ // smearing and divergence
+    G4double sigma = GlxManager::Instance()->GetBeamDimension()*mm;
     z = fParticleGun->GetParticlePosition().z();
     x = G4RandGauss::shoot(0,sigma);
     y = G4RandGauss::shoot(0,sigma);
@@ -106,18 +103,39 @@ void GlxPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     //fParticleGun->SetParticlePosition(G4ThreeVector(shiftx,shifty,shiftz));
     fParticleGun->SetParticlePosition(G4ThreeVector(-radiatorL/2. +0.1,0,5));
   }
-
   if(GlxManager::Instance()->GetRunType() == 0){
     G4ThreeVector vec(0,0,1);
-    vec.rotateY(M_PI/4.);
+    vec.rotateY(M_PI/10.);
     fParticleGun->SetParticleMomentumDirection(vec);
+    fParticleGun->SetParticlePosition(G4ThreeVector(0,0,-5600));
+  }
+
+  if(GlxManager::Instance()->GetBeamDimension() < 0){ // random momentum
+    //    fParticleGun->SetParticleMomentum(G4ThreeVector(0, 0, 4.0*GeV*G4UniformRand()));
+
+
+    Double_t xpos = -50 + 1220*2*(1-2*G4UniformRand()); // [-2490,2390]
+    Double_t ypos = 5 + (365 - 420/2.) + 420*2*G4UniformRand(); //[160,1000]
+    Double_t vertex = 5600;
+
+    if(GlxManager::Instance()->GetBeamDimension() == -2){
+      xpos = GlxManager::Instance()->GetBeamX();
+      ypos = GlxManager::Instance()->GetBeamZ();
+    }
+    
+    G4ThreeVector vec(xpos,ypos,vertex);
+    Double_t phi = atan(ypos/xpos);
+    Double_t theta =  atan(sqrt(xpos*xpos+ypos*ypos)/vertex);
+    
+    fParticleGun->SetParticleMomentumDirection(vec);
+    fParticleGun->SetParticlePosition(G4ThreeVector(0,0,-vertex));
   }
   
-  fParticleGun->GeneratePrimaryVertex(anEvent);
-
-  G4ThreeVector dir = fParticleGun->GetParticleMomentumDirection();
-  dir *= fParticleGun->GetParticleMomentum();
-  GlxManager::Instance()->SetMomentum(TVector3(dir.x(),dir.y(),dir.z()));
+fParticleGun->GeneratePrimaryVertex(anEvent);
+ 
+G4ThreeVector dir = fParticleGun->GetParticleMomentumDirection();
+dir *= fParticleGun->GetParticleMomentum();
+GlxManager::Instance()->SetMomentum(TVector3(dir.x(),dir.y(),dir.z()));
 }
 
 void GlxPrimaryGeneratorAction::SetOptPhotonPolar()

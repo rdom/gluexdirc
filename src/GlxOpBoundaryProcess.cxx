@@ -56,9 +56,7 @@ G4VParticleChange* GlxOpBoundaryProcess::PostStepDoIt(const G4Track& aTrack, con
     particleChange->ProposeTrackStatus(fStopAndKill);
   }
 
-  if((aStep.GetPreStepPoint()->GetPhysicalVolume()->GetName()=="wLens1" 
-      || aStep.GetPreStepPoint()->GetPhysicalVolume()->GetName()=="wLens2"
-      || aStep.GetPreStepPoint()->GetPhysicalVolume()->GetName()=="wLens3") 
+  if(aStep.GetPreStepPoint()->GetPhysicalVolume()->GetName()=="wTankBox" 
      &&  aStep.GetPostStepPoint()->GetPhysicalVolume()->GetName()=="wDirc"){
     particleChange->ProposeTrackStatus(fStopAndKill);
   }

@@ -74,6 +74,7 @@ private:
   G4double fMirror1[3];
   G4double fMirror2[3];
   G4double fMirror3[3];
+  G4double fMirror4[3];
   G4double fFdp[3];
 
   G4double fWindow[3];
