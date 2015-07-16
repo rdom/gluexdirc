@@ -60,6 +60,9 @@ GlxManager::GlxManager(G4String outfile, G4int runtype)
   fPrismStep=0;
   fBeamX=0;
   fBeamZ=-1;
+  fMirrorR = 1200;
+  fMirrorT = 20;
+  fMcpT = 42.13;
   fInfo="";
   
   std::cout<<"GlxManager has been successfully initialized. " <<std::endl;
@@ -90,6 +93,9 @@ void GlxManager::AddEvent(GlxEvent event){
     fEvent->SetPrismStep(fPrismStep);
     fEvent->SetBeamX(fBeamX);
     fEvent->SetBeamZ(fBeamZ);
+    fEvent->SetMirrorR(fMirrorR);
+    fEvent->SetMirrorT(fMirrorT);
+    fEvent->SetMcpT(fMcpT);
     fEvent->SetInfo(fInfo);
   }
 }

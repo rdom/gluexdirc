@@ -22,6 +22,9 @@
 #include "G4RunManager.hh"
 #include "G4Colour.hh"
 #include "G4VisAttributes.hh"
+#include "G4Transform3D.hh"
+#include "G4AssemblyVolume.hh"
+
 
 #include "GlxManager.h"
 #include "GlxTriggerSD.h"
@@ -46,7 +49,7 @@ GlxDetectorConstruction::GlxDetectorConstruction()
   fBarBox[0]= 18; fBarBox[1]=425; fBarBox[2]=fMirror[2]+fBar[2]+fPrizm[1];
   fWindow[0]=150; fWindow[1]=425; fWindow[2]=9.6;
   
-  fTankBox[0]=582; fTankBox[1]=2205+20; fTankBox[2]=300; //240 
+  fTankBox[0]=582; fTankBox[1]=2205+20; fTankBox[2]=350; //240 
 
   fMirror1[0]=197; fMirror1[1]=2200;  fMirror1[2]=1; 
   fMirror2[0]=66.97; fMirror2[1]=2200;  fMirror2[2]=1;
@@ -55,8 +58,8 @@ GlxDetectorConstruction::GlxDetectorConstruction()
 
   fFdp[0]=312; fFdp[1]=2200;  fFdp[2]=1; 
   
-  fMcpTotal[0] = fMcpTotal[1] = 53+6; fMcpTotal[2]=1;
-  fMcpActive[0] = fMcpActive[1] = 53; fMcpActive[2]=1;
+  fMcpTotal[0] = fMcpTotal[1] = 53+6; fMcpTotal[2]=0.5;
+  fMcpActive[0] = fMcpActive[1] = 53; fMcpActive[2]=0.5;
    
   GlxManager::Instance()->SetRadiatorL(fBar[2]);
   GlxManager::Instance()->SetRadiatorW(fBar[1]);
@@ -109,24 +112,33 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
 
   // Mirrors in tank
   G4Box* gTankMirror1 = new G4Box("gTankMirr1",fMirror1[0]/2.,fMirror1[1]/2.,fMirror1[2]/2.);
-  G4LogicalVolume *lTankMirror1 = new G4LogicalVolume(gTankMirror1,MirrorMaterial,"lTankMirror1",0,0,0);
+  lTankMirror1 = new G4LogicalVolume(gTankMirror1,MirrorMaterial,"lTankMirror1",0,0,0);
 
   G4Box* gTankMirror2 = new G4Box("gTankMirr2",fMirror2[0]/2.,fMirror2[1]/2.,fMirror2[2]/2.);
-  G4LogicalVolume *lTankMirror2 = new G4LogicalVolume(gTankMirror2,MirrorMaterial,"lTankMirror2",0,0,0);
+  lTankMirror2 = new G4LogicalVolume(gTankMirror2,MirrorMaterial,"lTankMirror2",0,0,0);
 
   G4Box* gTankMirror3 = new G4Box("gTankMirr3",fMirror3[0]/2.,fMirror3[1]/2.,fMirror3[2]/2.);
-  G4LogicalVolume *lTankMirror3 = new G4LogicalVolume(gTankMirror3,MirrorMaterial,"lTankMirror3",0,0,0);
+  lTankMirror3 = new G4LogicalVolume(gTankMirror3,MirrorMaterial,"lTankMirror3",0,0,0);
 
   G4Box* gTankMirror4 = new G4Box("gTankMirr3",fMirror4[0]/2.,fMirror4[1]/2.,fMirror4[2]/2.);
-  G4LogicalVolume *lTankMirror4 = new G4LogicalVolume(gTankMirror4,MirrorMaterial,"lTankMirror4",0,0,0);
+  lTankMirror4 = new G4LogicalVolume(gTankMirror4,MirrorMaterial,"lTankMirror4",0,0,0);
 
+  Double_t pi=4.*atan(1.);
+  Double_t fradius = GlxManager::Instance()->GetMirrorR();
+  Double_t rot_fm = GlxManager::Instance()->GetMirrorT()*deg;
+  Double_t fmx = 300; // width of the focusing mirror
+  Double_t fmy = sqrt(fradius*fradius-fmx*fmx/4.);
+  Double_t seg = 2*asin(fmx/(2*fradius))/deg;
+  
+  G4Tubs* gFmirror = new G4Tubs("gFmirror",fradius,fradius+1,1100, (-90-seg/2.)*deg,seg*deg);
+  lFmirror = new G4LogicalVolume(gFmirror,MirrorMaterial,"lFmirror",0,0,0);
 
-  G4Tubs* gFmirror = new G4Tubs("gFmirror",600, 601,1100, 90*deg,30*deg);
-  G4LogicalVolume *lFmirror = new G4LogicalVolume(gFmirror,MirrorMaterial,"lFmirror",0,0,0);
+  G4Box* gFmirrorC =  new G4Box("gBarBox",fTankBox[0]/2.,fTankBox[1]/2.,fTankBox[2]/2.);
+  lFmirrorC = new G4LogicalVolume(gFmirrorC,defaultMaterial,"lFmirrorC",0,0,0);
   
   // The FD plane
   G4Box* gFdp = new G4Box("gFdp",fFdp[0]/2.,fFdp[1]/2.,fFdp[2]/2.);
-  G4LogicalVolume* lFdp = new G4LogicalVolume(gFdp,BarMaterial,"lFdp",0,0,0);// BarMaterial
+  lFdp = new G4LogicalVolume(gFdp,BarMaterial,"lFdp",0,0,0);// BarMaterial
 
   for(Int_t i=0; i<12; i++){
     G4double yshift = (fBar[1]+0.15)*i - fBarBox[1]/2. + fBar[1]/2.;
@@ -143,8 +155,6 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   new G4PVPlacement(0,G4ThreeVector(47.75, 365,0.5*(-fBarBox[2]-fWindow[2])),lWindow,"wWindow",lDirc,false,2);
   new G4PVPlacement(0,G4ThreeVector(0, 795,0),lBarBox,"wBarBox",lDirc,false,3);
   new G4PVPlacement(0,G4ThreeVector(47.75, 795,0.5*(-fBarBox[2]-fWindow[2])),lWindow,"wWindow",lDirc,false,3);
-
-  Double_t pi=4.*atan(1.);
   
   Double_t redge = 0.5*fWindow[0]-47.75;
   new G4PVPlacement(0,G4ThreeVector(0.5*fTankBox[0]-redge,0,-0.5*fBarBox[2]-fWindow[2]-0.5*fTankBox[2] ),lTankBox,"wTankBox",lDirc,false,0);
@@ -155,12 +165,31 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   G4RotationMatrix* rotm3= new G4RotationMatrix; rotm3->rotateY(0.*deg);
   new G4PVPlacement(rotm3,G4ThreeVector(redge-0.5*(fBar[0]+fMirror3[2]+fTankBox[0]-fMirror3[0])+130,0,0.5*fTankBox[2]-78),lTankMirror3,"wMirror3",lTankBox,false,0);
   G4RotationMatrix* rotm4= new G4RotationMatrix; rotm4->rotateX(90.*deg);
-  new G4PVPlacement(rotm4,G4ThreeVector(0, 0.5*fTankBox[1]-10,0),lTankMirror4,"wMirror3",lTankBox,false,0);
-  new G4PVPlacement(rotm4,G4ThreeVector(0,-0.5*fTankBox[1]+10,0),lTankMirror4,"wMirror3",lTankBox,false,0);
+  new G4PVPlacement(rotm4,G4ThreeVector(0, 0.5*fTankBox[1]-12,0),lTankMirror4,"wMirror3",lTankBox,false,0);
+  new G4PVPlacement(rotm4,G4ThreeVector(0,-0.5*fTankBox[1]+12,0),lTankMirror4,"wMirror3",lTankBox,false,0);
+
+  G4AssemblyVolume* assemblyFMirror = new G4AssemblyVolume();
+
+  G4RotationMatrix* Ra= new G4RotationMatrix; Ra->rotateX(90.*deg);  
+  G4ThreeVector Ta(0.5*fmx,0,fmy);
+  assemblyFMirror->AddPlacedVolume(lFmirror,Ta,Ra);
+
+  // // Fill the assembly by the plates
+  // Ta.setX( caloX/4. ); Ta.setY( caloY/4. ); Ta.setZ( 0. );
+  // assemblyDetector->AddPlacedVolume( plateLV, G4Transform3D(Ta,Ra) );
   
-  G4RotationMatrix* rotm5= new G4RotationMatrix; rotm5->rotateX(90.*deg); 
-  new G4PVPlacement(rotm5,G4ThreeVector(28,0,450),lFmirror,"wFmirror",lTankBox,false,0);
- 
+  // Ta.setX( -1*caloX/4. ); Ta.setY( caloY/4. ); Ta.setZ( 0. );
+  // assemblyDetector->AddPlacedVolume( plateLV, G4Transform3D(Ta,Ra) );
+  
+  // Now instantiate the layers
+  // for(int i = 0; i < layers; i++ ){
+     // Translation of the assembly inside the world
+  G4ThreeVector Tm = G4ThreeVector(-0.5*fTankBox[0]+20,0,0.5*fTankBox[2]-fMirror1[0]-20);
+  G4RotationMatrix *Rm = new G4RotationMatrix; Rm->rotateY(rot_fm);
+  assemblyFMirror->MakeImprint(lTankBox,Tm,Rm,0);
+  // }
+
+  
   G4Box* gMcp;
   G4Box* gPixel;
 
@@ -200,7 +229,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   }
 
   G4RotationMatrix* rotmm= new G4RotationMatrix; rotmm->rotateY(42.13*deg);
-  new G4PVPlacement(rotmm,G4ThreeVector(redge-0.5*(fBar[0]+fMirror3[2]+fTankBox[0]-2*fMirror3[0])+130-0.5*fFdp[0]*cos(42.13*deg),0,-32),lFdp,"wFdp", lTankBox,false,0);
+  new G4PVPlacement(rotmm,G4ThreeVector(redge-0.5*(fBar[0]+fMirror3[2]+fTankBox[0]-2*fMirror3[0])+130-0.5*fFdp[0]*cos(42.13*deg),0,0.5*fTankBox[2]-185),lFdp,"wFdp", lTankBox,false,0);
 
   const G4int num = 36; 
   G4double WaveLength[num];
@@ -559,6 +588,10 @@ void GlxDetectorConstruction::SetVisualization(){
   waDirc->SetVisibility(false);
   lDirc->SetVisAttributes(waDirc);
 
+  G4VisAttributes *waTank = new G4VisAttributes(G4Colour(0.,0.33,0.5));
+  waTank->SetForceWireframe(true);
+  lTankBox->SetVisAttributes(waTank);
+
   G4VisAttributes *waBarBox = new G4VisAttributes(DircColour);
   waBarBox->SetVisibility(false);
   waBarBox->SetForceWireframe(true);
@@ -568,9 +601,20 @@ void GlxDetectorConstruction::SetVisualization(){
   waBar->SetVisibility(true);
   lBar->SetVisAttributes(waBar);
 
-  G4VisAttributes *waMirror = new G4VisAttributes(G4Colour(1.,1.,0.9));
+  G4VisAttributes *waWindow = new G4VisAttributes(G4Colour(0.2,0.8,0.9));
+  lWindow->SetVisAttributes(waWindow);
+
+  G4VisAttributes *waMirror = new G4VisAttributes(G4Colour(1.,0.7,0.2,0.5));
   waMirror->SetVisibility(true);
   lMirror->SetVisAttributes(waMirror);
+  lFmirror->SetVisAttributes(waMirror);
+  lTankMirror1->SetVisAttributes(waMirror);
+  lTankMirror2->SetVisAttributes(waMirror);
+  lTankMirror3->SetVisAttributes(waMirror);
+
+  G4VisAttributes *waMirror4 = new G4VisAttributes(G4Colour(1.,0.7,0.2,0.5));
+  waMirror4->SetVisibility(false);
+  lTankMirror4->SetVisAttributes(waMirror4);
 
   G4VisAttributes *waPrizm = new G4VisAttributes(G4Colour(0.,0.9,0.9,0.2));
   waPrizm->SetVisibility(true);
@@ -578,11 +622,15 @@ void GlxDetectorConstruction::SetVisualization(){
   //waPrizm->SetForceSolid(true);
   lWedge->SetVisAttributes(waPrizm);
 
+  G4VisAttributes *waFdp = new G4VisAttributes(green);
+  waFdp->SetForceWireframe(true);
+  lFdp->SetVisAttributes(waFdp);
+
   G4VisAttributes *waMcp = new G4VisAttributes(green);
   waMcp->SetForceWireframe(true);
   lMcp->SetVisAttributes(waMcp);
 
-  G4VisAttributes *waPixel = new G4VisAttributes(red);
+  G4VisAttributes *waPixel = new G4VisAttributes(G4Colour(1,0,0,0.6));
   waPixel->SetForceWireframe(true);
   lPixel->SetVisAttributes(waPixel);
 

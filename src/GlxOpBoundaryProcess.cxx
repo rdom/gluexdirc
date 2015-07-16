@@ -55,9 +55,16 @@ G4VParticleChange* GlxOpBoundaryProcess::PostStepDoIt(const G4Track& aTrack, con
      && aStep.GetPostStepPoint()->GetPhysicalVolume()->GetName()=="wDirc"){
     particleChange->ProposeTrackStatus(fStopAndKill);
   }
-
+  
+  // kill photons outside tankbox
   if(aStep.GetPreStepPoint()->GetPhysicalVolume()->GetName()=="wTankBox" 
      &&  aStep.GetPostStepPoint()->GetPhysicalVolume()->GetName()=="wDirc"){
+    particleChange->ProposeTrackStatus(fStopAndKill);
+  }
+
+  // kill photons exiting FD
+  if(aStep.GetPreStepPoint()->GetPhysicalVolume()->GetName()=="wFdp" 
+     &&  aStep.GetPostStepPoint()->GetPhysicalVolume()->GetName()=="wTankBox"){
     particleChange->ProposeTrackStatus(fStopAndKill);
   }
 

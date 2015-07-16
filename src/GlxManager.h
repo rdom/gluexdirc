@@ -62,6 +62,9 @@ public:
   void SetPrismStep(double val){ fPrismStep = val; }
   void SetBeamX(double val){ fBeamX = val; }
   void SetBeamZ(double val){ fBeamZ = val; }
+  void SetMirrorR(double val){ fMirrorR = val; }
+  void SetMirrorT(double val){ fMirrorT = val; }
+  void SetMcpT(double val){ fMcpT = val; }
   void SetInfo(TString val){ fInfo = val; }
   void AddInfo(TString val){ fInfo += val + "\n"; }
 
@@ -86,6 +89,10 @@ public:
   double GetPrismStep(){ return fPrismStep; }
   double GetBeamX(){ return fBeamX; }
   double GetBeamZ(){ return fBeamZ; }
+  double GetMirrorR(){ return fMirrorR; }
+  double GetMirrorT(){ return fMirrorT; }
+  double GetMcpT(){ return fMcpT; }
+  
   TString GetOutName(){return fOutName;}
   TString GetInfo() { return fInfo; }
 
@@ -112,6 +119,10 @@ private:
   double fPrismStep;
   double fBeamX;
   double fBeamZ;
+  double fMirrorR;
+  double fMirrorT;
+  double fMcpT;
+  
   TString fOutName;
   TString fInfo;
 };

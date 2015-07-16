@@ -16,7 +16,7 @@ void drawScan(TString infile="hits.root"){
       fHit = fEvent->GetHit(h);
       Int_t mcpid = fHit.GetMcpId();
       Int_t pixid = fHit.GetPixelId()-1;
-      TVector3 gpos = fHit->GetGlobalPos();
+      TVector3 gpos = fHit.GetGlobalPos();
       
       Double_t time = fHit.GetLeadTime();
       hTime->Fill(time);

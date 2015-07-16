@@ -7,7 +7,7 @@ tseed=$(($(date +%s%N)/1000000-1393400000000))
 
 echo $tseed
 
-for i in {0..4}; do ../build/glxdirc -o h_b$i.root -s 0 -e 200 -h 1 -s 0 -x "proton" -p 10 -z -2 -gx -2300 -gz 170 -b 1 -r $tseed$i > l_b$i.log & done
+for i in {0..4}; do ../build/glxdirc -o h_b$i.root -s 0 -e 100 -s 0 -x "proton" -p 10 -z -2 -gx 2000 -gy 200 -mr 400 -mt 15 -b 1 -r $tseed$i > l_b$i.log & done
 
 sleep 1
 

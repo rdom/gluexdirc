@@ -48,7 +48,15 @@ private:
   G4LogicalVolume* lMcp;
   G4LogicalVolume* lPixel;
   G4LogicalVolume* lPrizmC;
+  G4LogicalVolume *lTankMirror1;
+  G4LogicalVolume *lTankMirror2;
+  G4LogicalVolume *lTankMirror3;
+  G4LogicalVolume *lTankMirror4;
+  G4LogicalVolume *lFmirrorC;
+  G4LogicalVolume *lFmirror;
+  G4LogicalVolume *lFdp;
 
+  
   G4VPhysicalVolume* wBar;
   G4VPhysicalVolume* wMirror;
   G4VPhysicalVolume* wDirc;

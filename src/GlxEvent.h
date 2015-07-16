@@ -44,6 +44,9 @@ public:
   Double_t GetPrismStep(){ return fPrismStep; }
   Double_t GetBeamX(){ return fBeamX; }
   Double_t GetBeamZ(){ return fBeamZ; }
+  Double_t GetMirrorR(){ return fMirrorR; }
+  Double_t GetMirrorT(){ return fMirrorT; }
+  Double_t GetMcpT(){ return fMcpT; }
   TString  GetInfo() { return fInfo; }
   
   // Mutators
@@ -65,6 +68,9 @@ public:
   void SetPrismStep(Double_t val){ fPrismStep = val; }
   void SetBeamX(Double_t val){ fBeamX = val; }
   void SetBeamZ(Double_t val){ fBeamZ = val; }
+  void SetMirrorR(Double_t val){ fMirrorR = val; }
+  void SetMirrorT(Double_t val){ fMirrorT = val; }
+  void SetMcpT(Double_t val){ fMcpT = val; }
   void SetInfo(TString val){ fInfo = val; }
 
 private: 
@@ -90,6 +96,9 @@ private:
   Double_t fPrismStep;
   Double_t fBeamX;
   Double_t fBeamZ;
+  Double_t fMirrorR;
+  Double_t fMirrorT;
+  Double_t fMcpT;
   TString  fInfo;
   
   ClassDef(GlxEvent, 3);
