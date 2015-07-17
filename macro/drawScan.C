@@ -7,8 +7,9 @@ void drawScan(TString infile="hits.root"){
   fSavePath = "scan3";
   GlxInit(infile,1); //digi
   TH1F *hTime = new TH1F("hTime","hTime",500,0,200);
-  TH2F *hHits = new TH2F("hHits","hHits",1000,-1100,1100,200,-150,150);
-
+  TH2F *hHits = new TH2F("hHits",";x [mm];y [mm]",500,-1100,1100,100,-150,150);
+  hHits->SetStats(0);
+   
   GlxHit fHit;
   for (Int_t ievent=0; ievent<fCh->GetEntries(); ievent++){
     GlxNextEvent(ievent,1000);
@@ -35,7 +36,7 @@ void drawScan(TString infile="hits.root"){
   
   canvasAdd("hTime");  
   hTime->Draw();
-  canvasAdd("hHits");
+  canvasAdd("hHits",800,400);
   hHits->Draw("colz");
   canvasSave(1,0);
   
