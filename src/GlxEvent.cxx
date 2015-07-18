@@ -22,6 +22,9 @@ GlxEvent::GlxEvent(){
   fPrismStep = 0;
   fBeamX = 0;
   fBeamZ = 0;
+  fMirrorR = 0;
+  fMirrorT = 0;
+  fMcpT = 0;
   fInfo="";
 }
 
@@ -38,5 +41,9 @@ TString GlxEvent::PrintInfo(){
   info += Form("Particle momentum %f \n", fMomentum.Mag());
   info += Form("Geometry id %d \n", fGeometry);
   info += Form("Lens  id %d \n",    fLens);
+  info += Form("Focusing mirror radius %f \n", fMirrorR);
+  info += Form("Focusing mirror tilt   %f \n", fMirrorT);
+  info += Form("Mcp tilt  %f \n", fMcpT);
+  
   return info;
 }

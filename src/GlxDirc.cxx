@@ -187,11 +187,10 @@ int main(int argc,char** argv)
   }
 
   if(momentum.size()) UImanager->ApplyCommand( "/gun/momentumAmp "+momentum);
-
+  
   if(batchmode.size()){ // batch mode
     UImanager->ApplyCommand("/run/beamOn "+events);
   }else{  // UI session for interactive mode
-
 #ifdef G4UI_USE
     G4UIExecutive * ui = new G4UIExecutive(argc,argv,session);
 #ifdef G4VIS_USE
@@ -199,7 +198,6 @@ int main(int argc,char** argv)
 #endif
     if (ui->IsGUI()) UImanager->ApplyCommand("/control/execute ../glx/glx_gui.mac");
     UImanager->ApplyCommand("/run/beamOn "+events);
-    //UImanager->ApplyCommand("/vis/ogl/printEPS");
     ui->SessionStart();
     delete ui;
 #endif

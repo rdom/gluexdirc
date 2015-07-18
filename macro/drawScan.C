@@ -4,12 +4,13 @@
 #include "glxtools.C"
 
 void drawScan(TString infile="hits.root"){
-  fSavePath = "scan3";
+  fSavePath = "data/radius";
   GlxInit(infile,1); //digi
   TH1F *hTime = new TH1F("hTime","hTime",500,0,200);
   TH2F *hHits = new TH2F("hHits",";x [mm];y [mm]",500,-1100,1100,100,-150,150);
   hHits->SetStats(0);
-   
+
+  Int_t ntotal(0);
   GlxHit fHit;
   for (Int_t ievent=0; ievent<fCh->GetEntries(); ievent++){
     GlxNextEvent(ievent,1000);
@@ -22,6 +23,8 @@ void drawScan(TString infile="hits.root"){
       Double_t time = fHit.GetLeadTime();
       hTime->Fill(time);
       hHits->Fill(gpos.Y(),gpos.X());
+      ntotal++;
+      
       //std::cout<<"X "<<gpos.X()<<" Y "<<gpos.Y()<< "  Z  "<<   gpos.Z() <<std::endl;
 
 	
@@ -33,10 +36,16 @@ void drawScan(TString infile="hits.root"){
   //  drawDigi("m,p,v\n",4);
   //  cDigi->SetName(Form("sc_%d_%d",fAngle,fMomentum/1000));
 
+  std::cout<<"glx_radius "<<glx_radius <<std::endl;
   
-  canvasAdd("hTime");  
-  hTime->Draw();
-  canvasAdd("hHits",800,400);
+  Int_t rid = (glx_radius-300)/10.;
+  Int_t tid = (glx_tilt-5)/1.;
+  TString name =  Form("%d_%d",rid,tid);
+  hHits->SetTitle(Form("R=%2.0f, T=%2.0f#circ, N=%d",glx_radius,glx_tilt,ntotal));
+  
+  // canvasAdd("time_"+name);  
+  // hTime->Draw();
+  canvasAdd("hits_"+name,800,400);
   hHits->Draw("colz");
   canvasSave(1,0);
   

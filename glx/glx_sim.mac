@@ -18,7 +18,9 @@
 #/gun/direction 5 -3 0
 /Glx/gun/optPhotonPolar
 #/run/beamOn 1
+
 #
 /gun/position 0 20 -200 cm
 /gun/direction 0 0 1
 /Glx/gun/optPhotonPolar
+

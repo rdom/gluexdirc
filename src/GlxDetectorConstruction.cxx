@@ -192,7 +192,8 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   
   G4Box* gMcp;
   G4Box* gPixel;
-
+  
+ if(fMcpLayout>1){
   // The MCP
   gMcp = new G4Box("gMcp",fMcpTotal[0]/2.,fMcpTotal[1]/2.,fMcpTotal[2]/2.);
   lMcp = new G4LogicalVolume(gMcp,BarMaterial,"lMcp",0,0,0);// BarMaterial
@@ -227,8 +228,21 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
       mcpId++;
     }
   }
-
-  G4RotationMatrix* rotmm= new G4RotationMatrix; rotmm->rotateY(42.13*deg);
+ }else{
+   // for layout optimization 
+   gMcp = new G4Box("gMcp",fFdp[0]/2.,fFdp[1]/2.,fFdp[2]/2.);
+   lMcp = new G4LogicalVolume(gMcp,BarMaterial,"lMcp",0,0,0);
+   
+   // The MCP Pixel
+   if(fMcpLayout==0){ //one prism-size mcp with one pixel
+     gPixel = new G4Box("gPixel",fFdp[0]/2.,fFdp[1]/2.,fMcpActive[2]/16.);
+     lPixel = new G4LogicalVolume(gPixel,BarMaterial,"lPixel",0,0,0);
+     new G4PVPlacement(0,G4ThreeVector(0,0,0),lPixel,"wPixel", lMcp,false,1);
+   }
+   new G4PVPlacement(0,G4ThreeVector(0,0,0),lMcp,"wMcp", lFdp,false,1);
+ }
+ 
+ G4RotationMatrix* rotmm= new G4RotationMatrix; rotmm->rotateY(42.13*deg);
   new G4PVPlacement(rotmm,G4ThreeVector(redge-0.5*(fBar[0]+fMirror3[2]+fTankBox[0]-2*fMirror3[0])+130-0.5*fFdp[0]*cos(42.13*deg),0,0.5*fTankBox[2]-185),lFdp,"wFdp", lTankBox,false,0);
 
   const G4int num = 36; 

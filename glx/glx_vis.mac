@@ -1,7 +1,6 @@
 # Use this open statement to create an OpenGL view:
 /vis/open OGL 600x600-0+0
 
-#
 # Use this open statement to create a .prim file suitable for
 # viewing in DAWN:
 #/vis/open DAWNFILE
@@ -18,7 +17,6 @@
 # trajectories are established:
 /vis/viewer/set/autoRefresh false
 /vis/verbose errors
-#
 
 /vis/geometry/set/lineWidth all 0 2
 /vis/viewer/set/lightsVector -1 -1 -1
@@ -88,7 +86,6 @@
 #/vis/open VRML2FILE
 #/vis/modeling/trajectories/drawByParticleID-0/default/setDrawStepPts false
 
-
 # tank zoom
 /vis/viewer/set/upVector -1 0 0
 /vis/viewer/set/viewpointThetaPhi 90 -90
@@ -96,5 +93,13 @@
 /vis/viewer/set/projection orthogonal
 /vis/viewer/zoomTo 15.
 /vis/viewer/scaleTo 1 1 1
-/vis/viewer/set/targetPoint 2.67293 0.0523676 -0.240695 m  
-/vis/ogl/export pp.png
+/vis/viewer/set/targetPoint 2.67293 0.0523676 -0.240695 m
+
+
+#/vis/scene/notifyHandlers
+#/vis/viewer/update
+#/run/beamOn 1
+#/vis/ogl/set/printSize 2400 1800
+#/vis/ogl/set/exportFormat png
+#/vis/ogl/export pp.eps
+

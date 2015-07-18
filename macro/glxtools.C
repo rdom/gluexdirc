@@ -45,6 +45,7 @@
 
 TChain*  fCh = 0;
 Int_t    fNEntries(0), fMomentum(0),fAngle(0),fParticle(0),fTest1(0),fTest2(0);
+Double_t glx_radius(0), glx_tilt(0), glx_hitx(0), glx_hity(0);
 TString  fSavePath = "";
 TString  fInfo = "", fPath;
 TH2F*    fhDigi[15];
@@ -389,6 +390,10 @@ void GlxNextEvent(Int_t ievent, Int_t printstep){
     fParticle =  fEvent->GetParticle();
     fTest1 = fEvent->GetTest1();
     fTest2 = fEvent->GetTest2();
+    glx_radius = fEvent->GetMirrorR();
+    glx_tilt = fEvent->GetMirrorT();
+    glx_hitx = fEvent->GetBeamX();
+    glx_hity = fEvent->GetBeamZ();
   }
 }
 #endif
