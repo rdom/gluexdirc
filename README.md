@@ -22,10 +22,9 @@ example:
                 0    default
 
 -c   MCP layout
-                0    4x6 standard MCPs (pixel size == mcp size)
-                1    4x6 standard MCPs (6.4x6.4 pixels)
-		3    one MCP cover all FD plain (custom pixel size)
-		4    4x6 MCPs with compact paking and 32x32 pixels (2 mm x 2 mm)
+		0    one MCP cover all FD plain (custom pixel size)
+                4    4x6 standard MCPs (6.4x6.4 pixels)
+		
 
 -mr   radius of the focusing mirror
 

@@ -49,17 +49,35 @@ GlxDetectorConstruction::GlxDetectorConstruction()
   fBarBox[0]= 18; fBarBox[1]=425; fBarBox[2]=fMirror[2]+fBar[2]+fPrizm[1];
   fWindow[0]=150; fWindow[1]=425; fWindow[2]=9.6;
   
-  fTankBox[0]=582; fTankBox[1]=2205+20; fTankBox[2]=350; //240 
+  fTankBox0[0]=582; fTankBox0[1]=2205+20; fTankBox0[2]=350; //240
+  fTankBox1[0]=582; fTankBox1[1]=900; fTankBox1[2]=350; //240 
 
-  fMirror1[0]=197; fMirror1[1]=2200;  fMirror1[2]=1; 
-  fMirror2[0]=66.97; fMirror2[1]=2200;  fMirror2[2]=1;
-  fMirror3[0]=422.9; fMirror3[1]=2200;  fMirror3[2]=1;
+  if(fGeomId==0){
+    fNRow = 5;
+    fNCol = 35;
+    fTankBox[0]=fTankBox0[0];
+    fTankBox[1]=fTankBox0[1];
+    fTankBox[2]=fTankBox0[2];
+  }
+  if(fGeomId==1){
+    fNRow = 5;
+    fNCol = 14;
+    fTankBox[0]=fTankBox1[0];
+    fTankBox[1]=fTankBox1[1];
+    fTankBox[2]=fTankBox1[2];
+  }
+  
+  fMirror1[0]=197; fMirror1[1]=fTankBox[1]-25;  fMirror1[2]=1; 
+  fMirror2[0]=66.97; fMirror2[1]=fTankBox[1]-25;  fMirror2[2]=1;
+  fMirror3[0]=422.9; fMirror3[1]=fTankBox[1]-25;  fMirror3[2]=1;
   fMirror4[0]=580;   fMirror4[1]=300;  fMirror4[2]=1;
 
-  fFdp[0]=312; fFdp[1]=2200;  fFdp[2]=1; 
+  fFdp[0]=312; fFdp[1]=fTankBox[1]-25;  fFdp[2]=1; 
   
   fMcpTotal[0] = fMcpTotal[1] = 53+6; fMcpTotal[2]=0.5;
   fMcpActive[0] = fMcpActive[1] = 53; fMcpActive[2]=0.5;
+
+ 
    
   GlxManager::Instance()->SetRadiatorL(fBar[2]);
   GlxManager::Instance()->SetRadiatorW(fBar[1]);
@@ -109,7 +127,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   // The tank box
   G4Box* gTankBox = new G4Box("gBarBox",fTankBox[0]/2.,fTankBox[1]/2.,fTankBox[2]/2.);
   lTankBox = new G4LogicalVolume(gTankBox,OilMaterial,"lTankBox",0,0,0); //OilMaterial //BarMaterial
-
+  
   // Mirrors in tank
   G4Box* gTankMirror1 = new G4Box("gTankMirr1",fMirror1[0]/2.,fMirror1[1]/2.,fMirror1[2]/2.);
   lTankMirror1 = new G4LogicalVolume(gTankMirror1,MirrorMaterial,"lTankMirror1",0,0,0);
@@ -130,7 +148,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   Double_t fmy = sqrt(fradius*fradius-fmx*fmx/4.);
   Double_t seg = 2*asin(fmx/(2*fradius))/deg;
   
-  G4Tubs* gFmirror = new G4Tubs("gFmirror",fradius,fradius+1,1100, (-90-seg/2.)*deg,seg*deg);
+  G4Tubs* gFmirror = new G4Tubs("gFmirror",fradius,fradius+1,fMirror1[1]/2., (-90-seg/2.)*deg,seg*deg);
   lFmirror = new G4LogicalVolume(gFmirror,MirrorMaterial,"lFmirror",0,0,0);
 
   G4Box* gFmirrorC =  new G4Box("gBarBox",fTankBox[0]/2.,fTankBox[1]/2.,fTankBox[2]/2.);
@@ -157,7 +175,16 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   new G4PVPlacement(0,G4ThreeVector(47.75, 795,0.5*(-fBarBox[2]-fWindow[2])),lWindow,"wWindow",lDirc,false,3);
   
   Double_t redge = 0.5*fWindow[0]-47.75;
-  G4VPhysicalVolume * wTankBox = new G4PVPlacement(0,G4ThreeVector(0.5*fTankBox[0]-redge,0,-0.5*fBarBox[2]-fWindow[2]-0.5*fTankBox[2] ),lTankBox,"wTankBox",lDirc,false,0);
+  
+  if(fGeomId==0){
+    new G4PVPlacement(0,G4ThreeVector(0.5*fTankBox[0]-redge,0,-0.5*fBarBox[2]-fWindow[2]-0.5*fTankBox[2] ),lTankBox,"wTankBox",lDirc,false,0);
+  }
+  if(fGeomId==1){
+    new G4PVPlacement(0,G4ThreeVector(0.5*fTankBox[0]-redge,365+0.5*fBarBox[1],-0.5*fBarBox[2]-fWindow[2]-0.5*fTankBox[2] ),lTankBox,"wTankBox",lDirc,false,0);
+    new G4PVPlacement(0,G4ThreeVector(0.5*fTankBox[0]-redge,-365-0.5*fBarBox[1],-0.5*fBarBox[2]-fWindow[2]-0.5*fTankBox[2] ),lTankBox,"wTankBox",lDirc,false,1);
+  }
+  
+
   G4RotationMatrix* rotm1= new G4RotationMatrix; rotm1->rotateY(90.*deg);
   new G4PVPlacement(rotm1,G4ThreeVector(redge-0.5*(fBar[0]+fMirror1[2]+fTankBox[0]),0,0.5*(fTankBox[2]-fMirror1[0])-20),lTankMirror1,"wMirror1",lTankBox,false,0);
   G4RotationMatrix* rotm2= new G4RotationMatrix; rotm2->rotateY(-60.*deg);
@@ -207,7 +234,6 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   }
   gPixel = new G4Box("gPixel",fMcpActive[0]/(2*(double)mcpDimx),fMcpActive[1]/(2*(double)mcpDimy),fMcpActive[2]/20.);
   lPixel = new G4LogicalVolume(gPixel,BarMaterial,"lPixel",0,0,0);
-  
 
   int pixelId = 0;
   for(int i=0; i<mcpDimx; i++){
@@ -222,7 +248,9 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   for(int j=0; j<fNCol; j++){
     for(int i=0; i<fNRow; i++){
       double shiftx = i*(fMcpTotal[0]+3)-fFdp[0]/2.+fMcpTotal[0]/2.; 
-      double shifty = (fMcpTotal[0]+3)*(j-1)-1000; 
+      double shifty = (fMcpTotal[0]+3)*(j-1);
+      if(fGeomId==0) shifty = shifty-0.5*fFdp[1]+110;	 
+      if(fGeomId==1) shifty = shifty-0.5*fFdp[1]+97;	      
 
       new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,0),lMcp,"wMcp", lFdp,false,mcpId);
       mcpId++;
@@ -243,7 +271,8 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
  }
  
  G4RotationMatrix* rotmm= new G4RotationMatrix; rotmm->rotateY(42.13*deg);
-  new G4PVPlacement(rotmm,G4ThreeVector(redge-0.5*(fBar[0]+fMirror3[2]+fTankBox[0]-2*fMirror3[0])+130-0.5*fFdp[0]*cos(42.13*deg),0,0.5*fTankBox[2]-185),lFdp,"wFdp", lTankBox,false,0);
+ new G4PVPlacement(rotmm,G4ThreeVector(redge-0.5*(fBar[0]+fMirror3[2]+fTankBox[0]-2*fMirror3[0])+130-0.5*fFdp[0]*cos(42.13*deg),0,0.5*fTankBox[2]-185),lFdp,"wFdp", lTankBox,false,0);
+
 
   const G4int num = 36; 
   G4double WaveLength[num];

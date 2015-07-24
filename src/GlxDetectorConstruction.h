@@ -78,6 +78,8 @@ private:
   G4double fBar[3];
   G4double fBarBox[3];
   G4double fTankBox[3];
+  G4double fTankBox0[3];
+  G4double fTankBox1[3];
   G4double fMirror[3];
   G4double fMirror1[3];
   G4double fMirror2[3];

@@ -3,11 +3,11 @@
 #include "../src/GlxEvent.h"
 #include "glxtools.C"
 
-void drawScan(TString infile="hits.root"){
-  fSavePath = "data/radius";
+void drawScan(TString infile="hits_w10.root"){
+  fSavePath = "data/angle";
   GlxInit(infile,1); //digi
   TH1F *hTime = new TH1F("hTime","hTime",500,0,200);
-  TH2F *hHits = new TH2F("hHits",";x [mm];y [mm]",500,-1100,1100,100,-150,150);
+  TH2F *hHits = new TH2F("hHits",";x [mm];y [mm]",1000,-1100,1100,500,-150,150);
   hHits->SetStats(0);
 
   Int_t ntotal(0);
@@ -40,12 +40,17 @@ void drawScan(TString infile="hits.root"){
   
   Int_t rid = (glx_radius-300)/10.;
   Int_t tid = (glx_tilt-5)/1.;
-  TString name =  Form("%d_%d",rid,tid);
-  hHits->SetTitle(Form("R=%2.0f, T=%2.0f#circ, N=%d",glx_radius,glx_tilt,ntotal));
+  std::cout<<"glx_hitx  "<<glx_hitx << " glx_hity  "<<  glx_hity<<std::endl;
+  
+  Int_t thetaid = (glx_hitx+2490)/((2390+2490)/80.);
+  Int_t phiid = (glx_hity-160)/((1000-160)/20.);
+  //TString name =  Form("%d_%d",rid,tid);
+  TString name =  Form("%d_%d",thetaid,phiid);
+  hHits->SetTitle(Form("#theta=%2.2f, #varphi=%2.2f, R=%2.0f, T=%2.0f#circ, N=%d",glx_theta,glx_phi, glx_radius,glx_tilt,ntotal));
   
   // canvasAdd("time_"+name);  
   // hTime->Draw();
-  canvasAdd("hits_"+name,800,400);
+  canvasAdd("hits_"+name,1800,1400);
   hHits->Draw("colz");
   canvasSave(1,0);
   
