@@ -4,7 +4,7 @@
 #include "glxtools.C"
 
 void drawScan(TString infile="hits_w10.root"){
-  fSavePath = "data/angle";
+  fSavePath = "data/angle_w10";
   GlxInit(infile,1); //digi
   TH1F *hTime = new TH1F("hTime","hTime",500,0,200);
   TH2F *hHits = new TH2F("hHits",";x [mm];y [mm]",1000,-1100,1100,500,-150,150);
@@ -50,7 +50,7 @@ void drawScan(TString infile="hits_w10.root"){
   
   // canvasAdd("time_"+name);  
   // hTime->Draw();
-  canvasAdd("hits_"+name,1800,1400);
+  canvasAdd("hits_"+name,800,400);
   hHits->Draw("colz");
   canvasSave(1,0);
   

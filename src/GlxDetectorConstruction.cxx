@@ -79,7 +79,7 @@ GlxDetectorConstruction::GlxDetectorConstruction()
 
  
    
-  GlxManager::Instance()->SetRadiatorL(fBar[2]);
+  GlxManager::Instance()->SetRadiatorL(fBarBox[2]-2*fPrizm[1]);
   GlxManager::Instance()->SetRadiatorW(fBar[1]);
   GlxManager::Instance()->SetRadiatorH(fBar[0]);			  
 

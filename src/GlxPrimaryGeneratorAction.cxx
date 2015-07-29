@@ -13,9 +13,7 @@
 #include "GlxManager.h"
 
 GlxPrimaryGeneratorAction::GlxPrimaryGeneratorAction()
- : G4VUserPrimaryGeneratorAction(), 
-   fParticleGun(0)
-{
+  : G4VUserPrimaryGeneratorAction(), fParticleGun(0){
   G4int n_particle = 1;
   fParticleGun = new G4ParticleGun(n_particle);
 
@@ -34,14 +32,12 @@ GlxPrimaryGeneratorAction::GlxPrimaryGeneratorAction()
   fParticleGun->SetParticleEnergy(500.0*keV);
 }
 
-GlxPrimaryGeneratorAction::~GlxPrimaryGeneratorAction()
-{
+GlxPrimaryGeneratorAction::~GlxPrimaryGeneratorAction(){
   delete fParticleGun;
   delete fGunMessenger;
 }
 
-void GlxPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
-{ 
+void GlxPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){ 
   G4double x,y,z;
   G4double radiatorL = GlxManager::Instance()->GetRadiatorL();
   G4double radiatorW = GlxManager::Instance()->GetRadiatorW();
@@ -59,49 +55,15 @@ void GlxPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     GlxManager::Instance()->Event()->SetPosition(TVector3(x,y,z));
   }
   if(GlxManager::Instance()->GetRunType() == 1){ // LUT generation
-    fParticleGun->SetParticlePosition(G4ThreeVector(0,0,radiatorL/2.-0.1));
+    
+    fParticleGun->SetParticlePosition(G4ThreeVector(radiatorL/2.-0.1,365+0.5*425-0.5*35,0));
     G4double angle = -G4UniformRand()*M_PI;
     G4ThreeVector vec(0,0,1);
     vec.setTheta(acos(G4UniformRand()));
     vec.setPhi(2*M_PI*G4UniformRand());
+    vec.rotateY(M_PI/2.);
     
-    //    vec.rotateY(-M_PI/2.);
     fParticleGun->SetParticleMomentumDirection(vec);
-  }
-  if(GlxManager::Instance()->GetRunType() == 5){ // calibration light
-    G4double shift = GlxManager::Instance()->GetShift();
-    
-    fParticleGun->SetParticlePosition(G4ThreeVector(-radiatorL/2.+0.1-shift,0,5+tan(45*M_PI/180.)*shift+25));
-    G4double angle = -G4UniformRand()*M_PI;
-    G4ThreeVector vec(0,0,1);
-    vec.setTheta(acos(G4UniformRand()));
-    vec.setPhi(2*M_PI*G4UniformRand());
-    
-    vec.rotateY(-M_PI/2.);
-    fParticleGun->SetParticleMomentumDirection(vec);
-  }
-  if(GlxManager::Instance()->GetRunType() == 6){ // for determining focal plane of the lens
-    G4double shiftx = -radiatorL/2.+0.1;
-    G4double shifty = radiatorW/2. - G4UniformRand()*radiatorW;
-    G4double shiftz = radiatorH/2. - G4UniformRand()*radiatorH;
-
-    //fParticleGun->SetParticlePosition(G4ThreeVector(shiftx,shifty,shiftz));
-    fParticleGun->SetParticlePosition(G4ThreeVector(-radiatorL/2. +0.1, 0,-5));
-    G4double angle = -G4UniformRand()*M_PI;
-    G4ThreeVector vec(0,0,1);
-    //vec.setTheta(M_PI/2.+angle);
-    vec.setTheta(acos(G4UniformRand()));
-    //vec.setPhi(2*M_PI*G4UniformRand());
-    
-    vec.rotateY(-M_PI/2.);
-    fParticleGun->SetParticleMomentumDirection(vec);
-
-    fParticleGun->GeneratePrimaryVertex(anEvent);
-    shiftx = -radiatorL/2.+0.1;
-    shifty = radiatorW/2. - G4UniformRand()*radiatorW;
-    shiftz = radiatorH/2. - G4UniformRand()*radiatorH;
-    //fParticleGun->SetParticlePosition(G4ThreeVector(shiftx,shifty,shiftz));
-    fParticleGun->SetParticlePosition(G4ThreeVector(-radiatorL/2. +0.1,0,5));
   }
   if(GlxManager::Instance()->GetRunType() == 0){
     G4ThreeVector vec(0,0,1);
@@ -112,7 +74,6 @@ void GlxPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
   if(GlxManager::Instance()->GetBeamDimension() < 0){ // random momentum
     //    fParticleGun->SetParticleMomentum(G4ThreeVector(0, 0, 4.0*GeV*G4UniformRand()));
-
 
     Double_t xpos = -50 + 1220*2*(1-2*G4UniformRand()); // [-2490,2390]
     Double_t ypos = 5 + (365 - 420/2.) + 420*2*G4UniformRand(); //[160,1000]
@@ -131,38 +92,35 @@ void GlxPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     fParticleGun->SetParticlePosition(G4ThreeVector(0,0,-vertex));
   }
   
-fParticleGun->GeneratePrimaryVertex(anEvent);
+  fParticleGun->GeneratePrimaryVertex(anEvent);
  
-G4ThreeVector dir = fParticleGun->GetParticleMomentumDirection();
-dir *= fParticleGun->GetParticleMomentum();
-GlxManager::Instance()->SetMomentum(TVector3(dir.x(),dir.y(),dir.z()));
+  G4ThreeVector dir = fParticleGun->GetParticleMomentumDirection();
+  dir *= fParticleGun->GetParticleMomentum();
+  GlxManager::Instance()->SetMomentum(TVector3(dir.x(),dir.y(),dir.z()));
 }
 
-void GlxPrimaryGeneratorAction::SetOptPhotonPolar()
-{
- G4double angle = G4UniformRand() * 360.0*deg;
- SetOptPhotonPolar(angle);
+void GlxPrimaryGeneratorAction::SetOptPhotonPolar(){
+  G4double angle = G4UniformRand() * 360.0*deg;
+  SetOptPhotonPolar(angle);
 }
 
-void GlxPrimaryGeneratorAction::SetOptPhotonPolar(G4double angle)
-{
- if (fParticleGun->GetParticleDefinition()->GetParticleName()!="opticalphoton")
-   {
-     G4cout << "--> warning from PrimaryGeneratorAction::SetOptPhotonPolar() :"
-       "the particleGun is not an opticalphoton " << 
-       fParticleGun->GetParticleDefinition()->GetParticleName()<< G4endl;
-     return;
-   }
+void GlxPrimaryGeneratorAction::SetOptPhotonPolar(G4double angle){
+  if (fParticleGun->GetParticleDefinition()->GetParticleName()!="opticalphoton"){
+    G4cout << "--> warning from PrimaryGeneratorAction::SetOptPhotonPolar() :"
+      "the particleGun is not an opticalphoton " << 
+      fParticleGun->GetParticleDefinition()->GetParticleName()<< G4endl;
+    return;
+  }
 
- G4ThreeVector normal (1., 0., 0.);
- G4ThreeVector kphoton = fParticleGun->GetParticleMomentumDirection();
- G4ThreeVector product = normal.cross(kphoton);
- G4double modul2       = product*product;
+  G4ThreeVector normal (1., 0., 0.);
+  G4ThreeVector kphoton = fParticleGun->GetParticleMomentumDirection();
+  G4ThreeVector product = normal.cross(kphoton);
+  G4double modul2       = product*product;
  
- G4ThreeVector e_perpend (0., 0., 1.);
- if (modul2 > 0.) e_perpend = (1./std::sqrt(modul2))*product;
- G4ThreeVector e_paralle    = e_perpend.cross(kphoton);
+  G4ThreeVector e_perpend (0., 0., 1.);
+  if (modul2 > 0.) e_perpend = (1./std::sqrt(modul2))*product;
+  G4ThreeVector e_paralle    = e_perpend.cross(kphoton);
  
- G4ThreeVector polar = std::cos(angle)*e_paralle + std::sin(angle)*e_perpend;
- fParticleGun->SetParticlePolarization(polar);
+  G4ThreeVector polar = std::cos(angle)*e_paralle + std::sin(angle)*e_perpend;
+  fParticleGun->SetParticlePolarization(polar);
 }

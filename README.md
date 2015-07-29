@@ -36,6 +36,10 @@ example:
 
 -gy   y position of the hit in the radiator [160,1000]   [mm]
 
+-z    track direction
+                -1 random track (always hits the radiator) 
+                -2 use gx, gy to calculate track angle
+		
 -e    number of simulated events
 
 -x    particle type

@@ -2,14 +2,11 @@
 
 #include "GlxManager.h"
 
-GlxOpBoundaryProcess::GlxOpBoundaryProcess()
-  : G4OpBoundaryProcess()
-{
+GlxOpBoundaryProcess::GlxOpBoundaryProcess() : G4OpBoundaryProcess(){
   fLensId = GlxManager::Instance()->GetLens();
 }
 
-G4VParticleChange* GlxOpBoundaryProcess::PostStepDoIt(const G4Track& aTrack, const G4Step& aStep)
-{  
+G4VParticleChange* GlxOpBoundaryProcess::PostStepDoIt(const G4Track& aTrack, const G4Step& aStep){  
   G4StepPoint* pPreStepPoint  = aStep.GetPreStepPoint();
   G4StepPoint* pPostStepPoint = aStep.GetPostStepPoint();
   G4VParticleChange* particleChange = G4OpBoundaryProcess::PostStepDoIt(aTrack, aStep); 
@@ -42,11 +39,11 @@ G4VParticleChange* GlxOpBoundaryProcess::PostStepDoIt(const G4Track& aTrack, con
     }
   }
 
-  if(GlxManager::Instance()->GetRunType() == 1 && pPostStepPoint->GetPosition().z()<pPreStepPoint->GetPosition().z()){
-    particleChange->ProposeTrackStatus(fStopAndKill);
-  }
+  // if(GlxManager::Instance()->GetRunType() == 1 && pPostStepPoint->GetPosition().z()<pPreStepPoint->GetPosition().z()){
+  //   particleChange->ProposeTrackStatus(fStopAndKill);
+  // }
 
-  if(GlxManager::Instance()->GetRunType() == 5 &&  aStep.GetPreStepPoint()->GetPhysicalVolume()->GetName()=="wDirc" && aStep.GetPostStepPoint()->GetPhysicalVolume()->GetName()=="wPrizm" && GetStatus() == FresnelRefraction){
+  if(aStep.GetPreStepPoint()->GetPhysicalVolume()->GetName()=="wWedge" &&  aStep.GetPostStepPoint()->GetPhysicalVolume()->GetName()=="wBarBox" && GetStatus() == FresnelRefraction ){
     particleChange->ProposeTrackStatus(fStopAndKill);
   }
   
