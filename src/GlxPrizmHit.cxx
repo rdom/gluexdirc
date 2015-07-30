@@ -20,22 +20,19 @@ GlxPrizmHit::GlxPrizmHit()
    fTrackID(-1),
    fNormalId(-1),
    fEdep(0.),
-   fPos(G4ThreeVector())
-{}
+   fPos(G4ThreeVector()){}
 
-GlxPrizmHit::~GlxPrizmHit() {}
+GlxPrizmHit::~GlxPrizmHit(){}
 
 GlxPrizmHit::GlxPrizmHit(const GlxPrizmHit& right)
-  : G4VHit()
-{
+  : G4VHit(){
   fTrackID   = right.fTrackID;
   fNormalId = right.fNormalId;
   fEdep      = right.fEdep;
   fPos       = right.fPos;
 }
 
-const GlxPrizmHit& GlxPrizmHit::operator=(const GlxPrizmHit& right)
-{
+const GlxPrizmHit& GlxPrizmHit::operator=(const GlxPrizmHit& right){
   fTrackID   = right.fTrackID;
   fNormalId = right.fNormalId;
   fEdep      = right.fEdep;
@@ -44,16 +41,13 @@ const GlxPrizmHit& GlxPrizmHit::operator=(const GlxPrizmHit& right)
   return *this;
 }
 
-G4int GlxPrizmHit::operator==(const GlxPrizmHit& right) const
-{
+G4int GlxPrizmHit::operator==(const GlxPrizmHit& right) const{
   return ( this == &right ) ? 1 : 0;
 }
 
-void GlxPrizmHit::Draw()
-{
+void GlxPrizmHit::Draw(){
   G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
-  if(pVVisManager)
-  {
+  if(pVVisManager){
     G4Circle circle(fPos);
     circle.SetScreenSize(4.);
     circle.SetFillStyle(G4Circle::filled);
@@ -64,8 +58,7 @@ void GlxPrizmHit::Draw()
   }
 }
 
-void GlxPrizmHit::Print()
-{
+void GlxPrizmHit::Print(){
   G4cout
      << "  trackID: " << fTrackID << " chamberNb: " << fNormalId
      << "Edep: "

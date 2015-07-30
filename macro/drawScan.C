@@ -4,7 +4,8 @@
 #include "glxtools.C"
 
 void drawScan(TString infile="hits_w10.root"){
-  fSavePath = "data/angle_w10";
+  if(infile=="") return;
+  fSavePath = "data/ang_mir";
   GlxInit(infile,1); //digi
   TH1F *hTime = new TH1F("hTime","hTime",500,0,200);
   TH2F *hHits = new TH2F("hHits",";x [mm];y [mm]",1000,-1100,1100,500,-150,150);
@@ -25,9 +26,6 @@ void drawScan(TString infile="hits_w10.root"){
       hHits->Fill(gpos.Y(),gpos.X());
       ntotal++;
       
-      //std::cout<<"X "<<gpos.X()<<" Y "<<gpos.Y()<< "  Z  "<<   gpos.Z() <<std::endl;
-
-	
       //fhDigi[mcpid]->Fill(7-pixid/8, pixid%8);
       //fhDigi[mcpid]->Fill(pixid%8, pixid/8); // for beam data
     }
@@ -36,16 +34,15 @@ void drawScan(TString infile="hits_w10.root"){
   //  drawDigi("m,p,v\n",4);
   //  cDigi->SetName(Form("sc_%d_%d",fAngle,fMomentum/1000));
 
-  std::cout<<"glx_radius "<<glx_radius <<std::endl;
-  
-  Int_t rid = (glx_radius-300)/10.;
+  Int_t rid = (glx_radius-300)/40.;
   Int_t tid = (glx_tilt-5)/1.;
-  std::cout<<"glx_hitx  "<<glx_hitx << " glx_hity  "<<  glx_hity<<std::endl;
-  
-  Int_t thetaid = (glx_hitx+2490)/((2390+2490)/80.);
+  Int_t thetaid = (glx_hitx+2490)/((2390+2490)/40.);
   Int_t phiid = (glx_hity-160)/((1000-160)/20.);
+  
   //TString name =  Form("%d_%d",rid,tid);
-  TString name =  Form("%d_%d",thetaid,phiid);
+  //TString name =  Form("%d_%d",thetaid,phiid);
+  TString name =  Form("%d_%d",thetaid,rid);
+
   hHits->SetTitle(Form("#theta=%2.2f, #varphi=%2.2f, R=%2.0f, T=%2.0f#circ, N=%d",glx_theta,glx_phi, glx_radius,glx_tilt,ntotal));
   
   // canvasAdd("time_"+name);  

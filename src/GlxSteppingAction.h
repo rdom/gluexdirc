@@ -12,19 +12,18 @@
 
 /// Stepping action class 
 
-class GlxSteppingAction : public G4UserSteppingAction
-{
-  public:
-    GlxSteppingAction();
-    virtual ~GlxSteppingAction();
+class GlxSteppingAction : public G4UserSteppingAction{
+public:
+  GlxSteppingAction();
+  virtual ~GlxSteppingAction();
 
-    // method from the base class
-    virtual void UserSteppingAction(const G4Step*);
+  // method from the base class
+  virtual void UserSteppingAction(const G4Step*);
 
-  private:
-    G4int fScintillationCounter;
-    G4int fCerenkovCounter;
-    G4int fEventNumber;
+private:
+  G4int fScintillationCounter;
+  G4int fCerenkovCounter;
+  G4int fEventNumber;
 };
 
 #endif

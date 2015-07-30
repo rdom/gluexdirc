@@ -83,6 +83,7 @@ G4bool GlxPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist)
   G4ThreeVector inPrismpos = touchable->GetHistory()->GetTransform( 3 ).TransformPoint(globalpos);
   G4ThreeVector g4mom = track->GetVertexMomentumDirection(); //track->GetMomentum();
   G4ThreeVector g4pos = track->GetVertexPosition();
+  
  
   TVector3 globalPos(inPrismpos.x(),inPrismpos.y(),inPrismpos.z());
   //TVector3 globalPos(globalpos.x(),globalpos.y(),globalpos.z());
@@ -137,10 +138,10 @@ G4bool GlxPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist)
   G4double resolution = 0.3; //ns
   time = G4RandGauss::shoot(time,resolution);
   hit.SetLeadTime(time);
-  hit.SetTotTime(1);
+  hit.SetTotTime(track->GetTrackLength());
+
   // time since event created
-  //hit.SetTrailTime(0,step->GetPreStepPoint()->GetGlobalTime()*1000); 
- 
+  // hit.SetTrailTime(0,step->GetPreStepPoint()->GetGlobalTime()*1000);
 
   GlxManager::Instance()->AddHit(hit);
   

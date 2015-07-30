@@ -19,32 +19,25 @@
 #include "GlxRunAction.h"
 #include "GlxManager.h"
 
-GlxPrizmSD::GlxPrizmSD(
-                            const G4String& name, 
-                            const G4String& hitsCollectionName,
-                            G4int nofCells)
-  : G4VSensitiveDetector(name), fHitsCollection(NULL)
-{
+GlxPrizmSD::GlxPrizmSD( const G4String& name, 
+			const G4String& hitsCollectionName,
+			G4int nofCells) : G4VSensitiveDetector(name), fHitsCollection(NULL){
   collectionName.insert(hitsCollectionName);
 }
 
-GlxPrizmSD::~GlxPrizmSD() 
-{ 
+GlxPrizmSD::~GlxPrizmSD() { 
 }
 
-void GlxPrizmSD::Initialize(G4HCofThisEvent* hce)
-{ 
+void GlxPrizmSD::Initialize(G4HCofThisEvent* hce){ 
   // Create hits collection
   fHitsCollection = new GlxPrizmHitsCollection(SensitiveDetectorName, collectionName[0]); 
-
+  
   // Add this collection in hce
-  G4int hcID 
-    = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
+  G4int hcID = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
   hce->AddHitsCollection( hcID, fHitsCollection );
 }
 
-G4bool GlxPrizmSD::ProcessHits(G4Step* aStep, G4TouchableHistory* hist)
-{   
+G4bool GlxPrizmSD::ProcessHits(G4Step* aStep, G4TouchableHistory* hist){   
   // energy deposit
   G4double edep = aStep->GetTotalEnergyDeposit();
 
@@ -57,16 +50,14 @@ G4bool GlxPrizmSD::ProcessHits(G4Step* aStep, G4TouchableHistory* hist)
   newHit->SetPos (aStep->GetPostStepPoint()->GetPosition());
 
   // // store normal to the closest boundary
-  G4Navigator* theNavigator 
-    = G4TransportationManager::GetTransportationManager()
+  G4Navigator* theNavigator = G4TransportationManager::GetTransportationManager()
     ->GetNavigatorForTracking();
 
   Double_t normalId = 0;
   G4bool valid;
   G4ThreeVector theLocalNormal = theNavigator->GetLocalExitNormal(&valid);
   if (valid ){
-    G4ThreeVector theGlobalNormal 
-      = theNavigator->GetLocalToGlobalTransform().TransformAxis(theLocalNormal);
+    G4ThreeVector theGlobalNormal = theNavigator->GetLocalToGlobalTransform().TransformAxis(theLocalNormal);
     normalId = theGlobalNormal.x() + 10*theGlobalNormal.y() + 100*theGlobalNormal.z();
   }
   newHit->SetNormalId(normalId);
