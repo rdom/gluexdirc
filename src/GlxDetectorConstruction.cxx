@@ -691,6 +691,12 @@ void GlxDetectorConstruction::ConstructSDandField(){
 
   GlxPrizmSD* prizmSD = new GlxPrizmSD("PrizmSD", "PrizmHitsCollection", 0);
   SetSensitiveDetector("lWedge",prizmSD);
+  SetSensitiveDetector("lMirror",prizmSD);
+  SetSensitiveDetector("lFmirror",prizmSD);
+  SetSensitiveDetector("lTankMirror1",prizmSD);
+  SetSensitiveDetector("lTankMirror2",prizmSD);
+  SetSensitiveDetector("lTankMirror3",prizmSD);
+  SetSensitiveDetector("lTankMirror4",prizmSD);
 
   GlxBarSD* barSD = new GlxBarSD("BarSD", "BarHitsCollection", 0);
   SetSensitiveDetector("lBar",barSD);
