@@ -43,7 +43,10 @@ G4VParticleChange* GlxOpBoundaryProcess::PostStepDoIt(const G4Track& aTrack, con
   //   particleChange->ProposeTrackStatus(fStopAndKill);
   // }
 
-  if(aStep.GetPreStepPoint()->GetPhysicalVolume()->GetName()=="wWedge" &&  aStep.GetPostStepPoint()->GetPhysicalVolume()->GetName()=="wBarBox" && GetStatus() == FresnelRefraction ){
+  if((aStep.GetPreStepPoint()->GetPhysicalVolume()->GetName()=="wBar"
+      || aStep.GetPreStepPoint()->GetPhysicalVolume()->GetName()=="wWedge")
+     &&  aStep.GetPostStepPoint()->GetPhysicalVolume()->GetName()=="wBarBox"
+     && GetStatus() == FresnelRefraction ){
     particleChange->ProposeTrackStatus(fStopAndKill);
   }
   
