@@ -23,7 +23,7 @@ void drawScan(TString infile="hits_w10.root"){
       
       Double_t time = fHit.GetLeadTime();
       hTime->Fill(time);
-      hHits->Fill(gpos.Y(),gpos.X());
+      hHits->Fill(gpos.Y(),gpos.X()); //-577.5
       ntotal++;
       
       //fhDigi[mcpid]->Fill(7-pixid/8, pixid%8);

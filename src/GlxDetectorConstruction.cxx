@@ -180,7 +180,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
     new G4PVPlacement(0,G4ThreeVector(0.5*fTankBox[0]-redge,0,-0.5*fBarBox[2]-fWindow[2]-0.5*fTankBox[2] ),lTankBox,"wTankBox",lDirc,false,0);
   }
   if(fGeomId==1){
-    new G4PVPlacement(0,G4ThreeVector(0.5*fTankBox[0]-redge,365+0.5*fBarBox[1],-0.5*fBarBox[2]-fWindow[2]-0.5*fTankBox[2] ),lTankBox,"wTankBox",lDirc,false,0);
+    new G4PVPlacement(0,G4ThreeVector(0.5*fTankBox[0]-redge, 365+0.5*fBarBox[1],-0.5*fBarBox[2]-fWindow[2]-0.5*fTankBox[2] ),lTankBox,"wTankBox",lDirc,false,0);
     new G4PVPlacement(0,G4ThreeVector(0.5*fTankBox[0]-redge,-365-0.5*fBarBox[1],-0.5*fBarBox[2]-fWindow[2]-0.5*fTankBox[2] ),lTankBox,"wTankBox",lDirc,false,1);
   }
   
