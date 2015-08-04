@@ -4,7 +4,7 @@
 glxdirc [OPTION] [ARGUMENT] ... [OPTION] [ARGUMENT]
 
 example:
-./glxdirc -s 0 -e 0 -h 1 -s 0 -x "K+" -p 10 -z -2 -gx 2000 -gz 200
+./glxdirc -s 0 -e 0 -h 1 -s 0 -x kaon+ -p 10 -z -2 -gx 2000 -gz 200
 
 ```
 ##Options
@@ -72,10 +72,10 @@ example:
 ```
 
 lut generation:
-./glxdirc -e 2000000 -s 1 -x opticalphoton -p "3.18 eV" -mr 800 -mt 16 -c 2 -g 0 -w 0 -b 1
+./glxdirc -e 1000000 -s 1 -x opticalphoton -p "3.18 eV" -mr 800 -mt 16 -c 2 -g 0 -w 0 -b 1
 
 simulation:
-./glxdirc -s 0 -e 1 -x kaon+ -p 4.5 -z -2 -gx 2000 -gy 200 -c 2 -w 0
+./glxdirc -s 0 -e 100 -x proton -p 4.5 -z -2 -gx 2000 -gy 200 -mr 800 -mt 16 -c 2 -w 0 -b 1
 
 
 
