@@ -3,7 +3,7 @@
 #include "../src/GlxEvent.h"
 #include "glxtools.C"
 
-void drawScan(TString infile="hits_w10.root"){
+void drawScan(TString infile="hits.root"){
   if(infile=="") return;
   fSavePath = "data/ang_mir";
   GlxInit(infile,1); //digi

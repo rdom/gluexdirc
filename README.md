@@ -23,7 +23,7 @@ example:
 
 -c   MCP layout
 		0    one MCP cover all FD plain (custom pixel size)
-                4    4x6 standard MCPs (6.4x6.4 pixels)
+                2    standard MCPs (6.4x6.4 pixels)
 		
 
 -mr   radius of the focusing mirror
@@ -68,6 +68,14 @@ example:
                2    display hit occupancy of occuhits.root (need to be generated)
 ```
 
-##Example of script usage from macro folder
+##Examples
 ```
+
+lut generation:
+./glxdirc -e 2000000 -s 1 -x opticalphoton -p "3.18 eV" -mr 800 -mt 16 -c 2 -g 0 -w 0 -b 1
+
+simulation:
+./glxdirc -s 0 -e 1 -x kaon+ -p 4.5 -z -2 -gx 2000 -gy 200 -c 2 -w 0
+
+
 
