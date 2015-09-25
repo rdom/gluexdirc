@@ -8,8 +8,7 @@
 
 GlxManager * GlxManager::fInstance= NULL;
 
-GlxManager::GlxManager(G4String outfile, G4int runtype)
-{
+GlxManager::GlxManager(G4String outfile, G4int runtype){
   TString filename = outfile;
   fOutName = filename; 
   fOutName = fOutName.Remove(fOutName.Last('.'));

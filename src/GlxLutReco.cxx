@@ -81,7 +81,7 @@ void GlxLutReco::Run(Int_t start, Int_t end){
 
   TString outFile = GlxManager::Instance()->GetOutName()+"_spr.root";
   Double_t theta(0),phi(0), trr(0),  nph(0),
-    par1(0), par2(0), par3(0), par4(0), par5(0), par6(0), test1(0), test2(0);
+    par1(0), par2(0), par3(0), xx(0), yy(0), par6(0), test1(0), test2(0);
   
   TFile f(outFile,"recreate");
   TTree tree("dirc","SPR");
@@ -90,8 +90,8 @@ void GlxLutReco::Run(Int_t start, Int_t end){
   tree.Branch("nph",&nph,"nph/D");
   tree.Branch("cangle",&cangle,"cangle/D");
   tree.Branch("par3",&par3,"par3/D");
-  tree.Branch("par4",&par4,"par4/D");
-  tree.Branch("par5",&par5,"par5/D");
+  tree.Branch("xx",&xx,"xx/D");
+  tree.Branch("yy",&yy,"yy/D");
   tree.Branch("par6",&par6,"par6/D");
   tree.Branch("test1",&test1,"test1/D");
   tree.Branch("test2",&test2,"test2/D");
@@ -247,6 +247,8 @@ void GlxLutReco::Run(Int_t start, Int_t end){
   trr = spr/sqrt(aEvents);
   theta = fEvent->GetAngle();
   par3 = fEvent->GetTest1();
+  xx = fEvent->GetBeamX();
+  yy = fEvent->GetBeamZ();
   
   std::cout<<"RES   "<<spr << "   N "<< nph << " trr  "<<trr<<std::endl;
     
