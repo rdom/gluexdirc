@@ -65,6 +65,7 @@ private:
   G4Material*        defaultMaterial; // material for bars
   G4Material*        BarMaterial; // material for bars
   G4Material*        OilMaterial;
+  G4Material*        H2OMaterial;
   G4Material*        MirrorMaterial; // material of mirror
   G4Material*        epotekMaterial;  
   G4Material*        Nlak33aMaterial;  

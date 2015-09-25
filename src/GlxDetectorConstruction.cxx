@@ -126,7 +126,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   lWindow = new G4LogicalVolume(gWindow,BarMaterial,"lWindow",0,0,0);
   // The tank box
   G4Box* gTankBox = new G4Box("gBarBox",fTankBox[0]/2.,fTankBox[1]/2.,fTankBox[2]/2.);
-  lTankBox = new G4LogicalVolume(gTankBox,OilMaterial,"lTankBox",0,0,0); //OilMaterial //BarMaterial
+  lTankBox = new G4LogicalVolume(gTankBox,H2OMaterial,"lTankBox",0,0,0); // OilMaterial //BarMaterial
   
   // Mirrors in tank
   G4Box* gTankMirror1 = new G4Box("gTankMirr1",fMirror1[0]/2.,fMirror1[1]/2.,fMirror1[2]/2.);
@@ -418,9 +418,9 @@ void GlxDetectorConstruction::DefineMaterials(){
 
   G4Element* Al = new G4Element("Aluminum",symbol="Al",z=13.,a=26.98*g/mole);
   
-  G4Material* H2O = new G4Material("Water",density=1.000*g/cm3,ncomponents=2);
-  H2O->AddElement(H, natoms=2);
-  H2O->AddElement(O, natoms=1);
+  H2OMaterial = new G4Material("Water",density=1.000*g/cm3,ncomponents=2);
+  H2OMaterial->AddElement(H, natoms=2);
+  H2OMaterial->AddElement(O, natoms=1);
 
   // quartz material = SiO2
   G4Material* SiO2 = new G4Material("quartz",density= 2.200*g/cm3, ncomponents=2);
@@ -466,7 +466,7 @@ void GlxDetectorConstruction::DefineMaterials(){
   frontMaterial = CarbonFiber; 
   BarMaterial = SiO2; // material of all Bars, Quartz and Window
   
-  OilMaterial = H2O; //KamLandOil; // material of volume 1,2,3,4
+  OilMaterial = KamLandOil; // material of volume 1,2,3,4
   MirrorMaterial = Aluminum; // mirror material
   epotekMaterial = Epotek; // Epotek material - glue between bars
 
@@ -514,6 +514,36 @@ void GlxDetectorConstruction::DefineMaterials(){
      0.99999999,0.99999999,0.99999999,0.99999999,0.99999999,
      0.9999,0.9998,0.9995,0.999,0.998,0.997,0.996,0.9955,0.993,
      0.9871,0.9745};
+
+
+  //water
+  const G4int nEntries = 32;
+  G4double photonEnergyH2O[nEntries] =
+    { 2.034*eV, 2.068*eV, 2.103*eV, 2.139*eV,
+      2.177*eV, 2.216*eV, 2.256*eV, 2.298*eV,
+      2.341*eV, 2.386*eV, 2.433*eV, 2.481*eV,
+      2.532*eV, 2.585*eV, 2.640*eV, 2.697*eV,
+      2.757*eV, 2.820*eV, 2.885*eV, 2.954*eV,
+      3.026*eV, 3.102*eV, 3.181*eV, 3.265*eV,
+      3.353*eV, 3.446*eV, 3.545*eV, 3.649*eV,
+      3.760*eV, 3.877*eV, 4.002*eV, 4.136*eV };
+  G4double H2ORefractiveIndex[nEntries] =
+    { 1.3435, 1.344,  1.3445, 1.345,  1.3455,
+      1.346,  1.3465, 1.347,  1.3475, 1.348,
+      1.3485, 1.3492, 1.35,   1.3505, 1.351,
+      1.3518, 1.3522, 1.3530, 1.3535, 1.354,
+      1.3545, 1.355,  1.3555, 1.356,  1.3568,
+      1.3572, 1.358,  1.3585, 1.359,  1.3595,
+      1.36,   1.3608};
+      
+  G4double H2OAbsorption[nEntries] =
+    {3.448*m,  4.082*m,  6.329*m,  9.174*m, 12.346*m, 13.889*m,
+     15.152*m, 17.241*m, 18.868*m, 20.000*m, 26.316*m, 35.714*m,
+     45.455*m, 47.619*m, 52.632*m, 52.632*m, 55.556*m, 52.632*m,
+     52.632*m, 47.619*m, 45.455*m, 41.667*m, 37.037*m, 33.333*m,
+     30.000*m, 28.500*m, 27.000*m, 24.500*m, 22.000*m, 19.500*m,
+     17.500*m, 14.500*m };
+       
 
   //N-Lak 33a
   G4double Nlak33aAbsorption[76]={371813,352095,331021,310814,291458,272937,255238,238342,222234,206897,192313,178463,165331,152896,141140,130043,119585,109747,100507,91846.3,83743.1,76176.7,69126.1,62570.2,56488,50858.3,45660.1,40872.4,36474.6,32445.8,28765.9,25414.6,22372.2,19619.3,17136.9,14906.5,12910.2,11130.3,9550.13,8153.3,6924.25,5848.04,4910.46,4098.04,3398.06,2798.54,2288.32,1856.99,1494.92,1193.28,943.973,739.657,573.715,440.228,333.94,250.229,185.064,134.967,96.9664,68.5529,47.6343,32.4882,21.7174,14.2056,9.07612,5.65267,3.4241,2.01226,1.14403,0.62722,0.330414,0.166558,0.0799649,0.0363677,0.0155708,0.00623089};
@@ -602,8 +632,13 @@ void GlxDetectorConstruction::DefineMaterials(){
   G4MaterialPropertiesTable* KamLandOilMPT = new G4MaterialPropertiesTable();
   KamLandOilMPT->AddProperty("RINDEX", PhotonEnergy, KamLandOilRefractiveIndex, num);
   KamLandOilMPT->AddProperty("ABSLENGTH", PhotonEnergy, KamLandOilAbsorption, num);
-  // assing this parameter table  to the KamLandOil
-  OilMaterial->SetMaterialPropertiesTable(KamLandOilMPT);  
+  OilMaterial->SetMaterialPropertiesTable(KamLandOilMPT);
+
+  // Water                                                
+  G4MaterialPropertiesTable* WaterMPT = new G4MaterialPropertiesTable();
+  WaterMPT->AddProperty("RINDEX", photonEnergyH2O, H2ORefractiveIndex, nEntries);
+  WaterMPT->AddProperty("ABSLENGTH", photonEnergyH2O, H2OAbsorption, nEntries);
+  H2OMaterial->SetMaterialPropertiesTable(WaterMPT);  
 
   // N-Lak 33a                                                
   G4MaterialPropertiesTable* Nlak33aMPT = new G4MaterialPropertiesTable();
