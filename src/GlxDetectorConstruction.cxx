@@ -151,9 +151,6 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   G4Tubs* gFmirror = new G4Tubs("gFmirror",fradius,fradius+1,fMirror1[1]/2., (-90-seg/2.)*deg,seg*deg);
   lFmirror = new G4LogicalVolume(gFmirror,MirrorMaterial,"lFmirror",0,0,0);
 
-  G4Box* gFmirrorC =  new G4Box("gBarBox",fTankBox[0]/2.,fTankBox[1]/2.,fTankBox[2]/2.);
-  lFmirrorC = new G4LogicalVolume(gFmirrorC,defaultMaterial,"lFmirrorC",0,0,0);
-  
   // The FD plane
   G4Box* gFdp = new G4Box("gFdp",fFdp[0]/2.,fFdp[1]/2.,fFdp[2]/2.);
   lFdp = new G4LogicalVolume(gFdp,BarMaterial,"lFdp",0,0,0);// BarMaterial

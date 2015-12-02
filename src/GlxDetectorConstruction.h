@@ -52,7 +52,6 @@ private:
   G4LogicalVolume *lTankMirror2;
   G4LogicalVolume *lTankMirror3;
   G4LogicalVolume *lTankMirror4;
-  G4LogicalVolume *lFmirrorC;
   G4LogicalVolume *lFmirror;
   G4LogicalVolume *lFdp;
 
