@@ -32,7 +32,7 @@ public:
   void Run(Int_t start=0, Int_t end=0);
 
 private:
-  Bool_t FindPeak(Double_t& cherenkovreco, Double_t& spr,Int_t a);
+  Bool_t FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t theta, Double_t phi);
   Int_t FindPdg(Double_t mom, Double_t cangle);
   void FitRing(Double_t& x0, Double_t& y0, Double_t& theta);
   Int_t fDetectorID;  
