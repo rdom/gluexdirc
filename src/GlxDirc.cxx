@@ -122,7 +122,7 @@ int main(int argc,char** argv)
   //if(beamDimension.size())GlxManager::Instance()->SetTest1(atoi(beamDimension));
 
   if(runtype == 2){
-    GlxLutReco * reco = new GlxLutReco(infile,lutfile,verbose); 
+    GlxLutReco * reco = new GlxLutReco(infile.c_str(),lutfile.c_str(),verbose); 
     reco->Run(firstevent,atoi(events));
     return 0;
   }
