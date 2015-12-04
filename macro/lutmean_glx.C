@@ -19,14 +19,12 @@ void lutmean_glx(TString baseFile = "../data/lut.root"){
   TFile *fFileNew = TFile::Open(outFile, "RECREATE");
   TClonesArray *fLutNew[48];
 
-  TTree *fTreeNew = new TTree("prtlut","Look-up table for DIRC. Averaged");
-
-  fTreeNew->Branch("LUT",&fLutNew,256000,2); 
+  TTree *fTreeNew = new TTree("glxlut","Look-up table for DIRC. Averaged");
 
   Int_t Nnodes = 20000;
   for(Int_t l=0; l<48; l++){
     fLutNew[l] = new TClonesArray("GlxLutNode");
-    fTreeNew->Branch(Form("LUT_%d",b),&fLutNew[l],256000,2);
+    fTreeNew->Branch(Form("LUT_%d",l),&fLutNew[l],256000,2);
     TClonesArray &fLutaNew = *fLutNew[l];
     for (Long64_t n=0; n<Nnodes; n++) {
       new((fLutaNew)[n]) GlxLutNode(-1);
@@ -48,9 +46,9 @@ void lutmean_glx(TString baseFile = "../data/lut.root"){
   GlxLutNode *node;
 
   for(Int_t l=0; l<48; l++){
-    for (Int_t inode=0; inode<fLut->GetEntriesFast(); inode++){
+    for (Int_t inode=0; inode<fLut[l]->GetEntriesFast(); inode++){
       if(inode%1000==0) cout<<"Node # "<<inode<<endl;
-      node= (GlxLutNode*) fLut->At(inode);
+      node= (GlxLutNode*) fLut[l]->At(inode);
       //histNode->Fill(node->GetNodeId(),node->Entries());
       Int_t size = node->Entries();    
       if(size<1) continue;
