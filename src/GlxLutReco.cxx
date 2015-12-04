@@ -51,8 +51,12 @@ GlxLutReco::GlxLutReco(TString infile, TString lutfile, Int_t verbose){
 
   fFile = new TFile(lutfile);
   fTree=(TTree *) fFile->Get("prtlut") ;
-  fLut = new TClonesArray("GlxLutNode");
-  fTree->SetBranchAddress("LUT",&fLut); 
+  
+  for(Int_t b=0; b<48; b++){
+    fLut[b] = new TClonesArray("GlxLutNode");
+    fTree->SetBranchAddress(Form("LUT_%d",b),&fLut[b]); 
+  }
+
   fTree->GetEntry(0);
 
   fHist = new TH1F("chrenkov_angle_hist","chrenkov_angle_hist", 100,minChangle,maxChangle);
@@ -71,7 +75,7 @@ GlxLutReco::~GlxLutReco(){
 void GlxLutReco::Run(Int_t start, Int_t end){
   TVector3 dird, dir, momInBar(0,0,1),posInBar,rotatedmom;
   Double_t cangle,spr,tangle,boxPhi,evtime, bartime, lenz,luttheta, barHitTime, hitTime;
-  Int_t pdgcode, evpointcount(0);
+  Int_t pdgcode, evpointcount(0),barId(-1);
   Bool_t reflected = kFALSE;
   gStyle->SetOptFit(111);
  
@@ -129,6 +133,7 @@ void GlxLutReco::Run(Int_t start, Int_t end){
 
     for(Int_t h=0; h<nHits; h++) {
       fHit = fEvent->GetHit(h);
+      barId=fHit.GetType();
       hitTime = fHit.GetLeadTime();
       //      if(hitTime<40) continue;
       Double_t radiatorL = 1225*4; //bar
@@ -153,7 +158,7 @@ void GlxLutReco::Run(Int_t start, Int_t end){
       }
 
       Bool_t isGoodHit(false);
-      GlxLutNode *node = (GlxLutNode*) fLut->At(sensorId);
+      GlxLutNode *node = (GlxLutNode*) fLut[barId]->At(sensorId);
       Int_t size = node->Entries();
       for(int i=0; i<size; i++){
 	dird = node->GetEntry(i);

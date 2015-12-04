@@ -38,7 +38,7 @@ private:
   Int_t fDetectorID;  
   Double_t fBboxNum,fPipehAngle,fDphi,fBarPhi;
 
-  TClonesArray *fLut;
+  TClonesArray *fLut[48];
   TClonesArray *fTrackInfoArray;
 
   TFile *fFile; 
