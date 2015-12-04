@@ -6,9 +6,13 @@ void lutmean_glx(TString baseFile = "../data/lut.root"){
   TString outFile = baseFile.Remove(baseFile.Last('.'))+"_avr.root";
 
   TFile* f = new TFile(inFile);
-  TTree *t=(TTree *) f->Get("prtlut") ;
-  TClonesArray* fLut;
-  t->SetBranchAddress(Form("LUT_%d",b),&fLut); 
+  TTree *t=(TTree *) f->Get("glxlut") ;
+  TClonesArray* fLut[48];
+  for(Int_t l=0; l<48; l++){
+    fLut[l] = new TClonesArray("PndDrcLutNode");
+    t->SetBranchAddress(Form("LUT_%d",l),&fLut[l]); 
+  }
+  
   t->GetEntry(0);
 
  
