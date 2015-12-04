@@ -47,7 +47,7 @@ void lutmean_glx(TString baseFile = "../data/lut.root"){
 
   for(Int_t l=0; l<48; l++){
     for (Int_t inode=0; inode<fLut[l]->GetEntriesFast(); inode++){
-      if(inode%1000==0) cout<<"Node # "<<inode<<endl;
+      if(inode%1000==0) cout<<"Node # "<<inode << "  L "<<l<<endl;
       node= (GlxLutNode*) fLut[l]->At(inode);
       //histNode->Fill(node->GetNodeId(),node->Entries());
       Int_t size = node->Entries();    

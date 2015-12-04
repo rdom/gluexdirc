@@ -50,10 +50,11 @@ GlxLutReco::GlxLutReco(TString infile, TString lutfile, Int_t verbose){
   fChain->SetBranchAddress("GlxEvent", &fEvent);
 
   fFile = new TFile(lutfile);
-  fTree=(TTree *) fFile->Get("prtlut") ;
+  fTree=(TTree *) fFile->Get("glxlut") ;
   
   for(Int_t b=0; b<48; b++){
-    fLut[b] = new TClonesArray("GlxLutNode");
+    std::cout<<"FFFFFFFFFFFFFFFFF " <<b<<std::endl;
+    //fLut[b] = new TClonesArray("GlxLutNode");
     fTree->SetBranchAddress(Form("LUT_%d",b),&fLut[b]); 
   }
 
@@ -158,6 +159,8 @@ void GlxLutReco::Run(Int_t start, Int_t end){
       }
 
       Bool_t isGoodHit(false);
+      std::cout<<"barId "<< barId<<std::endl;
+      
       GlxLutNode *node = (GlxLutNode*) fLut[barId]->At(sensorId);
       Int_t size = node->Entries();
       for(int i=0; i<size; i++){
