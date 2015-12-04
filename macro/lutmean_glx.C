@@ -9,7 +9,7 @@ void lutmean_glx(TString baseFile = "../data/lut.root"){
   TTree *t=(TTree *) f->Get("glxlut") ;
   TClonesArray* fLut[48];
   for(Int_t l=0; l<48; l++){
-    fLut[l] = new TClonesArray("PndDrcLutNode");
+    fLut[l] = new TClonesArray("GlxLutNode");
     t->SetBranchAddress(Form("LUT_%d",l),&fLut[l]); 
   }
   
