@@ -58,7 +58,7 @@ private:
   TH1F *fHist;
   TF1 *fFit;
   TSpectrum *fSpect;
-
+  Bool_t fLoopoverAll;
 };
 
 #endif

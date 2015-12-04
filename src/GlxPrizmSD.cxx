@@ -45,7 +45,7 @@ G4bool GlxPrizmSD::ProcessHits(G4Step* aStep, G4TouchableHistory* hist){
 
   GlxPrizmHit* newHit = new GlxPrizmHit();
 
-  newHit->SetTrackID  (aStep->GetTrack()->GetTrackID());
+  newHit->SetTrackId(aStep->GetTrack()->GetTrackID());
   newHit->SetEdep(edep);
   newHit->SetPos (aStep->GetPostStepPoint()->GetPosition());
 
@@ -62,9 +62,12 @@ G4bool GlxPrizmSD::ProcessHits(G4Step* aStep, G4TouchableHistory* hist){
   }
   newHit->SetNormalId(normalId);
 
-  fHitsCollection->insert( newHit );
-
-  //newHit->Print();
+  G4StepPoint* preStepPoint = aStep->GetPreStepPoint();
+  G4TouchableHandle theTouchable = preStepPoint->GetTouchableHandle();
+  G4int copyNo = theTouchable->GetCopyNumber();
+  G4int motherCopyNo = theTouchable->GetCopyNumber(1);
+  newHit->SetId(motherCopyNo*12+copyNo);
+  fHitsCollection->insert(newHit);
 
   return true;
 }

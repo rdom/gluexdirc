@@ -110,7 +110,7 @@ private:
   int fParticle;
   int fBeamDimension;
   TVector3 fMomentum;
-  TClonesArray *fLut;
+  TClonesArray *fLut[48];
   TClonesArray *fTrackInfoArray;
   double fCurrentCherenkov;
   double fShift;

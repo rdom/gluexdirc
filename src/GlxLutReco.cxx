@@ -44,6 +44,7 @@ Double_t maxChangle = 0.9;
 // -----   Default constructor   -------------------------------------------
 GlxLutReco::GlxLutReco(TString infile, TString lutfile, Int_t verbose){
   fVerbose = verbose;
+  fLoopoverAll = false;
   fChain = new TChain("data");
   fChain->Add(infile);
   fChain->SetBranchAddress("GlxEvent", &fEvent);
@@ -70,7 +71,7 @@ GlxLutReco::~GlxLutReco(){
 void GlxLutReco::Run(Int_t start, Int_t end){
   TVector3 dird, dir, momInBar(0,0,1),posInBar,rotatedmom;
   Double_t cangle,spr,tangle,boxPhi,evtime, bartime, lenz,luttheta, barHitTime, hitTime;
-  Int_t  nsHits(0),nsEvents(0),pdgcode, evpointcount(0);
+  Int_t pdgcode, evpointcount(0);
   Bool_t reflected = kFALSE;
   gStyle->SetOptFit(111);
  
@@ -100,14 +101,21 @@ void GlxLutReco::Run(Int_t start, Int_t end){
   tree.Branch("phi",&phi,"phi/D");
 
   test1 = GlxManager::Instance()->GetTest1();
-  
-  std::cout<<"Run started " <<std::endl;
-  Int_t ntotal=0;
+
   Int_t nEvents = fChain->GetEntries();
-  for (Int_t ievent=0; ievent<nEvents; ievent++){
+  if(end==0) end = nEvents;
+  
+  Int_t nsHits(0),nsEvents(0), nHits(0), ninfit(0);
+  std::cout<<"Run started for ["<<start<<","<<end <<"]"<<std::endl;
+  if(start<0) {
+    fLoopoverAll=true;
+    ninfit=abs(start);
+    start=0;
+  }
+    
+  for (Int_t ievent=start; ievent<nEvents; ievent++){
     fChain->GetEntry(ievent);
-    Int_t nHits = fEvent->GetHitSize();
-    ntotal+=nHits;
+    nHits = fEvent->GetHitSize();
     std::cout<<"Event # "<< ievent << " has "<< nHits <<" hits"<<std::endl;
     GlxTrackInfo trackinfo;
     trackinfo.AddInfo(fEvent->PrintInfo()+"\n Basic reco informaion: \n");
@@ -129,9 +137,8 @@ void GlxLutReco::Run(Int_t start, Int_t end){
 
       if(fHit.GetMomentum().X()<0) reflected = kTRUE;
       else reflected = kFALSE;
-
+      
       if(reflected) lenz = 2*radiatorL - lenz; 
-      std::cout<<"lenz  "<<lenz <<std::endl;
       
       TVector3 cd = fHit.GetMomentum();
       Double_t phi0 =  cd.Phi();        
@@ -198,25 +205,32 @@ void GlxLutReco::Run(Int_t start, Int_t end){
       if(isGoodHit) nsHits++;
     }
 
-    nsEvents++;
-    //FindPeak(cangle,spr,fEvent->GetAngle()+0.01);
-    std::cout<<"RES   "<<spr*1000 << "   N "<<nHits << "  "<<spr/sqrt(nHits)*1000<<std::endl;
-    
-    //Int_t pdgreco = FindPdg(fEvent->GetMomentum().Mag(), cherenkovreco);
+    if(fLoopoverAll && nsEvents%ninfit==0){
+      FindPeak(cangle,spr,rotatedmom.Theta()/TMath::Pi()*180 ,rotatedmom.Phi()/TMath::Pi()*180);
+      nph = nsHits/(Double_t)ninfit;
+      spr = spr*1000;
+      trr = spr/sqrt(nph);
+      theta = fEvent->GetAngle();
+      par3 = fEvent->GetTest1();
+      std::cout<<"RES   "<<spr << "   N "<< nph << " trr  "<<trr<<std::endl;
+      tree.Fill();
+      nsHits=0;
+    }
+    if(++nsEvents>=end) break;
   }
- 
-  FindPeak(cangle,spr,rotatedmom.Theta(),rotatedmom.Phi());
-  Double_t aEvents = ntotal/(Double_t)nEvents;
 
-  nph = nsHits/(Double_t)nsEvents;
-  spr = spr*1000;
-  trr = spr/sqrt(nph);
-  theta = fEvent->GetAngle();
-  par3 = fEvent->GetTest1();
-  xx = fEvent->GetBeamX();
-  yy = fEvent->GetBeamZ();
-  
-  std::cout<<"RES   "<<spr << "   N "<< nph << " trr  "<<trr<<std::endl;
+  if(!fLoopoverAll){
+    FindPeak(cangle,spr,rotatedmom.Theta()/TMath::Pi()*180 ,rotatedmom.Phi()/TMath::Pi()*180);
+    nph = nsHits/(Double_t)nsEvents;
+    spr = spr*1000;
+    trr = spr/sqrt(nph);
+    theta = fEvent->GetAngle();
+    par3 = fEvent->GetTest1();
+    xx = fEvent->GetBeamX();
+    yy = fEvent->GetBeamZ();
+    std::cout<<"RES   "<<spr << "   N "<< nph << " trr  "<<trr<<std::endl;
+    tree.Fill();
+  }
     
   tree.Fill();
   tree.Write();
@@ -289,7 +303,7 @@ Bool_t GlxLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t the
       fHistDiff->GetYaxis()->SetTitle("measured time [ns]");
       
       fHistDiff->Draw();
-      c2->WaitPrimitive("s");
+      c2->WaitPrimitive("");
       
       // fHist4->SetStats(0);
       // fHist4->GetXaxis()->SetTitle("#theta_{c}sin(#varphi_{c})");

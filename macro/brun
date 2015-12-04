@@ -9,7 +9,7 @@ echo $tseed
 
 #./glxdirc -e 1000000 -s 1 -x "opticalphoton" -p "3.18 eV" -mr 800 -mt 16 -c 2 -g 0 -w 0 -b 1
 
-for i in {0..4}; do ../build/glxdirc -o h_b$i.root -s 0 -e 2000  -x proton -p 4.5 -z -2 -gx -2180 -gy 200 -mr 800 -mt 16 -c 0 -w 10 -b 1 -r $tseed$i > l_b$i.log & done
+for i in {0..4}; do ../build/glxdirc -o h_b$i.root -s 0 -e 10  -x proton -p 3 -z -2 -gx 0 -gy 200 -mr 800 -mt 16 -c 2 -w 0 -b 1 -r $tseed$i > l_b$i.log & done
 
 sleep 1
 
