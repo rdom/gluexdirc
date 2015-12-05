@@ -53,14 +53,15 @@ GlxManager::GlxManager(G4String outfile, G4int runtype){
   fTest1 = 0;
   fTest2 = 0;
   fLens = 0;
+  fGap = 0;
   fMcpLayout = 2014;
   fBeamDimension = 0;
 
   fPrismStep=0;
   fBeamX=0;
   fBeamZ=-1;
-  fMirrorR = 1200;
-  fMirrorT = 20;
+  fMirrorR = 800;//1200;
+  fMirrorT = 16;//20;
   fMcpT = 42.13;
   fInfo="";
   
@@ -87,6 +88,7 @@ void GlxManager::AddEvent(GlxEvent event){
     fEvent->SetMomentum(fMomentum);
     fEvent->SetGeometry(fGeometry);
     fEvent->SetLens(fLens);
+	fEvent->SetGap(fGap);
     fEvent->SetTest1(fTest1);
     fEvent->SetTest2(fTest2);
     fEvent->SetPrismStep(fPrismStep);

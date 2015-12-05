@@ -5,11 +5,10 @@
  
 #pragma link C++ class  GlxEvent+;
 #pragma link C++ class  GlxHit+;
+#pragma link C++ class  vector<GlxHit>;
 #pragma link C++ class  GlxLutNode+;
 #pragma link C++ class  GlxTrackInfo+;
 #pragma link C++ class  GlxPhotonInfo+;
 #pragma link C++ class  GlxAmbiguityInfo+;
-
-#pragma link C++ class  vector<GlxHit>;
 
 #endif

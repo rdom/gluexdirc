@@ -53,7 +53,10 @@ private:
   G4LogicalVolume *lTankMirror3;
   G4LogicalVolume *lTankMirror4;
   G4LogicalVolume *lFmirror;
+  G4LogicalVolume *lSmirror;
   G4LogicalVolume *lFdp;
+  G4LogicalVolume *lGap;	
+  G4LogicalVolume *lWall;
 
   
   G4VPhysicalVolume* wBar;
@@ -73,6 +76,7 @@ private:
   G4int fNRow;
   G4int fNCol;
   G4int fGeomId;
+  G4int fLensId;
   G4int fMcpLayout;
   G4double fHall[3];
   G4double fBar[3];
@@ -85,7 +89,12 @@ private:
   G4double fMirror2[3];
   G4double fMirror3[3];
   G4double fMirror4[3];
+  G4double fMirrorS[3];
   G4double fFdp[3];
+
+  G4double fGap;
+  G4double fWall;
+  G4double fMShift;
 
   G4double fWindow[3];
   G4double fPrizm[4];
