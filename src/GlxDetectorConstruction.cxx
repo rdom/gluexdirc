@@ -37,6 +37,8 @@ GlxDetectorConstruction::GlxDetectorConstruction()
 
   fGeomId = GlxManager::Instance()->GetGeometry();
   fMcpLayout = GlxManager::Instance()->GetMcpLayout();
+  fLensId = GlxManager::Instance()->GetLens();
+  fGap = GlxManager::Instance()->GetGap();
  
   fNRow = 5;
   fNCol = 35;
@@ -48,7 +50,10 @@ GlxDetectorConstruction::GlxDetectorConstruction()
   fPrizm[0]=33.25; fPrizm[1]=91.0; fPrizm[2]=78.9929; fPrizm[3]=27.0;
   fBarBox[0]= 18; fBarBox[1]=425; fBarBox[2]=fMirror[2]+fBar[2]+fPrizm[1];
   fWindow[0]=150; fWindow[1]=425; fWindow[2]=9.6;
-  
+
+  fWall = 12.7; // [mm]  = 0.5 inch thickness of the EV wall
+  fMShift = (fWall+fGap)/cos(42.13*deg)/2. + 1.;//
+	  
   fTankBox0[0]=582; fTankBox0[1]=2205+20; fTankBox0[2]=350; //240
   fTankBox1[0]=582; fTankBox1[1]=900; fTankBox1[2]=350; //240 
 
@@ -69,10 +74,10 @@ GlxDetectorConstruction::GlxDetectorConstruction()
   
   fMirror1[0]=197; fMirror1[1]=fTankBox[1]-25;  fMirror1[2]=1; 
   fMirror2[0]=66.97; fMirror2[1]=fTankBox[1]-25;  fMirror2[2]=1;
-  fMirror3[0]=422.9; fMirror3[1]=fTankBox[1]-25;  fMirror3[2]=1;
+  fMirror3[0]=422.9; fMirror3[1]=fTankBox[1]-25;  fMirror3[2]=1; //!!!!!!!!!!!!!
   fMirror4[0]=580;   fMirror4[1]=300;  fMirror4[2]=1;
 
-  fFdp[0]=312; fFdp[1]=fTankBox[1]-25;  fFdp[2]=1; 
+  fFdp[0]=312; fFdp[1]=fTankBox[1]-25;  fFdp[2]=1;  
   
   fMcpTotal[0] = fMcpTotal[1] = 53+6; fMcpTotal[2]=0.5;
   fMcpActive[0] = fMcpActive[1] = 53; fMcpActive[2]=0.5;
@@ -125,7 +130,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   G4Box* gWindow = new G4Box("gWindow",fWindow[0]/2.,fWindow[1]/2.,fWindow[2]/2.);
   lWindow = new G4LogicalVolume(gWindow,BarMaterial,"lWindow",0,0,0);
   // The tank box
-  G4Box* gTankBox = new G4Box("gBarBox",fTankBox[0]/2.,fTankBox[1]/2.,fTankBox[2]/2.);
+  G4Box* gTankBox = new G4Box("gTankBox",fTankBox[0]/2.,fTankBox[1]/2.,fTankBox[2]/2.);
   lTankBox = new G4LogicalVolume(gTankBox,H2OMaterial,"lTankBox",0,0,0); // OilMaterial //BarMaterial
   
   // Mirrors in tank
@@ -135,7 +140,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   G4Box* gTankMirror2 = new G4Box("gTankMirr2",fMirror2[0]/2.,fMirror2[1]/2.,fMirror2[2]/2.);
   lTankMirror2 = new G4LogicalVolume(gTankMirror2,MirrorMaterial,"lTankMirror2",0,0,0);
 
-  G4Box* gTankMirror3 = new G4Box("gTankMirr3",fMirror3[0]/2.,fMirror3[1]/2.,fMirror3[2]/2.);
+  G4Box* gTankMirror3 = new G4Box("gTankMirr3",fMirror3[0]/2.-fMShift,fMirror3[1]/2.,fMirror3[2]/2.); //!!!!!!!!!!!!!
   lTankMirror3 = new G4LogicalVolume(gTankMirror3,MirrorMaterial,"lTankMirror3",0,0,0);
 
   G4Box* gTankMirror4 = new G4Box("gTankMirr3",fMirror4[0]/2.,fMirror4[1]/2.,fMirror4[2]/2.);
@@ -147,13 +152,31 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   Double_t fmx = 300; // width of the focusing mirror
   Double_t fmy = sqrt(fradius*fradius-fmx*fmx/4.);
   Double_t seg = 2*asin(fmx/(2*fradius))/deg;
+
+  // focusing mirror made of flat segments:
+  if(fLensId > 0){
+    fMirrorS[0] = 2*fradius*sin(seg*deg/2/fLensId);
+	fMirrorS[1] = fTankBox[1]-25;
+	fMirrorS[2] = 1;
+    G4Box* gSmirror = new G4Box("gSmirror",fMirrorS[0]/2.,fMirrorS[1]/2.,fMirrorS[2]/2.);
+    lSmirror = new G4LogicalVolume(gSmirror, MirrorMaterial, "lSmirror", 0,0,0);
+  }
   
   G4Tubs* gFmirror = new G4Tubs("gFmirror",fradius,fradius+1,fMirror1[1]/2., (-90-seg/2.)*deg,seg*deg);
   lFmirror = new G4LogicalVolume(gFmirror,MirrorMaterial,"lFmirror",0,0,0);
-
+  
   // The FD plane
   G4Box* gFdp = new G4Box("gFdp",fFdp[0]/2.,fFdp[1]/2.,fFdp[2]/2.);
   lFdp = new G4LogicalVolume(gFdp,BarMaterial,"lFdp",0,0,0);// BarMaterial
+
+  // The Air Gap
+  if(fGap > 0.){
+    G4Box* gGap = new G4Box("gGap",fFdp[0]/2.,fFdp[1]/2.,fGap/2.);
+    lGap = new G4LogicalVolume(gGap,defaultMaterial,"lGap",0,0,0);
+  }
+  // The FS wall of the EV
+  G4Box* gWall = new G4Box("gWall",fFdp[0]/2.,fFdp[1]/2.,fWall/2.);
+  lWall = new G4LogicalVolume(gWall,BarMaterial,"lWall",0,0,0);
 
   for(Int_t i=0; i<12; i++){
     G4double yshift = (fBar[1]+0.15)*i - fBarBox[1]/2. + fBar[1]/2.;
@@ -180,24 +203,46 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
     new G4PVPlacement(0,G4ThreeVector(0.5*fTankBox[0]-redge, 365+0.5*fBarBox[1],-0.5*fBarBox[2]-fWindow[2]-0.5*fTankBox[2] ),lTankBox,"wTankBox",lDirc,false,0);
     new G4PVPlacement(0,G4ThreeVector(0.5*fTankBox[0]-redge,-365-0.5*fBarBox[1],-0.5*fBarBox[2]-fWindow[2]-0.5*fTankBox[2] ),lTankBox,"wTankBox",lDirc,false,1);
   }
-  
 
   G4RotationMatrix* rotm1= new G4RotationMatrix; rotm1->rotateY(90.*deg);
   new G4PVPlacement(rotm1,G4ThreeVector(redge-0.5*(fBar[0]+fMirror1[2]+fTankBox[0]),0,0.5*(fTankBox[2]-fMirror1[0])-20),lTankMirror1,"wMirror1",lTankBox,false,0);
   G4RotationMatrix* rotm2= new G4RotationMatrix; rotm2->rotateY(-60.*deg);
   new G4PVPlacement(rotm2,G4ThreeVector(redge-0.5*(fBar[0]+fMirror2[2]+fTankBox[0])+130-0.5*fMirror2[0]*cos(60*pi/180.),0,0.5*fTankBox[2]-78+0.5*fMirror2[0]*sin(60*pi/180.)),lTankMirror2,"wMirror2",lTankBox,false,0);
   G4RotationMatrix* rotm3= new G4RotationMatrix; rotm3->rotateY(0.*deg);
-  new G4PVPlacement(rotm3,G4ThreeVector(redge-0.5*(fBar[0]+fMirror3[2]+fTankBox[0]-fMirror3[0])+130,0,0.5*fTankBox[2]-78),lTankMirror3,"wMirror3",lTankBox,false,0);
+
+  //new G4PVPlacement(rotm3,G4ThreeVector(redge-0.5*(fBar[0]+fMirror3[2]+fTankBox[0]-fMirror3[0])+130,0,0.5*fTankBox[2]-78),lTankMirror3,"wMirror3",lTankBox,false,0);
+  new G4PVPlacement(rotm3,G4ThreeVector(redge-0.5*(fBar[0]+fMirror3[2]+fTankBox[0]-fMirror3[0])+130 -fMShift,0,0.5*fTankBox[2]-78),lTankMirror3,"wMirror3",lTankBox,false,0);
+
   G4RotationMatrix* rotm4= new G4RotationMatrix; rotm4->rotateX(90.*deg);
   new G4PVPlacement(rotm4,G4ThreeVector(0, 0.5*fTankBox[1]-12,0),lTankMirror4,"wMirror3",lTankBox,false,0);
   new G4PVPlacement(rotm4,G4ThreeVector(0,-0.5*fTankBox[1]+12,0),lTankMirror4,"wMirror3",lTankBox,false,0);
 
   G4AssemblyVolume* assemblyFMirror = new G4AssemblyVolume();
 
-  G4RotationMatrix* Ra= new G4RotationMatrix; Ra->rotateX(90.*deg);  
+  G4RotationMatrix* Ra= new G4RotationMatrix;   
   G4ThreeVector Ta(0.5*fmx,0,fmy);
-  assemblyFMirror->AddPlacedVolume(lFmirror,Ta,Ra);
 
+  if(fLensId == 0){
+	Ra->rotateX(90.*deg);  
+    assemblyFMirror->AddPlacedVolume(lFmirror,Ta,Ra);
+  }
+  if(fLensId > 0){ 
+	G4ThreeVector c(0.,0.,fradius*cos(seg*deg/fLensId/2.));
+ 	c.rotateY(-seg*deg/2. + seg*deg/fLensId/2.);
+ 	G4ThreeVector a(0.,0.,fmy);
+ 	G4ThreeVector b(0.,0.,0.);
+    Ra->rotateY(+seg*deg/2. - seg*deg/2./fLensId);
+ 	for(int isec=0; isec<fLensId; isec++){
+      b = c - a;
+ 	  Ta.setX(0.5*fmx + b.getX());
+ 	  Ta.setZ(-b.getZ());
+ 	  assemblyFMirror->AddPlacedVolume(lSmirror,Ta,Ra);
+ 	  c.rotateY(seg*deg/fLensId);
+ 	  Ra->rotateY(-seg*deg/fLensId);
+    }	
+  }
+
+	
   // // Fill the assembly by the plates
   // Ta.setX( caloX/4. ); Ta.setY( caloY/4. ); Ta.setZ( 0. );
   // assemblyDetector->AddPlacedVolume( plateLV, G4Transform3D(Ta,Ra) );
@@ -267,9 +312,28 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
    new G4PVPlacement(0,G4ThreeVector(0,0,0),lMcp,"wMcp", lFdp,false,1);
  }
  
- G4RotationMatrix* rotmm= new G4RotationMatrix; rotmm->rotateY(42.13*deg);
- new G4PVPlacement(rotmm,G4ThreeVector(redge-0.5*(fBar[0]+fMirror3[2]+fTankBox[0]-2*fMirror3[0])+130-0.5*fFdp[0]*cos(42.13*deg),0,0.5*fTankBox[2]-185),lFdp,"wFdp", lTankBox,false,0);
+  G4RotationMatrix* rotmm= new G4RotationMatrix; rotmm->rotateY(42.13*deg);
 
+  G4AssemblyVolume * assemblyPD = new G4AssemblyVolume();
+  G4RotationMatrix* Rp = new G4RotationMatrix;
+  Rp->rotateY(0.);
+  G4ThreeVector Tpd(0.,0.,0.);
+  assemblyPD->AddPlacedVolume(lFdp,Tpd,Rp);
+  if(fGap > 0.){	
+    G4ThreeVector Tgap(0.,0.,(fGap+fFdp[2])/2.);
+    assemblyPD->AddPlacedVolume(lGap,Tgap,Rp);
+  }
+  G4ThreeVector Twa(0.,0.,(fWall+2.*fGap+fFdp[2])/2.);
+  assemblyPD->AddPlacedVolume(lWall,Twa,Rp);
+	
+  double pdShiftX = redge-0.5*(fBar[0]+fMirror3[2]+fTankBox[0]-2*fMirror3[0])+130-0.5*fFdp[0]*cos(42.13*deg);
+  double pdShiftZ = 0.5*fTankBox[2]-185;
+  G4ThreeVector pdShift(pdShiftX,0,pdShiftZ);	
+  G4RotationMatrix *rotmm1 = new G4RotationMatrix;
+  rotmm1->rotateY((-42.13)*deg);
+  assemblyPD->MakeImprint(lTankBox, pdShift, rotmm1, 0);
+
+ // new G4PVPlacement(rotmm,G4ThreeVector(redge-0.5*(fBar[0]+fMirror3[2]+fTankBox[0]-2*fMirror3[0])+130-0.5*fFdp[0]*cos(42.13*deg),0,0.5*fTankBox[2]-185),lFdp,"wFdp", lTankBox,false,0);
 
   const G4int num = 36; 
   G4double WaveLength[num];
@@ -381,6 +445,9 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   MirrorOpSurface->SetMaterialPropertiesTable(MirrorMPT);
   new G4LogicalSkinSurface("MirrorSurface", lMirror,MirrorOpSurface);
   new G4LogicalSkinSurface("MirrorSurface", lFmirror,MirrorOpSurface);
+  if(fLensId > 0){
+    new G4LogicalSkinSurface("MirrorSurface", lSmirror,MirrorOpSurface);
+  }
   new G4LogicalSkinSurface("MirrorSurface", lTankMirror1,MirrorOpSurface);
   new G4LogicalSkinSurface("MirrorSurface", lTankMirror2,MirrorOpSurface);
   new G4LogicalSkinSurface("MirrorSurface", lTankMirror3,MirrorOpSurface);
@@ -679,14 +746,21 @@ void GlxDetectorConstruction::SetVisualization(){
   G4VisAttributes *waBar = new G4VisAttributes(G4Colour(0.,1.,0.9,0.2));
   waBar->SetVisibility(true);
   lBar->SetVisAttributes(waBar);
+  lWall->SetVisAttributes(waBar);
 
   G4VisAttributes *waWindow = new G4VisAttributes(G4Colour(0.2,0.8,0.9));
   lWindow->SetVisAttributes(waWindow);
-
+  if(fGap > 0.){
+    lGap->SetVisAttributes(waWindow);
+  }
+	
   G4VisAttributes *waMirror = new G4VisAttributes(G4Colour(1.,0.7,0.2,0.5));
   waMirror->SetVisibility(true);
   lMirror->SetVisAttributes(waMirror);
   lFmirror->SetVisAttributes(waMirror);
+  if(fLensId > 0){
+    lSmirror->SetVisAttributes(waMirror);
+  }
   lTankMirror1->SetVisAttributes(waMirror);
   lTankMirror2->SetVisAttributes(waMirror);
   lTankMirror3->SetVisAttributes(waMirror);
@@ -720,11 +794,14 @@ void GlxDetectorConstruction::ConstructSDandField(){
   GlxPixelSD* pixelSD = new GlxPixelSD("PixelSD", "PixelHitsCollection", 0);
   SetSensitiveDetector("lPixel",pixelSD);
   //SetSensitiveDetector("lScan",pixelSD);
-
+  
   GlxPrizmSD* prizmSD = new GlxPrizmSD("PrizmSD", "PrizmHitsCollection", 0);
   SetSensitiveDetector("lWedge",prizmSD);
   SetSensitiveDetector("lMirror",prizmSD);
   SetSensitiveDetector("lFmirror",prizmSD);
+  if(fLensId > 0){
+    SetSensitiveDetector("lSmirror",prizmSD);
+  }
   SetSensitiveDetector("lTankMirror1",prizmSD);
   SetSensitiveDetector("lTankMirror2",prizmSD);
   SetSensitiveDetector("lTankMirror3",prizmSD);
