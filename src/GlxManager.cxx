@@ -9,7 +9,7 @@
 GlxManager * GlxManager::fInstance= NULL;
 
 GlxManager::GlxManager(G4String outfile, G4int runtype){
-  TString filename = outfile;
+  TString filename = outfile.c_str();
   fOutName = filename; 
   fOutName = fOutName.Remove(fOutName.Last('.'));
   fRunType = runtype;
@@ -22,15 +22,19 @@ GlxManager::GlxManager(G4String outfile, G4int runtype){
   }
 
   if(fRunType==1 || fRunType==5){
-    fLut = new TClonesArray("GlxLutNode");
-    fTree = new TTree("prtlut","Look-up table for the geometrical reconstruction.");
-    fTree->Branch("LUT",&fLut,256000,2); 
-    Int_t Nnodes = 20000;
     
-    TClonesArray &fLuta = *fLut; 
-    for (Long64_t n=0; n<Nnodes; n++) {
-      new((fLuta)[n]) GlxLutNode(n);
-    }    
+    Int_t Nnodes = 20000;
+    fTree = new TTree("glxlut","Look-up table for the geometrical reconstruction.");
+    for(Int_t b=0; b<48; b++){
+      
+      fLut[b] = new TClonesArray("GlxLutNode");
+      fTree->Branch(Form("LUT_%d",b),&fLut[b],256000,2);
+
+      TClonesArray &fLuta = *fLut[b]; 
+      for (Long64_t n=0; n<Nnodes; n++) {
+	new((fLuta)[n]) GlxLutNode(n);
+      }
+    }
   }
 
   if(fRunType==2){
@@ -88,7 +92,7 @@ void GlxManager::AddEvent(GlxEvent event){
     fEvent->SetMomentum(fMomentum);
     fEvent->SetGeometry(fGeometry);
     fEvent->SetLens(fLens);
-	fEvent->SetGap(fGap);
+    fEvent->SetGap(fGap);
     fEvent->SetTest1(fTest1);
     fEvent->SetTest2(fTest2);
     fEvent->SetPrismStep(fPrismStep);
@@ -112,7 +116,7 @@ void GlxManager::AddHit(GlxHit hit){
   }
   if(fRunType==1 || fRunType==5){
     int id = 100*hit.GetMcpId() + hit.GetPixelId();
-    ((GlxLutNode*)(fLut->At(id)))->
+    ((GlxLutNode*)(fLut[hit.GetType()]->At(id)))->
       AddEntry(id, fMomentum, hit.GetPathInPrizm(),
 	       hit.GetNreflectionsInPrizm(),
 	       hit.GetLeadTime(),hit.GetGlobalPos(),hit.GetDigiPos());

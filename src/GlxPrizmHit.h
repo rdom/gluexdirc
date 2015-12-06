@@ -7,42 +7,44 @@
 #include "G4ThreeVector.hh"
 
 
-class GlxPrizmHit : public G4VHit
-{
-  public:
-    GlxPrizmHit();
-    GlxPrizmHit(const GlxPrizmHit&);
-    virtual ~GlxPrizmHit();
+class GlxPrizmHit : public G4VHit{
+public:
+  GlxPrizmHit();
+  GlxPrizmHit(const GlxPrizmHit&);
+  virtual ~GlxPrizmHit();
 
-    // operators
-    const GlxPrizmHit& operator=(const GlxPrizmHit&);
-    G4int operator==(const GlxPrizmHit&) const;
+  // operators
+  const GlxPrizmHit& operator=(const GlxPrizmHit&);
+  G4int operator==(const GlxPrizmHit&) const;
 
-    inline void* operator new(size_t);
-    inline void  operator delete(void*);
+  inline void* operator new(size_t);
+  inline void  operator delete(void*);
 
-    // methods from base class
-    virtual void Draw();
-    virtual void Print();
+  // methods from base class
+  virtual void Draw();
+  virtual void Print();
 
-    // Set methods
-    void SetTrackID  (G4int track)      { fTrackID = track; };
-    void SetNormalId(G4int chamb)       { fNormalId = chamb; };
-    void SetEdep     (G4double de)      { fEdep = de; };
-    void SetPos      (G4ThreeVector xyz){ fPos = xyz; };
+  // Set methods
+  void SetId  (G4int id)      { fId = id; };
+  void SetTrackId  (G4int track)         { fTrackId = track; };
+  void SetNormalId(G4int chamb)       { fNormalId = chamb; };
+  void SetEdep     (G4double de)      { fEdep = de; };
+  void SetPos      (G4ThreeVector xyz){ fPos = xyz; };
 
-    // Get methods
-    G4int GetTrackID() const     { return fTrackID; };
-    G4int GetNormalId() const    { return fNormalId; };
-    G4double GetEdep() const     { return fEdep; };
-    G4ThreeVector GetPos() const { return fPos; };
+  // Get methods
+  G4int GetId() const     { return fId; };
+  G4int GetTrackId() const     { return fTrackId; };
+  G4int GetNormalId() const    { return fNormalId; };
+  G4double GetEdep() const     { return fEdep; };
+  G4ThreeVector GetPos() const { return fPos; };
 
-  private:
+private:
 
-      G4int         fTrackID;
-      G4int         fNormalId;
-      G4double      fEdep;
-      G4ThreeVector fPos;
+  G4int         fId;
+  G4int         fTrackId;
+  G4int         fNormalId;
+  G4double      fEdep;
+  G4ThreeVector fPos;
 };
 
 
@@ -53,7 +55,7 @@ extern G4ThreadLocal G4Allocator<GlxPrizmHit>* GlxPrizmHitAllocator;
 inline void* GlxPrizmHit::operator new(size_t)
 {
   if(!GlxPrizmHitAllocator)
-      GlxPrizmHitAllocator = new G4Allocator<GlxPrizmHit>;
+    GlxPrizmHitAllocator = new G4Allocator<GlxPrizmHit>;
   return (void *) GlxPrizmHitAllocator->MallocSingle();
 }
 

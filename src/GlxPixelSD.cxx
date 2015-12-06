@@ -4,6 +4,8 @@
 #include "G4ThreeVector.hh"
 #include "G4SDManager.hh"
 #include "G4ios.hh"
+#include "G4TransportationManager.hh"
+#include "G4Navigator.hh" 
 #include "G4RunManager.hh"
 #include <TVector3.h>
 
@@ -16,17 +18,14 @@
 GlxPixelSD::GlxPixelSD( const G4String& name, 
 			const G4String& hitsCollectionName,
 			G4int nofCells)
-  : G4VSensitiveDetector(name)
-{
+  : G4VSensitiveDetector(name){
   collectionName.insert(hitsCollectionName);
 }
 
-GlxPixelSD::~GlxPixelSD() 
-{ 
+GlxPixelSD::~GlxPixelSD(){ 
 }
 
-void GlxPixelSD::Initialize(G4HCofThisEvent* hce)
-{
+void GlxPixelSD::Initialize(G4HCofThisEvent* hce){
 
  // TTree *gTree = new TTree("Glx","Prototype hits tree");
  // Event *fHit = 0;
@@ -50,19 +49,7 @@ void GlxPixelSD::Initialize(G4HCofThisEvent* hce)
   //GlxManager::Instance()->AddEvent(GlxEvent());
 }
 
-G4bool GlxPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist)
-{  
-  // // energy deposit
-  // G4double edep = step->GetTotalEnergyDeposit();
-  
-  // // step length
-  // G4double stepLength = 0.;
-  // if ( step->GetTrack()->GetDefinition()->GetPDGCharge() != 0. ) {
-  //   stepLength = step->GetStepLength();
-  // }
-
-  // if ( edep==0. && stepLength == 0. ) return false;     
-
+G4bool GlxPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){  
   if(step == 0) return false;
  
   //G4ThreeVector translation = hist->GetTranslation();
@@ -100,21 +87,19 @@ G4bool GlxPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist)
   G4HCofThisEvent* HCofEvent = currentEvent->GetHCofThisEvent();
   GlxPrizmHitsCollection* prizmCol = (GlxPrizmHitsCollection*)(HCofEvent->GetHC(collectionID));
 
-
- 
   Double_t pathId = 0;
-  Int_t refl=-1;
+  Int_t refl=-1, barId(-1);
   for (G4int i=0;i<prizmCol->entries();i++){
     GlxPrizmHit* phit = (*prizmCol)[i];
-    if(phit->GetTrackID()==track->GetTrackID()) {
+    if(i==0) barId=phit->GetId();
+    if(phit->GetTrackId()==track->GetTrackID()) {
       refl++;
       pathId += phit->GetNormalId()*1000*refl;
     }
   }
 
-  //std::cout<<"Number of reflections: "<<refl <<std::endl;
-
   GlxHit hit;
+  hit.SetType(barId);
   hit.SetMcpId(touchable->GetReplicaNumber(1));
   hit.SetPixelId(touchable->GetReplicaNumber(0));
   hit.SetGlobalPos(globalPos);

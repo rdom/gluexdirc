@@ -29,32 +29,39 @@
 using std::cout;
 using std::endl;
 
-TH1F*  fHist1 = new TH1F("Time1","1", 1000,0,20);
-TH1F*  fHist2 = new TH1F("Time2","2", 1000,0,20);
+TH1F*  fHist1 = new TH1F("Time1","1", 1000,0,100);
+TH1F*  fHist2 = new TH1F("Time2","2", 1000,0,100);
+TH1F*  fHistDiff = new TH1F("hDiff","hDiff", 1000,-50,50);
 TH2F*  fHist3 = new TH2F("Time3","3", 500,5,80, 500,5,60);
 TH2F*  fHist4 = new TH2F("Time4","4", 200,-1,1, 200,-1,1);
 TH2F*  fHist5 = new TH2F("Time5","5", 200,-1,1, 200,-1,1);
 Int_t gg_i(0);
 TGraph gg_gr;
 
-Double_t minChangle = 0.35;
+Double_t minChangle = 0.6;
 Double_t maxChangle = 0.9;
 
 // -----   Default constructor   -------------------------------------------
 GlxLutReco::GlxLutReco(TString infile, TString lutfile, Int_t verbose){
   fVerbose = verbose;
+  fLoopoverAll = false;
   fChain = new TChain("data");
   fChain->Add(infile);
   fChain->SetBranchAddress("GlxEvent", &fEvent);
 
   fFile = new TFile(lutfile);
-  fTree=(TTree *) fFile->Get("prtlut") ;
-  fLut = new TClonesArray("GlxLutNode");
-  fTree->SetBranchAddress("LUT",&fLut); 
+  fTree=(TTree *) fFile->Get("glxlut") ;
+  
+  for(Int_t b=0; b<48; b++){
+    std::cout<<"FFFFFFFFFFFFFFFFF " <<b<<std::endl;
+    //fLut[b] = new TClonesArray("GlxLutNode");
+    fTree->SetBranchAddress(Form("LUT_%d",b),&fLut[b]); 
+  }
+
   fTree->GetEntry(0);
 
   fHist = new TH1F("chrenkov_angle_hist","chrenkov_angle_hist", 100,minChangle,maxChangle);
-  fFit = new TF1("fgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +[3]",minChangle,maxChangle);
+  fFit = new TF1("fgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +x*[3]+[4]",minChangle,maxChangle);
   fSpect = new TSpectrum(10);
 
   cout << "-I- GlxLutReco: Intialization successfull" << endl;
@@ -67,12 +74,12 @@ GlxLutReco::~GlxLutReco(){
  
 //-------------- Loop over tracks ------------------------------------------
 void GlxLutReco::Run(Int_t start, Int_t end){
- TVector3 dird, dir, momInBar(0,0,1),posInBar;
- Double_t cangle,spr,tangle,boxPhi,evtime, bartime, lenz,dirz,luttheta, barHitTime, hitTime;
-  Int_t pdgcode, evpointcount=0;
+  TVector3 dird, dir, momInBar(0,0,1),posInBar,rotatedmom;
+  Double_t cangle,spr,tangle,boxPhi,evtime, bartime, lenz,luttheta, barHitTime, hitTime;
+  Int_t pdgcode, evpointcount(0),barId(-1);
   Bool_t reflected = kFALSE;
   gStyle->SetOptFit(111);
-
+ 
   TVector3 fnX1 = TVector3 (1,0,0);   
   TVector3 fnY1 = TVector3( 0,1,0);
   TVector3 fnZ1 = TVector3( 0,0,1);
@@ -99,14 +106,21 @@ void GlxLutReco::Run(Int_t start, Int_t end){
   tree.Branch("phi",&phi,"phi/D");
 
   test1 = GlxManager::Instance()->GetTest1();
-  
-  std::cout<<"Run started " <<std::endl;
-  Int_t ntotal=0;
+
   Int_t nEvents = fChain->GetEntries();
-  for (Int_t ievent=0; ievent<nEvents; ievent++){
+  if(end==0) end = nEvents;
+  
+  Int_t nsHits(0),nsEvents(0), nHits(0), ninfit(0);
+  std::cout<<"Run started for ["<<start<<","<<end <<"]"<<std::endl;
+  if(start<0) {
+    fLoopoverAll=true;
+    ninfit=abs(start);
+    start=0;
+  }
+    
+  for (Int_t ievent=start; ievent<nEvents; ievent++){
     fChain->GetEntry(ievent);
-    Int_t nHits = fEvent->GetHitSize();
-    ntotal+=nHits;
+    nHits = fEvent->GetHitSize();
     std::cout<<"Event # "<< ievent << " has "<< nHits <<" hits"<<std::endl;
     GlxTrackInfo trackinfo;
     trackinfo.AddInfo(fEvent->PrintInfo()+"\n Basic reco informaion: \n");
@@ -114,55 +128,46 @@ void GlxLutReco::Run(Int_t start, Int_t end){
  
     trackinfo.AddInfo(Form("Cerenkov angle selection: (%f,%f) \n",minChangle,maxChangle));
     
-    TVector3 rotatedmom = fEvent->GetMomentum().Unit();
-    rotatedmom.RotateY(TMath::PiOver2());
-    
-    Double_t fAngle =  180 - fEvent->GetAngle();
-    std::cout<<"fAngle  "<<fAngle  <<std::endl;
-    rotatedmom.Print();
-    
-    //TVector3 rotatedmom = momInBar;
-    //rotatedmom.RotateY(fAngle/180.*TMath::Pi());
+    rotatedmom = fEvent->GetMomentum().Unit();    
     TVector3 cz = rotatedmom.Unit();
     cz = TVector3(-cz.X(),cz.Y(),cz.Z());    
 
     for(Int_t h=0; h<nHits; h++) {
-      GlxPhotonInfo photoninfo;
       fHit = fEvent->GetHit(h);
+      barId=fHit.GetType();
       hitTime = fHit.GetLeadTime();
-      Double_t radiatorL = 1250*4; //bar
-      Double_t botZ = 0.5*(radiatorL-2*91.0);
-      lenz = botZ -fHit.GetPosition().X();
-      
-      TVector3 vv = fHit.GetMomentum();
-      vv.RotateY(fAngle/180.*TMath::Pi());
-      dirz = vv.Z();
+      //      if(hitTime<40) continue;
+      Double_t radiatorL = 1225*4; //bar
+      Double_t botZ = 0.5*radiatorL;
+      lenz = botZ -fHit.GetPosition().X()-0.5*91; 
 
+      if(fHit.GetMomentum().X()<0) reflected = kTRUE;
+      else reflected = kFALSE;
+      
+      if(reflected) lenz = 2*radiatorL - lenz; 
+      
       TVector3 cd = fHit.GetMomentum();
       Double_t phi0 =  cd.Phi();        
       Double_t theta0 = cd.Theta();      
       fHist5->Fill(theta0*TMath::Sin(phi0),theta0*TMath::Cos(phi0));
       
-      if(dirz<0) reflected = kTRUE;
-      else reflected = kFALSE;
-      reflected = kFALSE;
-      
       Int_t sensorId = 100*fHit.GetMcpId()+fHit.GetPixelId();
-      std::cout<<"sensorId "<<sensorId <<std::endl;
+      //std::cout<<"sensorId "<<sensorId <<std::endl;
       if(sensorId>20000) {
 	std::cout<<"=================== sensorId "<<sensorId <<std::endl;
 	continue;
       }
-      
-      GlxLutNode *node = (GlxLutNode*) fLut->At(sensorId);
-      Int_t size = node->Entries();
 
+      Bool_t isGoodHit(false);
+      std::cout<<"barId "<< barId<<std::endl;
+      
+      GlxLutNode *node = (GlxLutNode*) fLut[barId]->At(sensorId);
+      Int_t size = node->Entries();
       for(int i=0; i<size; i++){
 	dird = node->GetEntry(i);
 	evtime = node->GetTime(i);
-
+ 
 	for(int u=0; u<4; u++){
-
 	  if(u == 0) dir = dird;
 	  if(u == 1) dir.SetXYZ( dird.X(),-dird.Y(),  dird.Z());
 	  if(u == 2) dir.SetXYZ( dird.X(), dird.Y(), -dird.Z());
@@ -171,31 +176,26 @@ void GlxLutReco::Run(Int_t start, Int_t end){
 	  
 	  double criticalAngle = asin(1.00028/1.47125); // n_quarzt = 1.47125; //(1.47125 <==> 390nm)
 	  if(dir.Angle(fnY1) < criticalAngle || dir.Angle(fnZ1) < criticalAngle) continue;
-	  
-	  luttheta = dir.Theta();	
+
+	  TVector3 vt = dir;
+	  vt.RotateY(TMath::PiOver2());
+	  luttheta = vt.Theta();
 	  if(luttheta > TMath::PiOver2()) luttheta = TMath::Pi()-luttheta;
 	  
-	  if(!reflected) bartime = lenz/cos(luttheta)/198.; 
-	  else bartime = (2*radiatorL - lenz)/cos(luttheta)/198.; 
+	  bartime = lenz/cos(luttheta)/198.; 
 	
 	  fHist1->Fill(hitTime);
-	  fHist2->Fill(bartime + evtime);
+	  fHist2->Fill(bartime+evtime);
+	  fHistDiff->Fill(bartime+evtime - hitTime);
 	  //std::cout<<"T1  "<<hitTime << "  T2 "<< bartime << "  T3  "<< evtime <<std::endl;
-	  
-	  
-	  if(fabs((bartime + evtime)-hitTime)>test1) continue;
+	  	  
+	  if(fabs(bartime+evtime - hitTime)>test1) continue;
 	  fHist3->Fill(fabs((bartime + evtime)),hitTime);
 	  tangle = rotatedmom.Angle(dir);
-	  //if(  tangle>TMath::Pi()/2.) tangle = TMath::Pi()-tangle;
-	  
-	  GlxAmbiguityInfo ambinfo;
-	  ambinfo.SetBarTime(bartime);
-	  ambinfo.SetEvTime(evtime);
-	  ambinfo.SetCherenkov(tangle);
-	  photoninfo.AddAmbiguity(ambinfo);
-	  
+	  	  
 	  if(tangle > minChangle && tangle < maxChangle){
 	    fHist->Fill(tangle);
+	    isGoodHit=true;
 	   
 	    TVector3 rdir = TVector3(-dir.X(),dir.Y(),dir.Z());
 	    rdir.RotateUz(cz);
@@ -210,56 +210,42 @@ void GlxLutReco::Run(Int_t start, Int_t end){
 	}
       }
 
-      photoninfo.SetHitTime(hitTime);
-      photoninfo.SetReflected(reflected);
-      photoninfo.SetEvReflections(evpointcount);
-      photoninfo.SetSensorId(sensorId);
-      photoninfo.SetMcCherenkovInBar(fHit.GetCherenkovMC());
-      
-
-      trackinfo.AddPhoton(photoninfo);
+      if(isGoodHit) nsHits++;
     }
-    FindPeak(cangle,spr,fEvent->GetAngle()+0.01);
-    std::cout<<"RES   "<<spr*1000 << "   N "<<nHits << "  "<<spr/sqrt(nHits)*1000<<std::endl;
-    
-    
-    //Int_t pdgreco = FindPdg(fEvent->GetMomentum().Mag(), cherenkovreco);
 
-    // if(testTrRes) trackinfo.SetMomentum(TVector3(dtheta,dtphi,0)); //track deviation
-    trackinfo.SetMcMomentum(fEvent->GetMomentum());
-    trackinfo.SetMcMomentumInBar(momInBar);
-    trackinfo.SetMcPdg(0);
-    trackinfo.SetPdg(0);
-    trackinfo.SetAngle(fEvent->GetAngle());
-    trackinfo.SetMcCherenkov(cangle);
-
-    //trackinfo.SetCherenkov(cherenkovreco);
-    trackinfo.SetMcTimeInBar(barHitTime);
-    GlxManager::Instance()->AddTrackInfo(trackinfo);
-    GlxManager::Instance()->Fill();
+    if(fLoopoverAll && nsEvents%ninfit==0){
+      FindPeak(cangle,spr,rotatedmom.Theta()/TMath::Pi()*180 ,rotatedmom.Phi()/TMath::Pi()*180);
+      nph = nsHits/(Double_t)ninfit;
+      spr = spr*1000;
+      trr = spr/sqrt(nph);
+      theta = fEvent->GetAngle();
+      par3 = fEvent->GetTest1();
+      std::cout<<"RES   "<<spr << "   N "<< nph << " trr  "<<trr<<std::endl;
+      tree.Fill();
+      nsHits=0;
+    }
+    if(++nsEvents>=end) break;
   }
- 
-  //FindPeak(cangle,spr,fEvent->GetAngle()+0.01);
-  Double_t aEvents = ntotal/(Double_t)nEvents;
 
-  nph = ntotal/(Double_t)nEvents;
-  spr = spr*1000;
-  trr = spr/sqrt(aEvents);
-  theta = fEvent->GetAngle();
-  par3 = fEvent->GetTest1();
-  xx = fEvent->GetBeamX();
-  yy = fEvent->GetBeamZ();
-  
-  std::cout<<"RES   "<<spr << "   N "<< nph << " trr  "<<trr<<std::endl;
+  if(!fLoopoverAll){
+    FindPeak(cangle,spr,rotatedmom.Theta()/TMath::Pi()*180 ,rotatedmom.Phi()/TMath::Pi()*180);
+    nph = nsHits/(Double_t)nsEvents;
+    spr = spr*1000;
+    trr = spr/sqrt(nph);
+    theta = fEvent->GetAngle();
+    par3 = fEvent->GetTest1();
+    xx = fEvent->GetBeamX();
+    yy = fEvent->GetBeamZ();
+    std::cout<<"RES   "<<spr << "   N "<< nph << " trr  "<<trr<<std::endl;
+    tree.Fill();
+  }
     
   tree.Fill();
   tree.Write();
-
-  GlxManager::Instance()->Save();
 }
 
 Int_t g_num =0;
-Bool_t GlxLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Int_t a){
+Bool_t GlxLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t theta=0, Double_t phi=0){
   cherenkovreco=0;
   spr=0;
   //  gStyle->SetCanvasPreferGL(kTRUE);
@@ -271,47 +257,62 @@ Bool_t GlxLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Int_t a){
     if(nfound>0) cherenkovreco = xpeaks[0];
     else cherenkovreco =  fHist->GetXaxis()->GetBinCenter(fHist->GetMaximumBin());
 
-    fFit->SetParameters(100,cherenkovreco,0.005,10);   // peak
-    // fFit->SetParameter(1,cherenkovreco);   // peak
-    // fFit->SetParameter(2,0.005); // width
+    if(cherenkovreco>0.85) cherenkovreco=0.82;
+    fFit->SetParameters(100,cherenkovreco,0.010,10);
+    fFit->SetParNames("p0","#theta_{c}","#sigma_{c}","p3","p4");
 
-    fFit->FixParameter(2,0.009); // width
-    fHist->Fit("fgaus","","",cherenkovreco-0.07,cherenkovreco+0.07);
-    fFit->ReleaseParameter(2); // width
-    fHist->Fit("fgaus","M","",cherenkovreco-0.07,cherenkovreco+0.07);
+
+    fFit->SetParLimits(0,1,1E6);
+    fFit->SetParLimits(1,cherenkovreco-0.04,cherenkovreco+0.04);
+    fFit->SetParLimits(2,0.005,0.030); // width
+    fHist->Fit("fgaus","I","",cherenkovreco-0.05,cherenkovreco+0.05);
+    //fFit->FixParameter(3,fFit->GetParameter(3)); // width
+    fHist->Fit("fgaus","M","",cherenkovreco-0.05,cherenkovreco+0.05);
     cherenkovreco = fFit->GetParameter(1);
     spr = fFit->GetParameter(2); 
     if(fVerbose>1) gROOT->SetBatch(0);
     
     Bool_t storePics(true);
     if(storePics){
+      TString title=Form("#theta = %2.1f #circ #varphi = %2.1f #circ", theta,phi);
       TCanvas* c = new TCanvas("c","c",0,0,800,500);
       fHist->GetXaxis()->SetTitle("#theta_{C} [rad]");
       fHist->GetYaxis()->SetTitle("Entries [#]");
-      fHist->SetTitle(Form("theta %d", a));
+      fHist->SetTitle(title);
       fHist->Draw();
-      // fHist1->SetLineColor(2);
-      // fHist1->Draw();
-      // fHist2->Draw("same");
-
       c->Modified();
       c->Update();
+      
+      TCanvas* c3 = new TCanvas("c3","c3",0,0,800,500);
+      fHist1->SetLineColor(2);
+      fHist1->Draw();
+      fHist2->Draw("same");
+
+      c3->Modified();
+      c3->Update();
+      
       TPaveStats *stats =(TPaveStats*)c->GetPrimitive("stats");
       stats->SetY1NDC(.5);
       stats->SetY2NDC(.9);
       stats->SetX1NDC(.1);
       stats->SetX2NDC(.5);
       //stats->SetFillStyle(0);
-      c->Print(Form("spr/tangle_%d.png", a));
-      c->WaitPrimitive();
+      c->Print(Form("spr/tangle_%2.2f_%2.2f.png", theta,phi));
 
-      // TCanvas* c2 = new TCanvas("c2","c2",0,0,800,400);
-      // c2->Divide(2,1);
-      // c2->cd(1);
+      TCanvas* c2 = new TCanvas("c2","c2",0,0,800,400);
+      //c2->Divide(2,1);
+      //c2->cd(1);
       // fHist3->GetXaxis()->SetTitle("calculated time [ns]");
       // fHist3->GetYaxis()->SetTitle("measured time [ns]");
-      // fHist3->SetTitle(Form("theta %d", a));
+      // fHist3->SetTitle(title);
+      // fHist3->Draw("colz");
 
+      fHistDiff->GetXaxis()->SetTitle("t_{calculated} - t_{measured} [ns]");
+      fHistDiff->GetYaxis()->SetTitle("measured time [ns]");
+      
+      fHistDiff->Draw();
+      c2->WaitPrimitive("");
+      
       // fHist4->SetStats(0);
       // fHist4->GetXaxis()->SetTitle("#theta_{c}sin(#varphi_{c})");
       // fHist4->GetYaxis()->SetTitle("#theta_{c}cos(#varphi_{c})");

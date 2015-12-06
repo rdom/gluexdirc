@@ -17,7 +17,8 @@ G4ThreadLocal G4Allocator<GlxPrizmHit>* GlxPrizmHitAllocator=0;
 
 GlxPrizmHit::GlxPrizmHit()
  : G4VHit(),
-   fTrackID(-1),
+   fId(-1),
+   fTrackId(-1),
    fNormalId(-1),
    fEdep(0.),
    fPos(G4ThreeVector()){}
@@ -26,14 +27,16 @@ GlxPrizmHit::~GlxPrizmHit(){}
 
 GlxPrizmHit::GlxPrizmHit(const GlxPrizmHit& right)
   : G4VHit(){
-  fTrackID   = right.fTrackID;
+  fId   = right.fId;
+  fTrackId   = right.fTrackId;
   fNormalId = right.fNormalId;
   fEdep      = right.fEdep;
   fPos       = right.fPos;
 }
 
 const GlxPrizmHit& GlxPrizmHit::operator=(const GlxPrizmHit& right){
-  fTrackID   = right.fTrackID;
+  fId   = right.fId;
+  fTrackId   = right.fTrackId;
   fNormalId = right.fNormalId;
   fEdep      = right.fEdep;
   fPos       = right.fPos;
@@ -60,7 +63,8 @@ void GlxPrizmHit::Draw(){
 
 void GlxPrizmHit::Print(){
   G4cout
-     << "  trackID: " << fTrackID << " chamberNb: " << fNormalId
+     << "  trackID: " << fId 
+     << "  trackID: " << fTrackId << " chamberNb: " << fNormalId
      << "Edep: "
      << std::setw(7) << G4BestUnit(fEdep,"Energy")
      << " Position: "

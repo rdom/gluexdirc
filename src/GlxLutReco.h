@@ -32,13 +32,13 @@ public:
   void Run(Int_t start=0, Int_t end=0);
 
 private:
-  Bool_t FindPeak(Double_t& cherenkovreco, Double_t& spr,Int_t a);
+  Bool_t FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t theta, Double_t phi);
   Int_t FindPdg(Double_t mom, Double_t cangle);
   void FitRing(Double_t& x0, Double_t& y0, Double_t& theta);
   Int_t fDetectorID;  
   Double_t fBboxNum,fPipehAngle,fDphi,fBarPhi;
 
-  TClonesArray *fLut;
+  TClonesArray *fLut[48];
   TClonesArray *fTrackInfoArray;
 
   TFile *fFile; 
@@ -58,7 +58,7 @@ private:
   TH1F *fHist;
   TF1 *fFit;
   TSpectrum *fSpect;
-
+  Bool_t fLoopoverAll;
 };
 
 #endif

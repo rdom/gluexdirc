@@ -53,7 +53,7 @@ int main(int argc,char** argv)
     session,geomAng,batchmode,lensId,gap,particle,momentum,testVal1,testVal2,
     prismStep,beamZ,beamX,mirrorR,mirrorT,mcpT,
     beamDimension, mcpLayout, infile = "hits.root", lutfile = "../data/lut.root";
-  G4int runtype = 0, verbose(0);
+  G4int firstevent(0), runtype(0), verbose(0);
 
   G4long myseed = 345354;
   for ( G4int i=1; i<argc; i=i+2 ) {
@@ -67,9 +67,10 @@ int main(int argc,char** argv)
     else if ( G4String(argv[i]) == "-h" ) radiator  = argv[i+1];
     else if ( G4String(argv[i]) == "-a" ) geomAng   = argv[i+1];
     else if ( G4String(argv[i]) == "-b" ) batchmode = argv[i+1];
+    else if ( G4String(argv[i]) == "-f" ) firstevent= atoi(argv[i+1]);
     else if ( G4String(argv[i]) == "-e" ) events    = argv[i+1];
     else if ( G4String(argv[i]) == "-l" ) lensId    = argv[i+1];
-	else if ( G4String(argv[i]) == "-wg") gap       = argv[i+1];  
+    else if ( G4String(argv[i]) == "-wg") gap       = argv[i+1];  
     else if ( G4String(argv[i]) == "-x" ) particle  = argv[i+1];
     else if ( G4String(argv[i]) == "-p" ) momentum  = argv[i+1];
     else if ( G4String(argv[i]) == "-w" ) physlist  = argv[i+1];
@@ -93,7 +94,7 @@ int main(int argc,char** argv)
   }
 
   if(outfile=="" && runtype == 0) outfile = "hits.root"; // simulation
-  if(outfile=="" && (runtype == 1 || runtype == 5)) outfile = "../data/lut.root";  // lookup table generation
+  if(outfile=="" && (runtype == 1 || runtype == 5)) outfile = Form("../data/lut_%d.root",atoi(radiator));  // lookup table generation
   if(outfile=="" && runtype == 6) outfile = "focalplane.root";  // focal plane simulation
   if(outfile=="" && runtype == 2) outfile = "reco.root"; // reconstruction
 
@@ -106,7 +107,7 @@ int main(int argc,char** argv)
   if(geometry.size()) GlxManager::Instance()->SetGeometry(atoi(geometry));
   if(radiator.size()) GlxManager::Instance()->SetRadiator(atoi(radiator));
   if(lensId.size())   GlxManager::Instance()->SetLens(atoi(lensId));
-  if(gap.size())   GlxManager::Instance()->SetGap(atoi(gap));
+  if(gap.size())   GlxManager::Instance()->SetGap(atof(gap));
   if(mcpLayout.size())GlxManager::Instance()->SetMcpLayout(atoi(mcpLayout));
   if(beamDimension.size())   GlxManager::Instance()->SetBeamDimension(atoi(beamDimension));
   if(testVal1.size())   GlxManager::Instance()->SetShift(atof(testVal1));
@@ -123,8 +124,8 @@ int main(int argc,char** argv)
   //if(beamDimension.size())GlxManager::Instance()->SetTest1(atoi(beamDimension));
 
   if(runtype == 2){
-    GlxLutReco * reco = new GlxLutReco(infile,lutfile,verbose); 
-    reco->Run(0);
+    GlxLutReco * reco = new GlxLutReco(infile.c_str(),lutfile.c_str(),verbose); 
+    reco->Run(firstevent,atoi(events));
     return 0;
   }
 

@@ -1,0 +1,30 @@
+#!/bin/bash
+
+tseed=$(($(date +%s%N)/1000000-1393400000000))
+
+echo $tseed
+
+for i in {0..11}; do \
+    ../build/glxdirc -o l_b$i.root -r $tseed$i  \
+		     -e 10000000 -s 1 -x "opticalphoton" -p "3.18 eV" -mr 800 -mt 16 -c 2 -g 0 -w 0 -b 1 -h $i > l_b$i.log \
+    & done
+
+sleep 1
+
+while : 
+do
+    activth=$(ps aux | grep "[g]lx" | grep "l_b" | wc -l)
+    diffth=$(($maxnthr-$activth))
+    echo "We have $activth active glxdirc simulations" 
+    if [ "$activth" -eq 0 ]; then 
+      break  
+    fi
+    sleep 2
+done
+
+sleep 2
+
+hadd -f lut.root l_b*.root
+mv lut.root ../data/lut.root
+
+seq 0 47 | xargs -I {} -n 1 -P 8  ../build/glxdirc -o l_b{}.root -r $(($(date +%s%N)/1000000-1393400000000)){} -e 10000000 -s 1 -x "opticalphoton" -p "3.18 eV" -mr 800 -mt 16 -c 2 -g 0 -w 0 -b 1 -h {} > l_b{}.log

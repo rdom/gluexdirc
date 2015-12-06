@@ -56,8 +56,9 @@ void GlxPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
   }
   if(GlxManager::Instance()->GetRunType() == 1){ // LUT generation
 
-    G4int radid = 1;
-    fParticleGun->SetParticlePosition(G4ThreeVector(radiatorL/2.-0.1,365+0.5*425-0.5*35-(11-radid)*35,0));
+    G4int radid = 47-GlxManager::Instance()->GetRadiator();
+    G4int arr[]={-795,-365,365,795};
+    fParticleGun->SetParticlePosition(G4ThreeVector(radiatorL/2.-0.1,arr[radid/12]+0.5*425-0.5*35-(11-radid%12)*35,0));
     G4double angle = -G4UniformRand()*M_PI;
     G4ThreeVector vec(0,0,1);
     vec.setTheta(acos(G4UniformRand()));

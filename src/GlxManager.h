@@ -48,7 +48,7 @@ public:
   void SetBeamDimension(int val){ fBeamDimension = val; }
   void SetRadiator(int val){ fRadiator = val; }
   void SetLens(int val){ fLens = val; }
-  void SetGap(int val){ fGap = val; }
+  void SetGap(double val){ fGap = val; }
   void SetMcpLayout(int val){ fMcpLayout = val; }
   void SetAngle(double val){ fAngle = val; }
   void SetRadiatorL(double val){ fRadiatorL = val; }
@@ -76,7 +76,7 @@ public:
   int GetBeamDimension(){ return fBeamDimension; }
   int GetRadiator(){ return fRadiator; }
   int GetLens(){ return fLens; }
-  int GetGap(){ return fGap; }
+  double GetGap(){ return fGap; }
   int GetMcpLayout(){ return fMcpLayout; }
   double GetAngle(){ return fAngle; }
   double GetRadiatorL(){ return fRadiatorL; }
@@ -113,7 +113,7 @@ private:
   int fParticle;
   int fBeamDimension;
   TVector3 fMomentum;
-  TClonesArray *fLut;
+  TClonesArray *fLut[48];
   TClonesArray *fTrackInfoArray;
   double fCurrentCherenkov;
   double fShift;
