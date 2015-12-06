@@ -92,7 +92,7 @@ void GlxManager::AddEvent(GlxEvent event){
     fEvent->SetMomentum(fMomentum);
     fEvent->SetGeometry(fGeometry);
     fEvent->SetLens(fLens);
-	fEvent->SetGap(fGap);
+    fEvent->SetGap(fGap);
     fEvent->SetTest1(fTest1);
     fEvent->SetTest2(fTest2);
     fEvent->SetPrismStep(fPrismStep);
