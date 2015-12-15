@@ -48,7 +48,7 @@ GlxManager::GlxManager(G4String outfile, G4int runtype){
   fPhysList = 0;
   fParticle = 0;
   fMomentum = TVector3(0,0,0);
-  fGeometry = 0;
+  fGeometry = 1;
   fAngle = 0;
   fRadiatorL=0;
   fRadiatorW=0;
@@ -58,7 +58,7 @@ GlxManager::GlxManager(G4String outfile, G4int runtype){
   fTest2 = 0;
   fLens = 0;
   fGap = 0;
-  fMcpLayout = 2014;
+  fMcpLayout = 2;
   fBeamDimension = 0;
 
   fPrismStep=0;

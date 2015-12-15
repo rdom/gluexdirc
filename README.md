@@ -4,7 +4,7 @@
 glxdirc [OPTION] [ARGUMENT] ... [OPTION] [ARGUMENT]
 
 example:
-./glxdirc -s 0 -e 0 -h 1 -s 0 -x kaon+ -p 10 -z -2 -gx 2000 -gz 200
+./glxdirc -s 0 -l 0 -wg 1. -e 1 -x muon -p 4. -z -2 -gx 225. -gy 268.
 
 ```
 ##Options
@@ -19,18 +19,25 @@ example:
                 2    reconstruction
 
 -g    geometry configuration
-                0    default
+                0    single EV tank
+				1    two EV tanks - default value
 
 -c   MCP layout
 		0    one MCP cover all FD plain (custom pixel size)
-                2    standard MCPs (6.4x6.4 pixels)
+        2    standard MCPs (6.4x6.4 pixels) - default value
 		
 
--mr   radius of the focusing mirror
+-mr   radius of the focusing mirror (default value 800mm)
 
--mt   tilt of the focusing mirror
+-mt   tilt of the focusing mirror (default value 16 degrees)
 
--dt   tilt of the photon-detection plane
+-l	  focusing type
+		0   cylindrical mirror 
+		n   n-segmented mirror (usually n = 3)
+
+-dt   tilt of the photodetection plane
+
+-wg   thickness of the air gap between the window and the photosensors
 
 -gx   x position of the hit in the radiator [-2490,2390] [mm] 
 
@@ -51,8 +58,8 @@ example:
 
 -p    particle momentum [GeV/c]
 
--w    physical list
-                0    standard
+-w    physics list
+                0    standard (default value)
                 1    without multiple scattering
                 10   monochromatic Cherenkov light
                 11   10 + 1 
@@ -62,20 +69,16 @@ example:
 -b    batch mode
                1    run silent (without GUI)
 
-//-d    display option
-               0    standard (default)
-               1    display hit occupancy of current run
-               2    display hit occupancy of occuhits.root (need to be generated)
 ```
 
 ##Examples
 ```
 
 lut generation:
-./glxdirc -e 1000000 -s 1 -x opticalphoton -p "3.18 eV" -mr 800 -mt 16 -c 2 -g 0 -w 0 -b 1
+./glxdirc -e 1000000 -s 1 -x opticalphoton -p "3.18 eV" -g 0 -b 1
 
 simulation:
-./glxdirc -s 0 -e 100 -x proton -p 4.5 -z -2 -gx 2000 -gy 200 -mr 800 -mt 16 -c 2 -w 0 -b 1
+./glxdirc -s 0 -e 100 -x proton -p 4.5 -z -2 -gx 2000 -gy 200 -b 1
 
 
 
