@@ -66,6 +66,7 @@ private:
 
   G4Material*        defaultMaterial; // material for bars
   G4Material*        BarMaterial; // material for bars
+  G4Material*		 SiliconMaterial; // cookies material
   G4Material*        OilMaterial;
   G4Material*        H2OMaterial;
   G4Material*        MirrorMaterial; // material of mirror
@@ -78,6 +79,7 @@ private:
   G4int fGeomId;
   G4int fLensId;
   G4int fMcpLayout;
+  G4double fNsil;
   G4double fHall[3];
   G4double fBar[3];
   G4double fBarBox[3];

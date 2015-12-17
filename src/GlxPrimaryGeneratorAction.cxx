@@ -71,7 +71,7 @@ void GlxPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
     G4ThreeVector vec(0,0,1);
     vec.rotateY(M_PI/10.);
     fParticleGun->SetParticleMomentumDirection(vec);
-    fParticleGun->SetParticlePosition(G4ThreeVector(0,0,-5600));
+    fParticleGun->SetParticlePosition(G4ThreeVector(0,0,-4000));//-5600));
   }
 
   if(GlxManager::Instance()->GetBeamDimension() < 0){ // random momentum

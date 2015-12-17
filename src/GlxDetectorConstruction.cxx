@@ -39,6 +39,8 @@ GlxDetectorConstruction::GlxDetectorConstruction()
   fMcpLayout = GlxManager::Instance()->GetMcpLayout();
   fLensId = GlxManager::Instance()->GetLens();
   fGap = GlxManager::Instance()->GetGap();
+
+  fNsil = 1.406;
  
   fNRow = 5;
   fNCol = 35;
@@ -172,7 +174,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   // The Air Gap
   if(fGap > 0.){
     G4Box* gGap = new G4Box("gGap",fFdp[0]/2.,fFdp[1]/2.,fGap/2.);
-    lGap = new G4LogicalVolume(gGap,defaultMaterial,"lGap",0,0,0);
+    lGap = new G4LogicalVolume(gGap,SiliconMaterial,"lGap",0,0,0);
   }
   // The FS wall of the EV
   G4Box* gWall = new G4Box("gWall",fFdp[0]/2.,fFdp[1]/2.,fWall/2.);
@@ -370,6 +372,14 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
      0.181,0.188,0.196,0.203,0.206,0.212,0.218,0.219,0.225,0.230,
      0.228,0.222,0.217,0.210,0.199,0.177};
 
+  // hamamatsu H12700 quantum efficiency (as a function of photon E):	
+  G4double QuantumEfficiencyPMT12700[num]=
+	{0.001,0.001,0.00118865,0.00511371,0.0104755,0.0174337,0.0259711,
+	0.0358296,0.046982,0.0593714,0.0729143,0.0875043,0.103016,0.119306,
+	0.13622,0.153591,0.171246,0.188889,0.206372,0.223528,0.239941,0.255526,
+	0.269913,0.283034,0.294369,0.303953,0.31158,0.317117,0.320523,0.321858,
+	0.321271,0.31895,0.315347,0.310875,0.306056,0.301365};
+
   // these quantum efficiencies have to be multiplied by geometry
   //   efficiency of given PMT's
   //   for Hamamatsu by factor 0.7
@@ -378,7 +388,8 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
     {
       QuantumEfficiencyB[k] =  QuantumEfficiencyB[k] * 0.45 ;
       QuantumEfficiencyPMT[k] =  QuantumEfficiencyPMT[k] *.7;
-    }
+	  QuantumEfficiencyPMT12700[k] =  QuantumEfficiencyPMT12700[k] *.7;
+  }
  
   // G4double QuantumEfficiency[num]= 
   //    { 1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,
@@ -414,7 +425,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   /* hamamatsu pmt's - smaller slots => quantum efficiency again
      assign to slot and pad */
   
-  fQuantumEfficiency = QuantumEfficiencyIdial; //QuantumEfficiencyPMT;//QuantumEfficiencyIdial;
+  fQuantumEfficiency = QuantumEfficiencyIdial;//QuantumEfficiencyPMT12700;// QuantumEfficiencyPMT;
   G4MaterialPropertiesTable* PhotocatodHamamatsuMPT = new G4MaterialPropertiesTable();
   PhotocatodHamamatsuMPT->AddProperty("EFFICIENCY",  PhotonEnergy,fQuantumEfficiency,num);
   PhotocatodHamamatsuMPT->AddProperty("REFLECTIVITY",PhotonEnergy,PMTReflectivity,num);
@@ -518,17 +529,24 @@ void GlxDetectorConstruction::DefineMaterials(){
      the optical property of Epotek to this material */
 
   G4Material* Epotek = new G4Material("Epotek",density=1.2*g/cm3,ncomponents=3);
-
   Epotek->AddElement(C,natoms=3);
   Epotek->AddElement(H,natoms=5);
   Epotek->AddElement(O,natoms=2);
 
-
+	/* as I don't know the exact material composition,
+     I will use Epoxyd material composition and add
+     the optical property of Silicon to this material, I'll use the density of Silicon = 1.02 */
+  G4Material* Silicon = new G4Material("Silicon",density=1.02*g/cm3,ncomponents=3);
+  Silicon->AddElement(C,natoms=3);
+  Silicon->AddElement(H,natoms=5);
+  Silicon->AddElement(O,natoms=2);
+	
   // assign main materials
   if(fGeomId == 1) defaultMaterial = Vacuum;
   else defaultMaterial = Air; //Vacuum // material of world
   frontMaterial = CarbonFiber; 
   BarMaterial = SiO2; // material of all Bars, Quartz and Window
+  SiliconMaterial = Silicon;
   
   OilMaterial = KamLandOil; // material of volume 1,2,3,4
   MirrorMaterial = Aluminum; // mirror material
@@ -558,6 +576,14 @@ void GlxDetectorConstruction::DefineMaterials(){
      0.997571464,0.997885132,0.997992205,0.997880183,0.997536591,
      0.99,0.98,0.97,0.96,0.94,0.93,0.924507,0.89982,0.883299,
      0.85657,0.842637,0.77020213,0.65727,0.324022,0.019192};
+
+  // absorption of silicon per 1 m - assumed no absorption
+  G4double SiliconAbsorption[num] = 
+    {100.*m,100.*m,100.*m,100.*m,100.*m,100.*m,100.*m,100.*m,
+	 100.*m,100.*m,100.*m,100.*m,100.*m,100.*m,100.*m,100.*m,
+	 100.*m,100.*m,100.*m,100.*m,100.*m,100.*m,100.*m,100.*m,
+	 100.*m,100.*m,100.*m,100.*m,100.*m,100.*m,100.*m,100.*m,
+	 100.*m,100.*m,100.*m,100.*m};	
 
   // absorption of quartz per 1 m - from jjv
   G4double QuartzAbsorption[num] = 
@@ -642,6 +668,12 @@ void GlxDetectorConstruction::DefineMaterials(){
     1.465566,1.46635,1.46719,1.468094,1.469066,1.470116,1.471252,1.472485,
     1.473826,1.475289,1.476891,1.478651,1.480592,1.482739,1.485127,1.487793};
 
+  G4double SiliconRefractiveIndex[num]={
+    fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,
+	fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,
+	fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,
+	fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,fNsil};
+
   G4double EpotekRefractiveIndex[num]={
     1.554034,1.555575,1.55698,1.558266,1.559454,1.56056,1.561604,
      1.562604,1.563579,1.564547,1.565526,1.566536,1.567595,
@@ -674,11 +706,17 @@ void GlxDetectorConstruction::DefineMaterials(){
   // Quartz material => Si02
   G4MaterialPropertiesTable* QuartzMPT = new G4MaterialPropertiesTable();
   QuartzMPT->AddProperty("RINDEX",       PhotonEnergy, QuartzRefractiveIndex,num);
-  QuartzMPT->AddProperty("ABSLENGTH",    PhotonEnergy, QuartzAbsorption,           num);
+  QuartzMPT->AddProperty("ABSLENGTH",    PhotonEnergy, QuartzAbsorption,num);
 
   // assign this parameter table to BAR material
   BarMaterial->SetMaterialPropertiesTable(QuartzMPT);
 
+  // Silicon material
+  G4MaterialPropertiesTable* SiliconMPT = new G4MaterialPropertiesTable();
+  SiliconMPT->AddProperty("RINDEX",       PhotonEnergy, SiliconRefractiveIndex,num);
+  SiliconMPT->AddProperty("ABSLENGTH",    PhotonEnergy, SiliconAbsorption,num);
+  SiliconMaterial->SetMaterialPropertiesTable(SiliconMPT);
+	
   // Air
   G4MaterialPropertiesTable* AirMPT = new G4MaterialPropertiesTable();
   AirMPT->AddProperty("RINDEX",    PhotonEnergy, AirRefractiveIndex, num);
@@ -837,9 +875,17 @@ void GlxDetectorConstruction::SetQuantumEfficiency(G4int id){
      0.056,0.067,0.085,0.109,0.129,0.138,0.147,0.158,0.170,
      0.181,0.188,0.196,0.203,0.206,0.212,0.218,0.219,0.225,0.230,
      0.228,0.222,0.217,0.210,0.199,0.177};
+
+  // hamamatsu H12700 quantum efficiency (as a function of photon E):	
+  G4double QuantumEfficiencyPMT12700[num]=
+	{0.001,0.001,0.00118865,0.00511371,0.0104755,0.0174337,0.0259711,
+	0.0358296,0.046982,0.0593714,0.0729143,0.0875043,0.103016,0.119306,
+	0.13622,0.153591,0.171246,0.188889,0.206372,0.223528,0.239941,0.255526,
+	0.269913,0.283034,0.294369,0.303953,0.31158,0.317117,0.320523,0.321858,
+	0.321271,0.31895,0.315347,0.310875,0.306056,0.301365};
   
   if(id == 0 ) fQuantumEfficiency = QuantumEfficiencyIdial;
-  if(id == 1 ) fQuantumEfficiency = QuantumEfficiencyPMT;
+  if(id == 1 ) fQuantumEfficiency = QuantumEfficiencyPMT12700;
 
   G4RunManager::GetRunManager()->GeometryHasBeenModified();
 }
