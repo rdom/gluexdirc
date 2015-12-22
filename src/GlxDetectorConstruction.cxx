@@ -41,6 +41,7 @@ GlxDetectorConstruction::GlxDetectorConstruction()
   fGap = GlxManager::Instance()->GetGap();
 
   fNsil = 1.406;
+  fNgr = 1.46;
  
   fNRow = 5;
   fNCol = 35;
@@ -174,7 +175,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   // The Air Gap
   if(fGap > 0.){
     G4Box* gGap = new G4Box("gGap",fFdp[0]/2.,fFdp[1]/2.,fGap/2.);
-    lGap = new G4LogicalVolume(gGap,SiliconMaterial,"lGap",0,0,0);
+    lGap = new G4LogicalVolume(gGap, greaseMaterial,"lGap",0,0,0);
   }
   // The FS wall of the EV
   G4Box* gWall = new G4Box("gWall",fFdp[0]/2.,fFdp[1]/2.,fWall/2.);
@@ -533,6 +534,15 @@ void GlxDetectorConstruction::DefineMaterials(){
   Epotek->AddElement(H,natoms=5);
   Epotek->AddElement(O,natoms=2);
 
+	 /* as I don't know the exact material composition,
+     I will use Epoxyd material composition and add
+     the optical property of Epotek to this material */
+
+  G4Material* Eljen550 = new G4Material("Eljen550",density=1.2*g/cm3,ncomponents=3);
+  Eljen550->AddElement(C,natoms=3);
+  Eljen550->AddElement(H,natoms=5);
+  Eljen550->AddElement(O,natoms=2);
+
 	/* as I don't know the exact material composition,
      I will use Epoxyd material composition and add
      the optical property of Silicon to this material, I'll use the density of Silicon = 1.02 */
@@ -542,11 +552,12 @@ void GlxDetectorConstruction::DefineMaterials(){
   Silicon->AddElement(O,natoms=2);
 	
   // assign main materials
-  if(fGeomId == 1) defaultMaterial = Vacuum;
+  if(fGeomId == 0) defaultMaterial = Vacuum;
   else defaultMaterial = Air; //Vacuum // material of world
   frontMaterial = CarbonFiber; 
   BarMaterial = SiO2; // material of all Bars, Quartz and Window
   SiliconMaterial = Silicon;
+  greaseMaterial = Eljen550;
   
   OilMaterial = KamLandOil; // material of volume 1,2,3,4
   MirrorMaterial = Aluminum; // mirror material
@@ -562,6 +573,9 @@ void GlxDetectorConstruction::DefineMaterials(){
   G4double AirAbsorption[num]; // absorption value for air
   G4double AirRefractiveIndex[num]; // air refractive index
   G4double PhotonEnergy[num]; // energy of photons which correspond to the given 
+  G4double SiliconRefractiveIndex[num]; // refractive index of silicon
+  G4double GreaseRefractiveIndex[num]; // refractive index of Eljen optical grease
+	
   // refractive or absoprtion values
 
   G4double PhotonEnergyNlak33a[76] = {1,1.2511,1.26386,1.27687,1.29016,1.30372,1.31758,1.33173,1.34619,1.36097,1.37607,1.39152,1.40731,1.42347,1.44,1.45692,1.47425,1.49199,1.51016,1.52878,1.54787,1.56744,1.58751,1.6081,1.62923,1.65092,1.6732,1.69609,1.71961,1.7438,1.76868,1.79427,1.82062,1.84775,1.87571,1.90452,1.93423,1.96488,1.99652,2.0292,2.06296,2.09787,2.13398,2.17135,2.21006,2.25017,2.29176,2.33492,2.37973,2.42631,2.47473,2.52514,2.57763,2.63236,2.68946,2.7491,2.81143,2.87666,2.94499,3.01665,3.09187,3.17095,3.25418,3.34189,3.43446,3.53231,3.6359,3.74575,3.86244,3.98663,4.11908,4.26062,4.41225,4.57506,4.75035,4.93961};
@@ -576,14 +590,6 @@ void GlxDetectorConstruction::DefineMaterials(){
      0.997571464,0.997885132,0.997992205,0.997880183,0.997536591,
      0.99,0.98,0.97,0.96,0.94,0.93,0.924507,0.89982,0.883299,
      0.85657,0.842637,0.77020213,0.65727,0.324022,0.019192};
-
-  // absorption of silicon per 1 m - assumed no absorption
-  G4double SiliconAbsorption[num] = 
-    {100.*m,100.*m,100.*m,100.*m,100.*m,100.*m,100.*m,100.*m,
-	 100.*m,100.*m,100.*m,100.*m,100.*m,100.*m,100.*m,100.*m,
-	 100.*m,100.*m,100.*m,100.*m,100.*m,100.*m,100.*m,100.*m,
-	 100.*m,100.*m,100.*m,100.*m,100.*m,100.*m,100.*m,100.*m,
-	 100.*m,100.*m,100.*m,100.*m};	
 
   // absorption of quartz per 1 m - from jjv
   G4double QuartzAbsorption[num] = 
@@ -605,6 +611,14 @@ void GlxDetectorConstruction::DefineMaterials(){
      0.9999,0.9998,0.9995,0.999,0.998,0.997,0.996,0.9955,0.993,
      0.9871,0.9745};
 
+	// absorption of Eljen optical grease per 1mm - data from Erik (Giessen)
+	G4double GreaseAbsorption[num] = 
+	{0.99999999,0.99999999,0.99999999,0.99999999,0.99999999,
+	 0.993033,0.980836,0.971937,0.965692,0.961502,0.958826,
+	 0.957191,0.956202,0.955554,0.955035,0.954528,0.954011,
+	 0.953545,0.953257,0.953311,0.953873,0.955055,0.956862,
+	 0.959127,0.961441,0.963110,0.963131,0.960235,0.953011,
+	 0.940139,0.920731,0.894701,0.862855,0.826017,0.781512,0.713467};
 
   //water
   const G4int nEntries = 32;
@@ -617,6 +631,7 @@ void GlxDetectorConstruction::DefineMaterials(){
       3.026*eV, 3.102*eV, 3.181*eV, 3.265*eV,
       3.353*eV, 3.446*eV, 3.545*eV, 3.649*eV,
       3.760*eV, 3.877*eV, 4.002*eV, 4.136*eV };
+
   G4double H2ORefractiveIndex[nEntries] =
     { 1.3435, 1.344,  1.3445, 1.345,  1.3455,
       1.346,  1.3465, 1.347,  1.3475, 1.348,
@@ -645,6 +660,8 @@ void GlxDetectorConstruction::DefineMaterials(){
     Absorption[i]= 100*m; // not true, just due to definiton -> not absorb any
     AirAbsorption[i] = 4.*cm; // if photon in the air -> kill it immediately
     AirRefractiveIndex[i] = 1.; 
+	SiliconRefractiveIndex[i] = fNsil;
+	GreaseRefractiveIndex[i] = fNgr;
     PhotonEnergy[num-(i+1)]= LambdaE/WaveLength[i];
 
     /* as the absorption is given per length and G4 needs 
@@ -655,6 +672,7 @@ void GlxDetectorConstruction::DefineMaterials(){
     EpotekAbsorption[i] = (-1)/log(EpotekAbsorption[i])*EpotekThickness;
     QuartzAbsorption[i] = (-1)/log(QuartzAbsorption[i])*100*cm;
     KamLandOilAbsorption[i] = (-1)/log(KamLandOilAbsorption[i])*50*cm;
+	GreaseAbsorption[i] = (-1)/log(GreaseAbsorption[i]);
   }
 
   /**************************** REFRACTIVE INDEXES ****************************/
@@ -667,12 +685,6 @@ void GlxDetectorConstruction::DefineMaterials(){
     1.461789,1.462326,1.462897,1.463502,1.464146,1.464833,
     1.465566,1.46635,1.46719,1.468094,1.469066,1.470116,1.471252,1.472485,
     1.473826,1.475289,1.476891,1.478651,1.480592,1.482739,1.485127,1.487793};
-
-  G4double SiliconRefractiveIndex[num]={
-    fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,
-	fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,
-	fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,
-	fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,fNsil,fNsil};
 
   G4double EpotekRefractiveIndex[num]={
     1.554034,1.555575,1.55698,1.558266,1.559454,1.56056,1.561604,
@@ -714,8 +726,14 @@ void GlxDetectorConstruction::DefineMaterials(){
   // Silicon material
   G4MaterialPropertiesTable* SiliconMPT = new G4MaterialPropertiesTable();
   SiliconMPT->AddProperty("RINDEX",       PhotonEnergy, SiliconRefractiveIndex,num);
-  SiliconMPT->AddProperty("ABSLENGTH",    PhotonEnergy, SiliconAbsorption,num);
+  SiliconMPT->AddProperty("ABSLENGTH",    PhotonEnergy, Absorption,num);
   SiliconMaterial->SetMaterialPropertiesTable(SiliconMPT);
+
+  // Grease material
+  G4MaterialPropertiesTable* GreaseMPT = new G4MaterialPropertiesTable();
+  GreaseMPT->AddProperty("RINDEX",       PhotonEnergy, GreaseRefractiveIndex,num);
+  GreaseMPT->AddProperty("ABSLENGTH",    PhotonEnergy, GreaseAbsorption,num);
+  greaseMaterial->SetMaterialPropertiesTable(GreaseMPT);
 	
   // Air
   G4MaterialPropertiesTable* AirMPT = new G4MaterialPropertiesTable();
