@@ -46,7 +46,7 @@ public:
   void SetPhysList(int val){ fPhysList = val; }
   void SetGeometry(int val){ fGeometry = val; }
   void SetBeamDimension(int val){ fBeamDimension = val; }
-  void SetRadiator(int val){ fRadiator = val; }
+  //void SetRadiator(int val){ fRadiator = val; }
   void SetLens(int val){ fLens = val; }
   void SetGap(double val){ fGap = val; }
   void SetMcpLayout(int val){ fMcpLayout = val; }
@@ -74,7 +74,7 @@ public:
   int GetPhysList(){ return fPhysList; }
   int GetGeometry(){ return fGeometry; }
   int GetBeamDimension(){ return fBeamDimension; }
-  int GetRadiator(){ return fRadiator; }
+  //int GetRadiator(){ return fRadiator; }
   int GetLens(){ return fLens; }
   double GetGap(){ return fGap; }
   int GetMcpLayout(){ return fMcpLayout; }
@@ -102,7 +102,7 @@ private:
   int fRunType;
   int fPhysList;
   int fGeometry;
-  int fRadiator;
+  //int fRadiator;
   int fLens;
   double fGap;
   int fMcpLayout;

@@ -85,9 +85,6 @@ void GlxManager::AddEvent(GlxEvent event){
     fEvent = new GlxEvent(event);
     fEvent->SetPhysList(fPhysList);
     fEvent->SetAngle((180*deg-fAngle)/deg);
-    //fEvent->SetRadiatorL(fRadiatorL);
-    //fEvent->SetRadiatorW(fRadiatorW);
-    //fEvent->SetRadiatorH(fRadiatorH);
     fEvent->SetParticle(fParticle);
     fEvent->SetMomentum(fMomentum);
     fEvent->SetGeometry(fGeometry);
