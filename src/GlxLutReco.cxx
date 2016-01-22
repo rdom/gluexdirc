@@ -57,9 +57,8 @@ GlxLutReco::GlxLutReco(TString infile, TString lutfile, Int_t verbose){
     //fLut[b] = new TClonesArray("GlxLutNode");
     fTree->SetBranchAddress(Form("LUT_%d",b),&fLut[b]); 
   }
-
   fTree->GetEntry(0);
-
+	
   fHist = new TH1F("chrenkov_angle_hist","chrenkov_angle_hist", 100,minChangle,maxChangle);
   fFit = new TF1("fgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +x*[3]+[4]",minChangle,maxChangle);
   fSpect = new TSpectrum(10);

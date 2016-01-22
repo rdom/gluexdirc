@@ -21,15 +21,16 @@ GlxPrimaryGeneratorAction::GlxPrimaryGeneratorAction()
   fGunMessenger = new GlxPrimaryGeneratorMessenger(this);
 
   //default kinematic
-  //
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* particle = particleTable->FindParticle("e+");
+ // G4ParticleDefinition* particle = particleTable->FindParticle("e+");
+  G4ParticleDefinition* particle = particleTable->FindParticle("pi+");	  
 
   fParticleGun->SetParticleDefinition(particle);
   fParticleGun->SetParticleTime(0.0*ns);
   fParticleGun->SetParticlePosition(G4ThreeVector(0.0*cm,0.0*cm,0.0*cm));
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1.,0.,0.));
-  fParticleGun->SetParticleEnergy(500.0*keV);
+  //fParticleGun->SetParticleEnergy(500.0*keV);
+  fParticleGun->SetParticleEnergy(3.5*GeV);	  
 }
 
 GlxPrimaryGeneratorAction::~GlxPrimaryGeneratorAction(){
@@ -56,22 +57,22 @@ void GlxPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
   }
   if(GlxManager::Instance()->GetRunType() == 1){ // LUT generation
 
-    G4int radid = 47-GlxManager::Instance()->GetRadiator();
-    G4int arr[]={-795,-365,365,795};
-    fParticleGun->SetParticlePosition(G4ThreeVector(radiatorL/2.-0.1,arr[radid/12]+0.5*425-0.5*35-(11-radid%12)*35,0));
+    //G4int radid = 47-GlxManager::Instance()->GetRadiator();
+	G4int radid = 48.*G4UniformRand();
+	G4int arr[]={-795,-365,365,795};
     G4double angle = -G4UniformRand()*M_PI;
     G4ThreeVector vec(0,0,1);
     vec.setTheta(acos(G4UniformRand()));
     vec.setPhi(2*M_PI*G4UniformRand());
     vec.rotateY(M_PI/2.);
-    
     fParticleGun->SetParticleMomentumDirection(vec);
+	fParticleGun->SetParticlePosition(G4ThreeVector(radiatorL/2.-0.1,arr[radid/12]+0.5*425-0.5*35-(11-radid%12)*35,0));
   }
   if(GlxManager::Instance()->GetRunType() == 0){
     G4ThreeVector vec(0,0,1);
     vec.rotateY(M_PI/10.);
     fParticleGun->SetParticleMomentumDirection(vec);
-    fParticleGun->SetParticlePosition(G4ThreeVector(0,0,-5600));
+    fParticleGun->SetParticlePosition(G4ThreeVector(0,0,-4000));//-5600));
   }
 
   if(GlxManager::Instance()->GetBeamDimension() < 0){ // random momentum
