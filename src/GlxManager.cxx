@@ -57,7 +57,7 @@ GlxManager::GlxManager(G4String outfile, G4int runtype){
   fTest1 = 0;
   fTest2 = 0;
   fLens = 3;
-  fGap = 0;
+  fGap = 2.5;
   fMcpLayout = 2;
   fBeamDimension = 0;
 
