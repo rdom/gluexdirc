@@ -32,7 +32,7 @@ GlxManager::GlxManager(G4String outfile, G4int runtype){
 
       TClonesArray &fLuta = *fLut[b]; 
       for (Long64_t n=0; n<Nnodes; n++) {
-	new((fLuta)[n]) GlxLutNode(n);
+		new((fLuta)[n]) GlxLutNode(n);
       }
     }
   }

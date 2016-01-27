@@ -64,7 +64,7 @@ int main(int argc,char** argv)
     else if ( G4String(argv[i]) == "-i" ) infile    = argv[i+1];
     else if ( G4String(argv[i]) == "-u" ) lutfile   = argv[i+1];
     else if ( G4String(argv[i]) == "-g" ) geometry  = argv[i+1];
-    //else if ( G4String(argv[i]) == "-h" ) radiator  = argv[i+1];
+    else if ( G4String(argv[i]) == "-h" ) radiator  = argv[i+1];
     else if ( G4String(argv[i]) == "-a" ) geomAng   = argv[i+1];
     else if ( G4String(argv[i]) == "-b" ) batchmode = argv[i+1];
     else if ( G4String(argv[i]) == "-f" ) firstevent= atoi(argv[i+1]);
@@ -94,8 +94,8 @@ int main(int argc,char** argv)
   }
 
   if(outfile=="" && runtype == 0) outfile = "hits.root"; // simulation
-  //if(outfile=="" && (runtype == 1 || runtype == 5)) outfile = Form("../data/lut_%d.root",atoi(radiator));  // lookup table generation
-  if(outfile=="" && runtype == 1) outfile = Form("../data/lut.root"); // LUT generation
+  if(outfile=="" && (runtype == 1 || runtype == 5)) outfile = Form("../data/lut_%d.root",atoi(radiator));  // lookup table generation
+  //if(outfile=="" && runtype == 1) outfile = Form("../data/lut.root"); // LUT generation
   if(outfile=="" && runtype == 6) outfile = "focalplane.root";  // focal plane simulation
   if(outfile=="" && runtype == 2) outfile = "reco.root"; // reconstruction
 
@@ -106,7 +106,7 @@ int main(int argc,char** argv)
 
   if(physlist.size()) GlxManager::Instance()->SetPhysList(atoi(physlist));
   if(geometry.size()) GlxManager::Instance()->SetGeometry(atoi(geometry));
-  //if(radiator.size()) GlxManager::Instance()->SetRadiator(atoi(radiator));
+  if(radiator.size()) GlxManager::Instance()->SetRadiator(atoi(radiator));
   if(lensId.size())   GlxManager::Instance()->SetLens(atoi(lensId));
   if(gap.size())   GlxManager::Instance()->SetGap(atof(gap));
   if(mcpLayout.size())GlxManager::Instance()->SetMcpLayout(atoi(mcpLayout));
