@@ -32,7 +32,7 @@ GlxManager::GlxManager(G4String outfile, G4int runtype){
 
       TClonesArray &fLuta = *fLut[b]; 
       for (Long64_t n=0; n<Nnodes; n++) {
-	new((fLuta)[n]) GlxLutNode(n);
+		new((fLuta)[n]) GlxLutNode(n);
       }
     }
   }
@@ -57,7 +57,7 @@ GlxManager::GlxManager(G4String outfile, G4int runtype){
   fTest1 = 0;
   fTest2 = 0;
   fLens = 3;
-  fGap = 0;
+  fGap = 2.5;
   fMcpLayout = 2;
   fBeamDimension = 0;
 

@@ -172,10 +172,10 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   G4Box* gFdp = new G4Box("gFdp",fFdp[0]/2.,fFdp[1]/2.,fFdp[2]/2.);
   lFdp = new G4LogicalVolume(gFdp,BarMaterial,"lFdp",0,0,0);// BarMaterial
 
-  // The Air Gap
+  // The Air/Cookie Gap
   if(fGap > 0.){
     G4Box* gGap = new G4Box("gGap",fFdp[0]/2.,fFdp[1]/2.,fGap/2.);
-    lGap = new G4LogicalVolume(gGap, greaseMaterial,"lGap",0,0,0);
+    lGap = new G4LogicalVolume(gGap, SiliconMaterial,"lGap",0,0,0);
   }
   // The FS wall of the EV
   G4Box* gWall = new G4Box("gWall",fFdp[0]/2.,fFdp[1]/2.,fWall/2.);

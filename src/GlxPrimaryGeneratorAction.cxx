@@ -57,8 +57,8 @@ void GlxPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
   }
   if(GlxManager::Instance()->GetRunType() == 1){ // LUT generation
 
-    //G4int radid = 47-GlxManager::Instance()->GetRadiator();
-	G4int radid = 48.*G4UniformRand();
+    G4int radid = 47-GlxManager::Instance()->GetRadiator();
+	//G4int radid = 48.*G4UniformRand();
 	G4int arr[]={-795,-365,365,795};
     G4double angle = -G4UniformRand()*M_PI;
     G4ThreeVector vec(0,0,1);

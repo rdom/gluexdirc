@@ -4,7 +4,7 @@
 glxdirc [OPTION] [ARGUMENT] ... [OPTION] [ARGUMENT]
 
 example:
-./glxdirc -s 0 -l 0 -wg 1. -e 1 -x muon -p 4. -z -2 -gx 225. -gy 268.
+./glxdirc -s 0 -l 3 -wg 1. -e 1 -x muon -p 4. -z -2 -gx 225. -gy 268.
 
 ```
 ##Options
@@ -37,7 +37,8 @@ example:
 
 -dt   tilt of the photodetection plane
 
--wg   thickness of the air gap between the window and the photosensors
+-wg   thickness of the (air) gap between the window and the photosensors
+	check the material of the gap!!!
 
 -gx   x position of the hit in the radiator [-2490,2390] [mm] 
 
