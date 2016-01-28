@@ -1,18 +1,18 @@
-TClonesArray *fLutSum[5];
+TClonesArray *fLutSum[48];
 
-void lutaddbar(TString inFile = "../data/lut10000_*.root", TString outFile = "../data/lut10000.root")
+void lutaddbar(TString inFile = "l_*.root", TString outFile = "../../../data/luts.root")
 {
   //gROOT->Macro("$VMCWORKDIR/gconfig/rootlogon.C");
-	gROOT->ProcessLine(".L ../pomm/gluexdirc/src/GlxLutNode.cxx+");
+	gROOT->ProcessLine(".L ../src/GlxLutNode.cxx+");
 
-  TTree *fTreeNew = new TTree("dircsim","Look-up table for DIRC");
-  for(Int_t l=0; l<5; l++){
+  TTree *fTreeNew = new TTree("glxlut","Look-up table for DIRC");
+  for(Int_t l=0; l<48; l++){
     fLutSum[l] = new TClonesArray("GlxLutNode");
     fTreeNew->Branch(Form("LUT_%d",l),&fLutSum[l],256000,0); 
   }
 
   Int_t Nnodes = 30000;
-  for(Int_t l=0; l<5; l++){
+  for(Int_t l=0; l<48; l++){
     TClonesArray &fLutaSum = *fLutSum[l];
     for (Long64_t n=0; n<Nnodes; n++) {
       new((fLutaSum)[n]) GlxLutNode(-1);
@@ -62,8 +62,8 @@ void lutaddbar(TString inFile = "../data/lut10000_*.root", TString outFile = "..
 void adddirs(TString filename){
   TFile* f = new TFile(filename);
   TTree *t=(TTree *) f->Get("glxlut") ;
-  TClonesArray* fLut[5];
-  for(Int_t l=0; l<5; l++){
+  TClonesArray* fLut[48];
+  for(Int_t l=0; l<48; l++){
     fLut[l] = new TClonesArray("GlxLutNode");
     t->SetBranchAddress(Form("LUT_%d",l),&fLut[l]); 
   }
