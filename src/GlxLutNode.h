@@ -58,7 +58,7 @@ protected:
   std::vector<Double_t> fTimeArray;
 
 protected: 
-  ClassDef(GlxLutNode, 1);
+  ClassDef(GlxLutNode, 2);
   
 };
 

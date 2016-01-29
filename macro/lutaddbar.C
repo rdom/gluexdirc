@@ -1,6 +1,6 @@
 TClonesArray *fLutSum[48];
 
-void lutaddbar(TString inFile = "l_*.root", TString outFile = "../../../data/luts.root")
+void lutaddbar(TString inFile = "../../../data/lut10000_*.root", TString outFile = "../../../data/lut10000.root")
 {
   //gROOT->Macro("$VMCWORKDIR/gconfig/rootlogon.C");
 	gROOT->ProcessLine(".L ../src/GlxLutNode.cxx+");
@@ -11,7 +11,7 @@ void lutaddbar(TString inFile = "l_*.root", TString outFile = "../../../data/lut
     fTreeNew->Branch(Form("LUT_%d",l),&fLutSum[l],256000,0); 
   }
 
-  Int_t Nnodes = 30000;
+  Int_t Nnodes = 20000;
   for(Int_t l=0; l<48; l++){
     TClonesArray &fLutaSum = *fLutSum[l];
     for (Long64_t n=0; n<Nnodes; n++) {
@@ -69,7 +69,7 @@ void adddirs(TString filename){
   }
   t->GetEntry(0);
   std::cout<<filename<<" has "<<fLut[0]->GetEntriesFast()<< " entries" <<std::endl;
-  for(Int_t l=0; l<5; l++){
+  for(Int_t l=0; l<48; l++){
     for (Int_t inode=0; inode<fLut[l]->GetEntriesFast(); inode++){
       if(inode%10000==0) std::cout<<"Entry # "<< inode <<std::endl;
       GlxLutNode *node= (GlxLutNode*) fLut[l]->At(inode);
