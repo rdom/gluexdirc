@@ -32,7 +32,7 @@ GlxManager::GlxManager(G4String outfile, G4int runtype){
 
       TClonesArray &fLuta = *fLut[b]; 
       for (Long64_t n=0; n<Nnodes; n++) {
-	new((fLuta)[n]) GlxLutNode(n);
+		new((fLuta)[n]) GlxLutNode(n);
       }
     }
   }
@@ -48,7 +48,7 @@ GlxManager::GlxManager(G4String outfile, G4int runtype){
   fPhysList = 0;
   fParticle = 0;
   fMomentum = TVector3(0,0,0);
-  fGeometry = 0;
+  fGeometry = 1;
   fAngle = 0;
   fRadiatorL=0;
   fRadiatorW=0;
@@ -56,9 +56,9 @@ GlxManager::GlxManager(G4String outfile, G4int runtype){
   fShift = 150;
   fTest1 = 0;
   fTest2 = 0;
-  fLens = 0;
-  fGap = 0;
-  fMcpLayout = 2014;
+  fLens = 3;
+  fGap = 2.5;
+  fMcpLayout = 2;
   fBeamDimension = 0;
 
   fPrismStep=0;
@@ -85,9 +85,6 @@ void GlxManager::AddEvent(GlxEvent event){
     fEvent = new GlxEvent(event);
     fEvent->SetPhysList(fPhysList);
     fEvent->SetAngle((180*deg-fAngle)/deg);
-    //fEvent->SetRadiatorL(fRadiatorL);
-    //fEvent->SetRadiatorW(fRadiatorW);
-    //fEvent->SetRadiatorH(fRadiatorH);
     fEvent->SetParticle(fParticle);
     fEvent->SetMomentum(fMomentum);
     fEvent->SetGeometry(fGeometry);

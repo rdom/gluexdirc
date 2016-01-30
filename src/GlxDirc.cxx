@@ -95,6 +95,7 @@ int main(int argc,char** argv)
 
   if(outfile=="" && runtype == 0) outfile = "hits.root"; // simulation
   if(outfile=="" && (runtype == 1 || runtype == 5)) outfile = Form("../data/lut_%d.root",atoi(radiator));  // lookup table generation
+  //if(outfile=="" && runtype == 1) outfile = Form("../data/lut.root"); // LUT generation
   if(outfile=="" && runtype == 6) outfile = "focalplane.root";  // focal plane simulation
   if(outfile=="" && runtype == 2) outfile = "reco.root"; // reconstruction
 
