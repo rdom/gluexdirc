@@ -7,7 +7,7 @@
 // Container for look-up table
 
 #ifndef GlxLutNode_h
-#define GlxLutNode_h 1
+#define GlxLutNode_h
 
 #include "TObject.h"
 #include "TClonesArray.h"
@@ -58,7 +58,7 @@ protected:
   std::vector<Double_t> fTimeArray;
 
 protected: 
-  ClassDef(GlxLutNode, 1);
+  ClassDef(GlxLutNode, 2);
   
 };
 

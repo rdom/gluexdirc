@@ -1,4 +1,4 @@
-void lutmean_glx(TString baseFile = "../data/lut.root"){
+void lutmean_glx(TString baseFile = "../data/lut100000.root"){
   gROOT->ProcessLine(".L ../src/GlxLutNode.cxx+");
   gInterpreter->GenerateDictionary("vector<TVector3>","TVector3.h"); 
   
