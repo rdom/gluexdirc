@@ -27,4 +27,4 @@ sleep 2
 #hadd -f lut.root l_b*.root
 #mv lut.root ../data/lut.root
 
-#seq 0 47 | xargs -I {} -n 1 -P 8  ../build/glxdirc -o l_b{}.root -r $(($(date +%s%N)/1000000-1393400000000)){} -e 10000000 -s 1 -x "opticalphoton" -p "3.18 eV" -c 2 -g 1 -w 0 -wg 0 -b 1 -h {} > l_b{}.log
+#seq 0 47 | xargs -I {} -n 1 -P 4  ../build/glxdirc -o l_b{}.root -r $(($(date +%s%N)/1000000-1393400000000)){} -e 10000000 -s 1 -x "opticalphoton" -p "3.18 eV" -c 2 -g 1 -w 0 -wg 0 -b 1 -h {} > l_b{}.log

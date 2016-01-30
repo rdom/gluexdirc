@@ -67,6 +67,8 @@ example:
 
 -r    seed number for the random generator 
 
+-h    bar id for the LUT simulation [0,47]
+
 -b    batch mode
                1    run silent (without GUI)
 
@@ -75,8 +77,11 @@ example:
 ##Examples
 ```
 
-lut generation:
-./glxdirc -e 1000000 -s 1 -x opticalphoton -p "3.18 eV" -g 0 -b 1
+lut generation for bar #0 (-h 0 -> l_b0.root):
+./glxdirc -o l_b0.root -e 1000000 -s 1 -x opticalphoton -p "3.18 eV" -c 2 -g 1 -w 0 -wg 0  -h 0 -b 1
+
+adding look-up tables for all bars:
+root glxlut_add.C'("l_b*.root","lut_all.root")'
 
 simulation:
 ./glxdirc -s 0 -e 100 -x proton -p 4.5 -z -2 -gx 2000 -gy 200 -b 1
