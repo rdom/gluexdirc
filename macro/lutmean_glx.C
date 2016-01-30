@@ -12,8 +12,6 @@ void lutmean_glx(TString baseFile = "../data/lut.root"){
     fLut[l] = new TClonesArray("GlxLutNode");
     t->SetBranchAddress(Form("LUT_%d",l),&fLut[l]); 
   }
-  
-  t->GetEntry(0);
 
  
   TFile *fFileNew = TFile::Open(outFile, "RECREATE");
@@ -46,6 +44,7 @@ void lutmean_glx(TString baseFile = "../data/lut.root"){
   GlxLutNode *node;
 
   for(Int_t l=0; l<48; l++){
+    t->GetEntry(l);
     for (Int_t inode=0; inode<fLut[l]->GetEntriesFast(); inode++){
       if(inode%1000==0) cout<<"Node # "<<inode << "  L "<<l<<endl;
       node= (GlxLutNode*) fLut[l]->At(inode);
