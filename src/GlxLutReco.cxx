@@ -50,7 +50,7 @@ GlxLutReco::GlxLutReco(TString infile, TString lutfile, Int_t verbose){
   fChain->SetBranchAddress("GlxEvent", &fEvent);
 
   fFile = new TFile(lutfile);
-  fTree=(TTree *) fFile->Get("glxlut") ;
+  fTree=(TTree *) fFile->Get("glxlut");
   
   for(Int_t b=0; b<48; b++){
     std::cout<<"FFFFFFFFFFFFFFFFF " <<b<<std::endl;

@@ -1,9 +1,7 @@
 TClonesArray *fLutSum[48];
 
-void lutaddbar(TString inFile = "../../../data/lut10000_*.root", TString outFile = "../../../data/lut10000.root")
-{
-  //gROOT->Macro("$VMCWORKDIR/gconfig/rootlogon.C");
-	gROOT->ProcessLine(".L ../src/GlxLutNode.cxx+");
+void glxlut_add(TString inFile = "l_b*.root", TString outFile = "lut_all.root"){
+  gROOT->ProcessLine(".L ../src/GlxLutNode.cxx+");
 
   TTree *fTreeNew = new TTree("glxlut","Look-up table for DIRC");
   for(Int_t l=0; l<48; l++){
@@ -25,8 +23,9 @@ void lutaddbar(TString inFile = "../../../data/lut10000_*.root", TString outFile
     TString tname2 = inFile;
     TString end = tname1.Remove(0,inFile.Last('*')+1);
     TString start = tname2.Remove(inFile.Last('*'));
-
-    TString dirname= tname.Remove(inFile.Last('/')) + "/";
+    
+    TString dirname("./");
+    if(inFile.Last('/')!=-1) dirname= tname.Remove(inFile.Last('/')) + "/";
 
     const char *ext=".root";
     TSystemDirectory dir(dirname, dirname);
@@ -47,6 +46,7 @@ void lutaddbar(TString inFile = "../../../data/lut10000_*.root", TString outFile
       }
     }
   }else{
+    std::cout<<"infile  "<<inFile  <<std::endl;
     adddirs(inFile);
   }
  
@@ -71,14 +71,14 @@ void adddirs(TString filename){
   std::cout<<filename<<" has "<<fLut[0]->GetEntriesFast()<< " entries" <<std::endl;
   for(Int_t l=0; l<48; l++){
     for (Int_t inode=0; inode<fLut[l]->GetEntriesFast(); inode++){
-      if(inode%10000==0) std::cout<<"Entry # "<< inode <<std::endl;
       GlxLutNode *node= (GlxLutNode*) fLut[l]->At(inode);
       for(int i=0; i< node->Entries(); i++){
-	//((GlxLutNode*)(fLutSum[l]->At(inode)))->AddEntry(node->GetDetectorId(), node->GetEntry(i), node->GetPathId(i),node->GetTime(i), node->GetDigiPos());
-	  ((GlxLutNode*)(fLutSum[l]->At(inode)))->AddEntry(node->GetDetectorId(), node->GetEntry(i), node->GetPathId(i), node->GetNRefl(i), node->GetTime(i), node->GetHitPos(i), node->GetDigiPos());
-	  }
+	((GlxLutNode*)(fLutSum[l]->At(inode)))->AddEntry(node->GetDetectorId(), node->GetEntry(i), node->GetPathId(i), node->GetNRefl(i), node->GetTime(i), node->GetHitPos(i), node->GetDigiPos());
+      }
+      delete node;
     }
- }
-
+  }
+  for(Int_t l=0; l<48; l++) fLut[l]->Clear();
+    
   f->Close();
 }
