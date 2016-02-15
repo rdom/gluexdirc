@@ -3,6 +3,7 @@
 #include "G4Trajectory.hh"
 
 #include "GlxEventAction.h"
+#include <fstream>
 
 void GlxEventAction::EndOfEventAction(const G4Event* event){
 
@@ -11,7 +12,7 @@ void GlxEventAction::EndOfEventAction(const G4Event* event){
   if (tc) ntr = tc->entries();
 
   if(ntr>0){
-    ofstream  file;
+    std::ofstream  file;
     file.open ("trackst.json");
     file<< "{\"event\": [";
     for (G4int i=0; i<ntr; i++){

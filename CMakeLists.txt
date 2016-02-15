@@ -35,9 +35,11 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/src/*.h)
 
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
-add_executable(glxdirc ../src/GlxDirc.cxx ${sources} GlxDict.cxx ${headers} GlxDict.h)
+set(CMAKE_CXX_FLAGS "-std=gnu++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated")
+add_executable(glxdirc ../src/GlxDirc.cxx ${sources} GlxDict.cxx ${headers})
 target_link_libraries(glxdirc -lGLU ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} -lSpectrum )
-add_library(GlxDirc SHARED ../src/GlxHit.cxx ../src/GlxEvent.cxx ../src/GlxLutNode.cxx ../src/GlxTrackInfo.cxx  ../src/GlxPhotonInfo.cxx ../src/GlxAmbiguityInfo.cxx GlxDict.cxx ../src/GlxHit.h ../src/GlxEvent.h ../src/GlxLutNode.h ../src/GlxTrackInfo.h  ../src/GlxPhotonInfo.h ../src/GlxAmbiguityInfo.h GlxDict.h)
+add_library(GlxDirc SHARED ../src/GlxHit.cxx ../src/GlxEvent.cxx ../src/GlxLutNode.cxx ../src/GlxTrackInfo.cxx  ../src/GlxPhotonInfo.cxx ../src/GlxAmbiguityInfo.cxx GlxDict.cxx ../src/GlxHit.h ../src/GlxEvent.h ../src/GlxLutNode.h ../src/GlxTrackInfo.h  ../src/GlxPhotonInfo.h ../src/GlxAmbiguityInfo.h)
 
 
 #----------------------------------------------------------------------------
