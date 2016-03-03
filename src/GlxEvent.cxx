@@ -42,7 +42,7 @@ TString GlxEvent::PrintInfo(){
   info += Form("Particle momentum %f \n", fMomentum.Mag());
   info += Form("Geometry id %d \n", fGeometry);
   info += Form("Lens  id %d \n",    fLens);
-  info += Form("Air gap between MPT and EV %d \n", fGap);
+  info += Form("Air gap between MPT and EV %f \n", fGap);
   info += Form("Focusing mirror radius %f \n", fMirrorR);
   info += Form("Focusing mirror tilt   %f \n", fMirrorT);
   info += Form("Mcp tilt  %f \n", fMcpT);

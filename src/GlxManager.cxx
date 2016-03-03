@@ -21,7 +21,7 @@ GlxManager::GlxManager(G4String outfile, G4int runtype){
     fTree->Branch("GlxEvent", "GlxEvent", &fEvent, 64000, 2);
   }
 
-  if(fRunType==1 || fRunType==5){
+  if(fRunType==1 || fRunType==5 || fRunType==3){
     
     Int_t Nnodes = 20000;
     fTree = new TTree("glxlut","Look-up table for the geometrical reconstruction.");
@@ -65,7 +65,7 @@ GlxManager::GlxManager(G4String outfile, G4int runtype){
   fBeamX=0;
   fBeamZ=-1;
   fMirrorR = 800;//1200;
-  fMirrorT = 16;//20;
+  fMirrorT = 15.89;//16 - Roman's value, 15.89 - John's value
   fMcpT = 42.13;
   fInfo="";
   
@@ -111,7 +111,7 @@ void GlxManager::AddHit(GlxHit hit){
       std::cout<<"Event does not exist. Create it first. "<<std::endl;
     }
   }
-  if(fRunType==1 || fRunType==5){
+  if(fRunType==1 || fRunType==5 || fRunType==3){
     int id = 100*hit.GetMcpId() + hit.GetPixelId();
     ((GlxLutNode*)(fLut[hit.GetType()]->At(id)))->
       AddEntry(id, fMomentum, hit.GetPathInPrizm(),
@@ -138,5 +138,5 @@ void GlxManager::Fill(){
 }
 
 void GlxManager::FillLut(){
-  if(fRunType==1 || fRunType==5) fTree->Fill();
+  if(fRunType==1 || fRunType==5 || fRunType ==3) fTree->Fill();
 }

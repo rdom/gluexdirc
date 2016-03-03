@@ -50,11 +50,11 @@ GlxDetectorConstruction::GlxDetectorConstruction()
   
   fBar[0] = 17.25; fBar[1] = 35; fBar[2] =1225*4;
   fMirror[0] = 19.761; fMirror[1] = 34.493; fMirror[2] =1;
-  fPrizm[0]=33.25; fPrizm[1]=91.0; fPrizm[2]=78.9929; fPrizm[3]=27.0;
+  fPrizm[0]=33.25; fPrizm[1]=91.0; fPrizm[2]=79.537;/*78.9929;*/ fPrizm[3]=27.0; //tan(30)*9.1 + 2.7
   fBarBox[0]= 18; fBarBox[1]=425; fBarBox[2]=fMirror[2]+fBar[2]+fPrizm[1];
   fWindow[0]=150; fWindow[1]=425; fWindow[2]=9.6;
 
-  fWall = 12.7; // [mm]  = 0.5 inch thickness of the EV wall
+  fWall = 12.7; // [mm]  = 0.5 inch thickness of the EV wall, which is actually a window
   fMShift = (fWall+fGap)/cos(42.13*deg)/2. + 1.;//
 	  
   fTankBox0[0]=582; fTankBox0[1]=2205+20; fTankBox0[2]=350; //240
@@ -75,12 +75,12 @@ GlxDetectorConstruction::GlxDetectorConstruction()
     fTankBox[2]=fTankBox1[2];
   }
   
-  fMirror1[0]=197; fMirror1[1]=fTankBox[1]-25;  fMirror1[2]=1; 
-  fMirror2[0]=66.97; fMirror2[1]=fTankBox[1]-25;  fMirror2[2]=1;
-  fMirror3[0]=422.9; fMirror3[1]=fTankBox[1]-25;  fMirror3[2]=1; //!!!!!!!!!!!!!
-  fMirror4[0]=580;   fMirror4[1]=300;  fMirror4[2]=1;
+  fMirror1[0]=190;/*197;*/ fMirror1[1]=fTankBox[1]-25;  fMirror1[2]=1;  // bottom mirror, 2 cm gap between it and bar box window
+  fMirror2[0]=66.97; fMirror2[1]=fTankBox[1]-25;  fMirror2[2]=1; // new wedge mirror, 2 cm gap between it and bar box window
+  fMirror3[0]=429;/*422.9;*/ fMirror3[1]=fTankBox[1]-25;  fMirror3[2]=1; // vertical mirror !!!
+  fMirror4[0]=580;   fMirror4[1]=300;  fMirror4[2]=1; // side mirrors
 
-  fFdp[0]=312; fFdp[1]=fTankBox[1]-25;  fFdp[2]=1;  
+  fFdp[0]=314.5;/*312;*/ fFdp[1]=fTankBox[1]-25;  fFdp[2]=1;  
   
   fMcpTotal[0] = fMcpTotal[1] = 53+6; fMcpTotal[2]=0.5;
   fMcpActive[0] = fMcpActive[1] = 53; fMcpActive[2]=0.5;
@@ -143,7 +143,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   G4Box* gTankMirror2 = new G4Box("gTankMirr2",fMirror2[0]/2.,fMirror2[1]/2.,fMirror2[2]/2.);
   lTankMirror2 = new G4LogicalVolume(gTankMirror2,MirrorMaterial,"lTankMirror2",0,0,0);
 
-  G4Box* gTankMirror3 = new G4Box("gTankMirr3",fMirror3[0]/2.-fMShift,fMirror3[1]/2.,fMirror3[2]/2.); //!!!!!!!!!!!!!
+  G4Box* gTankMirror3 = new G4Box("gTankMirr3",fMirror3[0]/2.-fMShift,fMirror3[1]/2.,fMirror3[2]/2.);
   lTankMirror3 = new G4LogicalVolume(gTankMirror3,MirrorMaterial,"lTankMirror3",0,0,0);
 
   G4Box* gTankMirror4 = new G4Box("gTankMirr3",fMirror4[0]/2.,fMirror4[1]/2.,fMirror4[2]/2.);
@@ -152,7 +152,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   Double_t pi=4.*atan(1.);
   Double_t fradius = GlxManager::Instance()->GetMirrorR();
   Double_t rot_fm = GlxManager::Instance()->GetMirrorT()*deg;
-  Double_t fmx = 300; // width of the focusing mirror
+  Double_t fmx = 288.;/*300;*/ // width of the focusing mirror
   Double_t fmy = sqrt(fradius*fradius-fmx*fmx/4.);
   Double_t seg = 2*asin(fmx/(2*fradius))/deg;
 
