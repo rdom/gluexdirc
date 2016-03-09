@@ -74,6 +74,7 @@ private:
   G4Material*        Nlak33aMaterial;  
   G4Material*        frontMaterial;
   G4Material*        greaseMaterial;  //Eljen 550 optical grease
+  G4Material*		 EJ560Material;  // EJ560 silicone rubber - pre-made cookies
   
   G4int fNRow;
   G4int fNCol;
@@ -82,6 +83,7 @@ private:
   G4int fMcpLayout;
   G4double fNsil;
   G4double fNgr;
+  G4double fNej560;
   G4double fHall[3];
   G4double fBar[3];
   G4double fBarBox[3];

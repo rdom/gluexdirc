@@ -42,6 +42,7 @@ GlxDetectorConstruction::GlxDetectorConstruction()
 
   fNsil = 1.406;
   fNgr = 1.46;
+  fNej560 = 1.43;
  
   fNRow = 5;
   fNCol = 35;
@@ -550,14 +551,23 @@ void GlxDetectorConstruction::DefineMaterials(){
   Silicon->AddElement(C,natoms=3);
   Silicon->AddElement(H,natoms=5);
   Silicon->AddElement(O,natoms=2);
+
+	/* as I don't know the exact material composition,
+     I will use Epoxyd material composition and add
+     the optical property of Silicon to this material, I'll use the density from data sheet = 1.03 */
+  G4Material* EJ560 = new G4Material("EJ560",density=1.03*g/cm3,ncomponents=3);
+  EJ560->AddElement(C,natoms=3);
+  EJ560->AddElement(H,natoms=5);
+  EJ560->AddElement(O,natoms=2);
 	
   // assign main materials
   if(fGeomId == 0) defaultMaterial = Vacuum;
   else defaultMaterial = Air; //Vacuum // material of world
   frontMaterial = CarbonFiber; 
   BarMaterial = SiO2; // material of all Bars, Quartz and Window
-  SiliconMaterial = Silicon;
+  SiliconMaterial = Silicon; // material for cookies as for Belle II
   greaseMaterial = Eljen550;
+  EJ560Material = EJ560; // pre-made cookies as for FCAL
   
   OilMaterial = KamLandOil; // material of volume 1,2,3,4
   MirrorMaterial = Aluminum; // mirror material
@@ -575,6 +585,7 @@ void GlxDetectorConstruction::DefineMaterials(){
   G4double PhotonEnergy[num]; // energy of photons which correspond to the given 
   G4double SiliconRefractiveIndex[num]; // refractive index of silicon
   G4double GreaseRefractiveIndex[num]; // refractive index of Eljen optical grease
+  G4double EJ560RefractiveIndex[num]; // refractive index of silicon	
 	
   // refractive or absoprtion values
 
@@ -613,12 +624,19 @@ void GlxDetectorConstruction::DefineMaterials(){
 
 	// absorption of Eljen optical grease per 1mm - data from Erik (Giessen)
 	G4double GreaseAbsorption[num] = 
-	{0.99999999,0.99999999,0.99999999,0.99999999,0.99999999,
-	 0.993033,0.980836,0.971937,0.965692,0.961502,0.958826,
-	 0.957191,0.956202,0.955554,0.955035,0.954528,0.954011,
-	 0.953545,0.953257,0.953311,0.953873,0.955055,0.956862,
-	 0.959127,0.961441,0.963110,0.963131,0.960235,0.953011,
-	 0.940139,0.920731,0.894701,0.862855,0.826017,0.781512,0.713467};
+	{5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 4.988634, 2.690170, 
+	2.297563, 2.161372, 2.0, 2.0, 2.040140, 2.193315, 2.014751, 
+	2.153648, 2.0, 2.169406, 2.321625, 2.503214, 2.425420, 2.542272, 
+	2.448681, 2.496419, 2.639470, 2.207220, 1.866685, 1.509632, 
+	1.235643, 0.967075, 0.731461, 0.538345, 0.388385, 0.274928};
+
+	// absorption of EJ560 silicone rubber - data adopted from EJ560 data sheet
+	G4double EJ560Absorption[num] = {3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 
+	3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 2.971075, 
+	2.971075, 2.939202, 2.913124, 2.911231, 2.878580, 2.841403, 
+	2.801492, 2.751400, 2.685130, 2.576112, 2.430155, 2.251917, 
+	1.999915, 1.696846, 1.179734, 0.592869, 0.221841, 0.095961, 
+	0.056005};
 
   //water
   const G4int nEntries = 32;
@@ -662,7 +680,10 @@ void GlxDetectorConstruction::DefineMaterials(){
     AirRefractiveIndex[i] = 1.; 
 	SiliconRefractiveIndex[i] = fNsil;
 	GreaseRefractiveIndex[i] = fNgr;
+	EJ560RefractiveIndex[i] = fNej560;
     PhotonEnergy[num-(i+1)]= LambdaE/WaveLength[i];
+
+	  //std::cout<<"photon energy = "<<PhotonEnergy[num-(i+1)]<<std::endl;
 
     /* as the absorption is given per length and G4 needs 
        mean free path length, calculate it here
@@ -672,7 +693,7 @@ void GlxDetectorConstruction::DefineMaterials(){
     EpotekAbsorption[i] = (-1)/log(EpotekAbsorption[i])*EpotekThickness;
     QuartzAbsorption[i] = (-1)/log(QuartzAbsorption[i])*100*cm;
     KamLandOilAbsorption[i] = (-1)/log(KamLandOilAbsorption[i])*50*cm;
-	GreaseAbsorption[i] = (-1)/log(GreaseAbsorption[i]);
+	//fAbsorption[i] = (-1)/log(GreaseAbsorption[i]);
   }
 
   /**************************** REFRACTIVE INDEXES ****************************/
@@ -734,6 +755,12 @@ void GlxDetectorConstruction::DefineMaterials(){
   GreaseMPT->AddProperty("RINDEX",       PhotonEnergy, GreaseRefractiveIndex,num);
   GreaseMPT->AddProperty("ABSLENGTH",    PhotonEnergy, GreaseAbsorption,num);
   greaseMaterial->SetMaterialPropertiesTable(GreaseMPT);
+
+  // EJ560 material
+  G4MaterialPropertiesTable* EJ560MPT = new G4MaterialPropertiesTable();
+  EJ560MPT->AddProperty("RINDEX",       PhotonEnergy, EJ560RefractiveIndex,num);
+  EJ560MPT->AddProperty("ABSLENGTH",    PhotonEnergy, EJ560Absorption,num);
+  EJ560Material->SetMaterialPropertiesTable(EJ560MPT);
 	
   // Air
   G4MaterialPropertiesTable* AirMPT = new G4MaterialPropertiesTable();
