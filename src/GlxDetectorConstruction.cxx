@@ -176,7 +176,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   // The Air/Cookie Gap
   if(fGap > 0.){
     G4Box* gGap = new G4Box("gGap",fFdp[0]/2.,fFdp[1]/2.,fGap/2.);
-    lGap = new G4LogicalVolume(gGap, SiliconMaterial,"lGap",0,0,0);
+    lGap = new G4LogicalVolume(gGap, /*EJ560Material*/SiliconMaterial,"lGap",0,0,0);
   }
   // The FS wall of the EV
   G4Box* gWall = new G4Box("gWall",fFdp[0]/2.,fFdp[1]/2.,fWall/2.);
@@ -622,21 +622,21 @@ void GlxDetectorConstruction::DefineMaterials(){
      0.9999,0.9998,0.9995,0.999,0.998,0.997,0.996,0.9955,0.993,
      0.9871,0.9745};
 
-	// absorption of Eljen optical grease per 1mm - data from Erik (Giessen)
+	// attenuation length [mm] of Eljen optical grease based on 1mm data from Erik (Giessen)
 	G4double GreaseAbsorption[num] = 
-	{5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 4.988634, 2.690170, 
-	2.297563, 2.161372, 2.0, 2.0, 2.040140, 2.193315, 2.014751, 
-	2.153648, 2.0, 2.169406, 2.321625, 2.503214, 2.425420, 2.542272, 
-	2.448681, 2.496419, 2.639470, 2.207220, 1.866685, 1.509632, 
-	1.235643, 0.967075, 0.731461, 0.538345, 0.388385, 0.274928};
+	{50., 50., 50., 50., 50., 50., 50., 50., 49.88634, 26.90170, 
+	22.97563, 21.61372, 20., 20., 20.40140, 21.93315, 20.14751, 
+	21.53648, 20., 21.69406, 23.21625, 25.03214, 24.25420, 25.42272, 
+	24.48681, 24.96419, 26.39470, 22.07220, 18.66685, 15.09632, 
+	12.35643, 9.67075, 7.31461, 5.38345, 3.88385, 2.74928};
 
-	// absorption of EJ560 silicone rubber - data adopted from EJ560 data sheet
-	G4double EJ560Absorption[num] = {3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 
-	3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 2.971075, 
-	2.971075, 2.939202, 2.913124, 2.911231, 2.878580, 2.841403, 
-	2.801492, 2.751400, 2.685130, 2.576112, 2.430155, 2.251917, 
-	1.999915, 1.696846, 1.179734, 0.592869, 0.221841, 0.095961, 
-	0.056005};
+	// attenuation length [mm] of EJ560 silicone rubber - data adopted from EJ560 data sheet
+	G4double EJ560Absorption[num] = {30., 30., 30., 30., 30., 30., 
+	30., 30., 30., 30., 30., 30., 30., 30., 30., 30., 29.71075, 
+	29.71075, 29.39202, 29.13124, 29.11231, 28.78580, 28.41403, 
+	28.01492, 27.51400, 26.85130, 25.76112, 24.30155, 22.51917, 
+	19.99915, 16.96846, 11.79734, 5.92869, 2.21841, 0.95961, 
+	0.56005};
 
   //water
   const G4int nEntries = 32;
@@ -694,6 +694,8 @@ void GlxDetectorConstruction::DefineMaterials(){
     QuartzAbsorption[i] = (-1)/log(QuartzAbsorption[i])*100*cm;
     KamLandOilAbsorption[i] = (-1)/log(KamLandOilAbsorption[i])*50*cm;
 	//fAbsorption[i] = (-1)/log(GreaseAbsorption[i]);
+
+	  std::cout<<"e = "<<PhotonEnergy[num-i-1]<<", quartz abs = "<<QuartzAbsorption[i]<<std::endl;
   }
 
   /**************************** REFRACTIVE INDEXES ****************************/
