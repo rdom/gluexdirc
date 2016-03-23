@@ -42,6 +42,7 @@ GlxDetectorConstruction::GlxDetectorConstruction()
 
   fNsil = 1.406;
   fNgr = 1.46;
+  fNej560 = 1.43;
  
   fNRow = 5;
   fNCol = 35;
@@ -125,10 +126,22 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   G4Box* gMirror = new G4Box("gMirror",fMirror[0]/2.,fMirror[1]/2.,fMirror[2]/2.);
   lMirror = new G4LogicalVolume(gMirror,MirrorMaterial,"lMirror",0,0,0);
   // The Wedge
-  G4Trap* gWedge = new G4Trap("gWedge",fPrizm[0],fPrizm[1],fPrizm[2],fPrizm[3]);
+/*  G4Trap* gWedge = new G4Trap("gWedge",fPrizm[0],fPrizm[1],fPrizm[2],fPrizm[3]);
   lWedge = new G4LogicalVolume(gWedge, BarMaterial,"lWedge",0,0,0);
   G4RotationMatrix* xRot = new G4RotationMatrix();
   xRot->rotateX(-M_PI/2.*rad);
+*/
+  // The Wedge with 6 mrad angle of the bottom side:
+  fTilt = 0.006; // 6 mrad
+  fdH = fPrizm[1]*tan(fTilt);
+  fPrizm[2] = tan(30./180.*M_PI)*91. + 27. - fdH; // update the side of the prizm assuming bottom tilt
+  fTheta = atan((fPrizm[2]+fdH-fPrizm[3])/2./fPrizm[1]);
+  G4Trap* gWedge = new G4Trap("gWedge",fPrizm[1]/2., fTheta, 0.,fPrizm[0]/2., fPrizm[2]/2., fPrizm[2]/2., 0., fPrizm[0]/2., fPrizm[3]/2., fPrizm[3]/2., 0.);
+  lWedge = new G4LogicalVolume(gWedge, BarMaterial,"lWedge",0,0,0);
+  G4RotationMatrix* xRot = new G4RotationMatrix();
+  xRot->rotateY(M_PI*rad);
+  xRot->rotateX(M_PI*rad);
+	
   // The Window
   G4Box* gWindow = new G4Box("gWindow",fWindow[0]/2.,fWindow[1]/2.,fWindow[2]/2.);
   lWindow = new G4LogicalVolume(gWindow,BarMaterial,"lWindow",0,0,0);
@@ -175,7 +188,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   // The Air/Cookie Gap
   if(fGap > 0.){
     G4Box* gGap = new G4Box("gGap",fFdp[0]/2.,fFdp[1]/2.,fGap/2.);
-    lGap = new G4LogicalVolume(gGap, SiliconMaterial,"lGap",0,0,0);
+    lGap = new G4LogicalVolume(gGap, /*EJ560Material*/SiliconMaterial,"lGap",0,0,0);
   }
   // The FS wall of the EV
   G4Box* gWall = new G4Box("gWall",fFdp[0]/2.,fFdp[1]/2.,fWall/2.);
@@ -550,14 +563,23 @@ void GlxDetectorConstruction::DefineMaterials(){
   Silicon->AddElement(C,natoms=3);
   Silicon->AddElement(H,natoms=5);
   Silicon->AddElement(O,natoms=2);
+
+	/* as I don't know the exact material composition,
+     I will use Epoxyd material composition and add
+     the optical property of Silicon to this material, I'll use the density from data sheet = 1.03 */
+  G4Material* EJ560 = new G4Material("EJ560",density=1.03*g/cm3,ncomponents=3);
+  EJ560->AddElement(C,natoms=3);
+  EJ560->AddElement(H,natoms=5);
+  EJ560->AddElement(O,natoms=2);
 	
   // assign main materials
   if(fGeomId == 0) defaultMaterial = Vacuum;
   else defaultMaterial = Air; //Vacuum // material of world
   frontMaterial = CarbonFiber; 
   BarMaterial = SiO2; // material of all Bars, Quartz and Window
-  SiliconMaterial = Silicon;
+  SiliconMaterial = Silicon; // material for cookies as for Belle II
   greaseMaterial = Eljen550;
+  EJ560Material = EJ560; // pre-made cookies as for FCAL
   
   OilMaterial = KamLandOil; // material of volume 1,2,3,4
   MirrorMaterial = Aluminum; // mirror material
@@ -575,6 +597,7 @@ void GlxDetectorConstruction::DefineMaterials(){
   G4double PhotonEnergy[num]; // energy of photons which correspond to the given 
   G4double SiliconRefractiveIndex[num]; // refractive index of silicon
   G4double GreaseRefractiveIndex[num]; // refractive index of Eljen optical grease
+  G4double EJ560RefractiveIndex[num]; // refractive index of silicon	
 	
   // refractive or absoprtion values
 
@@ -611,14 +634,21 @@ void GlxDetectorConstruction::DefineMaterials(){
      0.9999,0.9998,0.9995,0.999,0.998,0.997,0.996,0.9955,0.993,
      0.9871,0.9745};
 
-	// absorption of Eljen optical grease per 1mm - data from Erik (Giessen)
+	// attenuation length [mm] of Eljen optical grease based on 1mm data from Erik (Giessen)
 	G4double GreaseAbsorption[num] = 
-	{0.99999999,0.99999999,0.99999999,0.99999999,0.99999999,
-	 0.993033,0.980836,0.971937,0.965692,0.961502,0.958826,
-	 0.957191,0.956202,0.955554,0.955035,0.954528,0.954011,
-	 0.953545,0.953257,0.953311,0.953873,0.955055,0.956862,
-	 0.959127,0.961441,0.963110,0.963131,0.960235,0.953011,
-	 0.940139,0.920731,0.894701,0.862855,0.826017,0.781512,0.713467};
+	{50., 50., 50., 50., 50., 50., 50., 50., 49.88634, 26.90170, 
+	22.97563, 21.61372, 20., 20., 20.40140, 21.93315, 20.14751, 
+	21.53648, 20., 21.69406, 23.21625, 25.03214, 24.25420, 25.42272, 
+	24.48681, 24.96419, 26.39470, 22.07220, 18.66685, 15.09632, 
+	12.35643, 9.67075, 7.31461, 5.38345, 3.88385, 2.74928};
+
+	// attenuation length [mm] of EJ560 silicone rubber - data adopted from EJ560 data sheet
+	G4double EJ560Absorption[num] = {30., 30., 30., 30., 30., 30., 
+	30., 30., 30., 30., 30., 30., 30., 30., 30., 30., 29.71075, 
+	29.71075, 29.39202, 29.13124, 29.11231, 28.78580, 28.41403, 
+	28.01492, 27.51400, 26.85130, 25.76112, 24.30155, 22.51917, 
+	19.99915, 16.96846, 11.79734, 5.92869, 2.21841, 0.95961, 
+	0.56005};
 
   //water
   const G4int nEntries = 32;
@@ -662,7 +692,10 @@ void GlxDetectorConstruction::DefineMaterials(){
     AirRefractiveIndex[i] = 1.; 
 	SiliconRefractiveIndex[i] = fNsil;
 	GreaseRefractiveIndex[i] = fNgr;
+	EJ560RefractiveIndex[i] = fNej560;
     PhotonEnergy[num-(i+1)]= LambdaE/WaveLength[i];
+
+	  //std::cout<<"photon energy = "<<PhotonEnergy[num-(i+1)]<<std::endl;
 
     /* as the absorption is given per length and G4 needs 
        mean free path length, calculate it here
@@ -672,7 +705,9 @@ void GlxDetectorConstruction::DefineMaterials(){
     EpotekAbsorption[i] = (-1)/log(EpotekAbsorption[i])*EpotekThickness;
     QuartzAbsorption[i] = (-1)/log(QuartzAbsorption[i])*100*cm;
     KamLandOilAbsorption[i] = (-1)/log(KamLandOilAbsorption[i])*50*cm;
-	GreaseAbsorption[i] = (-1)/log(GreaseAbsorption[i]);
+	//fAbsorption[i] = (-1)/log(GreaseAbsorption[i]);
+
+	  //std::cout<<"e = "<<PhotonEnergy[num-i-1]<<", quartz abs = "<<QuartzAbsorption[i]<<std::endl;
   }
 
   /**************************** REFRACTIVE INDEXES ****************************/
@@ -734,6 +769,12 @@ void GlxDetectorConstruction::DefineMaterials(){
   GreaseMPT->AddProperty("RINDEX",       PhotonEnergy, GreaseRefractiveIndex,num);
   GreaseMPT->AddProperty("ABSLENGTH",    PhotonEnergy, GreaseAbsorption,num);
   greaseMaterial->SetMaterialPropertiesTable(GreaseMPT);
+
+  // EJ560 material
+  G4MaterialPropertiesTable* EJ560MPT = new G4MaterialPropertiesTable();
+  EJ560MPT->AddProperty("RINDEX",       PhotonEnergy, EJ560RefractiveIndex,num);
+  EJ560MPT->AddProperty("ABSLENGTH",    PhotonEnergy, EJ560Absorption,num);
+  EJ560Material->SetMaterialPropertiesTable(EJ560MPT);
 	
   // Air
   G4MaterialPropertiesTable* AirMPT = new G4MaterialPropertiesTable();

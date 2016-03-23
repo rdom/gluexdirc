@@ -22,7 +22,6 @@ GlxManager::GlxManager(G4String outfile, G4int runtype){
   }
 
   if(fRunType==1 || fRunType==5 || fRunType==3){
-    
     Int_t Nnodes = 20000;
     fTree = new TTree("glxlut","Look-up table for the geometrical reconstruction.");
     for(Int_t b=0; b<48; b++){
@@ -65,7 +64,7 @@ GlxManager::GlxManager(G4String outfile, G4int runtype){
   fBeamX=0;
   fBeamZ=-1;
   fMirrorR = 800;//1200;
-  fMirrorT = 15.89;//16 - Roman's value, 15.89 - John's value
+  fMirrorT = 16.;//16 - Roman's value, 15.89 - John's value
   fMcpT = 42.13;
   fInfo="";
   
