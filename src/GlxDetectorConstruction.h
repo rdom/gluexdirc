@@ -104,6 +104,9 @@ private:
 
   G4double fWindow[3];
   G4double fPrizm[4];
+  G4double fTilt;
+G4double fTheta;
+	G4double fdH;
   G4double fMcpTotal[3];
   G4double fMcpActive[3];
   G4ThreeVector fPrismShift;

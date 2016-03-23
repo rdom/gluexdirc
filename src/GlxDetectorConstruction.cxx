@@ -126,10 +126,22 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   G4Box* gMirror = new G4Box("gMirror",fMirror[0]/2.,fMirror[1]/2.,fMirror[2]/2.);
   lMirror = new G4LogicalVolume(gMirror,MirrorMaterial,"lMirror",0,0,0);
   // The Wedge
-  G4Trap* gWedge = new G4Trap("gWedge",fPrizm[0],fPrizm[1],fPrizm[2],fPrizm[3]);
+/*  G4Trap* gWedge = new G4Trap("gWedge",fPrizm[0],fPrizm[1],fPrizm[2],fPrizm[3]);
   lWedge = new G4LogicalVolume(gWedge, BarMaterial,"lWedge",0,0,0);
   G4RotationMatrix* xRot = new G4RotationMatrix();
   xRot->rotateX(-M_PI/2.*rad);
+*/
+  // The Wedge with 6 mrad angle of the bottom side:
+  fTilt = 0.006; // 6 mrad
+  fdH = fPrizm[1]*tan(fTilt);
+  fPrizm[2] = tan(30./180.*M_PI)*91. + 27. - fdH; // update the side of the prizm assuming bottom tilt
+  fTheta = atan((fPrizm[2]+fdH-fPrizm[3])/2./fPrizm[1]);
+  G4Trap* gWedge = new G4Trap("gWedge",fPrizm[1]/2., fTheta, 0.,fPrizm[0]/2., fPrizm[2]/2., fPrizm[2]/2., 0., fPrizm[0]/2., fPrizm[3]/2., fPrizm[3]/2., 0.);
+  lWedge = new G4LogicalVolume(gWedge, BarMaterial,"lWedge",0,0,0);
+  G4RotationMatrix* xRot = new G4RotationMatrix();
+  xRot->rotateY(M_PI*rad);
+  xRot->rotateX(M_PI*rad);
+	
   // The Window
   G4Box* gWindow = new G4Box("gWindow",fWindow[0]/2.,fWindow[1]/2.,fWindow[2]/2.);
   lWindow = new G4LogicalVolume(gWindow,BarMaterial,"lWindow",0,0,0);
@@ -695,7 +707,7 @@ void GlxDetectorConstruction::DefineMaterials(){
     KamLandOilAbsorption[i] = (-1)/log(KamLandOilAbsorption[i])*50*cm;
 	//fAbsorption[i] = (-1)/log(GreaseAbsorption[i]);
 
-	  std::cout<<"e = "<<PhotonEnergy[num-i-1]<<", quartz abs = "<<QuartzAbsorption[i]<<std::endl;
+	  //std::cout<<"e = "<<PhotonEnergy[num-i-1]<<", quartz abs = "<<QuartzAbsorption[i]<<std::endl;
   }
 
   /**************************** REFRACTIVE INDEXES ****************************/
