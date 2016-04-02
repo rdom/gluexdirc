@@ -87,4 +87,5 @@ simulation:
 ./glxdirc -s 0 -e 100 -x proton -p 4.5 -z -2 -gx 2000 -gy 200 -b 1
 
 
-
+reconstruction:
+./glxdirc -s 2 -u lut_all.root -i hits.root -f -1 -t1 10. -e 0 -v 4
