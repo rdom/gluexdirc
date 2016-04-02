@@ -54,7 +54,7 @@ GlxLutReco::GlxLutReco(TString infile, TString lutfile, Int_t verbose){
   
   for(Int_t b=0; b<48; b++){
     std::cout<<"FFFFFFFFFFFFFFFFF " <<b<<std::endl;
-    //fLut[b] = new TClonesArray("GlxLutNode");
+    fLut[b] = new TClonesArray("GlxLutNode");
     fTree->SetBranchAddress(Form("LUT_%d",b),&fLut[b]); 
   }
 	
