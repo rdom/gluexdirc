@@ -87,11 +87,16 @@ G4bool GlxPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   G4HCofThisEvent* HCofEvent = currentEvent->GetHCofThisEvent();
   GlxPrizmHitsCollection* prizmCol = (GlxPrizmHitsCollection*)(HCofEvent->GetHC(collectionID));
 
+
+	
   Double_t pathId = 0;
   Int_t refl=-1, barId(-1);
+  if(GlxManager::Instance()->GetRunType()==3) {barId = GlxManager::Instance()->GetRadiator();} // if laser run
   for (G4int i=0;i<prizmCol->entries();i++){
     GlxPrizmHit* phit = (*prizmCol)[i];
-    if(i==0) barId=phit->GetId();
+    if(i==0 && GlxManager::Instance()->GetRunType()!=3){	
+	  barId=phit->GetId();
+	}
     if(phit->GetTrackId()==track->GetTrackID()) {
       refl++;
       pathId += phit->GetNormalId()*1000*refl;
@@ -117,8 +122,8 @@ G4bool GlxPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   hit.SetNreflectionsInPrizm(refl);
   hit.SetPathInPrizm(pathId);
   hit.SetCherenkovMC(GlxManager::Instance()->GetCurrentCherenkov());
-  // time since track created
 
+  // time since track created
   G4double time = step->GetPreStepPoint()->GetLocalTime();
   G4double resolution = 0.3; //ns
   time = G4RandGauss::shoot(time,resolution);

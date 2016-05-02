@@ -99,6 +99,7 @@ private:
   G4double fFdp[3];
 
   G4double fGap;
+  G4double fMirrorGap; 
   G4double fWall;
   G4double fMShift;
 

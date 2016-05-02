@@ -39,6 +39,7 @@ GlxDetectorConstruction::GlxDetectorConstruction()
   fMcpLayout = GlxManager::Instance()->GetMcpLayout();
   fLensId = GlxManager::Instance()->GetLens();
   fGap = GlxManager::Instance()->GetGap();
+  fMirrorGap = GlxManager::Instance()->GetMirrorGap();
 
   fNsil = 1.406;
   fNgr = 1.46;
@@ -76,9 +77,9 @@ GlxDetectorConstruction::GlxDetectorConstruction()
     fTankBox[2]=fTankBox1[2];
   }
   
-  fMirror1[0]=190;/*197;*/ fMirror1[1]=fTankBox[1]-25;  fMirror1[2]=1;  // bottom mirror, 2 cm gap between it and bar box window
+  fMirror1[0]=190-fMirrorGap;/*197;*/ fMirror1[1]=fTankBox[1]-25;  fMirror1[2]=1;  // bottom mirror, 2 cm gap between it and bar box window
   fMirror2[0]=66.97; fMirror2[1]=fTankBox[1]-25;  fMirror2[2]=1; // new wedge mirror, 2 cm gap between it and bar box window
-  fMirror3[0]=429;/*422.9;*/ fMirror3[1]=fTankBox[1]-25;  fMirror3[2]=1; // vertical mirror !!!
+  fMirror3[0]=429;/*422.9;*/ fMirror3[1]=fTankBox[1]-25;  fMirror3[2]=1; // vertical mirror
   fMirror4[0]=580;   fMirror4[1]=300;  fMirror4[2]=1; // side mirrors
 
   fFdp[0]=314.5;/*312;*/ fFdp[1]=fTankBox[1]-25;  fFdp[2]=1;  
@@ -258,7 +259,6 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
     }	
   }
 
-	
   // // Fill the assembly by the plates
   // Ta.setX( caloX/4. ); Ta.setY( caloY/4. ); Ta.setZ( 0. );
   // assemblyDetector->AddPlacedVolume( plateLV, G4Transform3D(Ta,Ra) );
@@ -269,7 +269,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   // Now instantiate the layers
   // for(int i = 0; i < layers; i++ ){
      // Translation of the assembly inside the world
-  G4ThreeVector Tm = G4ThreeVector(-0.5*fTankBox[0]+20,0,0.5*fTankBox[2]-fMirror1[0]-20);
+  G4ThreeVector Tm = G4ThreeVector(-0.5*fTankBox[0]+20,0,0.5*fTankBox[2]-(fMirror1[0]+fMirrorGap)-20);
   G4RotationMatrix *Rm = new G4RotationMatrix; Rm->rotateY(rot_fm);
   assemblyFMirror->MakeImprint(lTankBox,Tm,Rm,0);
   // }

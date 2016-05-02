@@ -49,6 +49,7 @@ public:
   void SetRadiator(int val){ fRadiator = val; }
   void SetLens(int val){ fLens = val; }
   void SetGap(double val){ fGap = val; }
+  void SetMirrorGap(double val){ fMirrorGap = val; }
   void SetMcpLayout(int val){ fMcpLayout = val; }
   void SetAngle(double val){ fAngle = val; }
   void SetRadiatorL(double val){ fRadiatorL = val; }
@@ -77,6 +78,7 @@ public:
   int GetRadiator(){ return fRadiator; }
   int GetLens(){ return fLens; }
   double GetGap(){ return fGap; }
+  double GetMirrorGap(){ return fMirrorGap; }
   int GetMcpLayout(){ return fMcpLayout; }
   double GetAngle(){ return fAngle; }
   double GetRadiatorL(){ return fRadiatorL; }
@@ -105,6 +107,7 @@ private:
   int fRadiator;
   int fLens;
   double fGap;
+  double fMirrorGap;
   int fMcpLayout;
   double fAngle;
   double fRadiatorL;
