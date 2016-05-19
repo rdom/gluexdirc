@@ -39,6 +39,7 @@ public:
   Int_t GetGeometry()      const { return fGeometry; }
   Int_t GetLens()          const { return fLens; }
   Double_t GetGap()		   const { return fGap;}
+  Double_t GetMirrorGap()  const { return fMirrorGap;}
   Int_t GetTrigger()       const { return fTrigger; } 
   Double_t GetTest1()      const { return fTest1; }
   Double_t GetTest2()      const { return fTest2; }
@@ -64,6 +65,7 @@ public:
   void SetGeometry(Int_t val) { fGeometry = val; }
   void SetLens(Int_t val) { fLens = val; }
   void SetGap(Double_t val) { fGap = val; }
+  void SetMirrorGap(Double_t val) { fMirrorGap = val; }
   void SetTrigger(Int_t val) { fTrigger = val; }
   void SetTest1(Double_t val) { fTest1 = val; }
   void SetTest2(Double_t val) { fTest2 = val; }
@@ -93,6 +95,7 @@ private:
   Int_t fGeometry;
   Int_t fLens;
   Double_t fGap;
+  Double_t fMirrorGap;
   Int_t fTrigger; 
   Double_t fTest1;
   Double_t fTest2;
