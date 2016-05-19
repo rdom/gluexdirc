@@ -84,8 +84,8 @@ GlxDetectorConstruction::GlxDetectorConstruction()
 
   fFdp[0]=314.5;/*312;*/ fFdp[1]=fTankBox[1]-25;  fFdp[2]=1;  
   
-  fMcpTotal[0] = fMcpTotal[1] = 53+6; fMcpTotal[2]=0.5;
-  fMcpActive[0] = fMcpActive[1] = 53; fMcpActive[2]=0.5;
+  fMcpTotal[0] = fMcpTotal[1] = 52+6; fMcpTotal[2]=0.5;
+  fMcpActive[0] = fMcpActive[1] = 52; fMcpActive[2]=0.5;
 
  
    
@@ -373,19 +373,6 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
      1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,
      1.0,1.0,1.0,1.0,1.0,1.0};
 
-  // Burle PMT's 
-  G4double QuantumEfficiencyB[num] =
-    {0.,0.001,0.002,0.005,0.01,0.015,0.02,0.03,0.04,0.05,0.06,
-     0.07,0.09,0.1,0.13,0.15,0.17,0.2,0.24,0.26,0.28,0.282,0.284,0.286,
-     0.288,0.29,0.28,0.26,0.24,0.22,0.20,0.18,0.15,0.13,0.12,0.10};
-  
-  //hamamatsu pmt quantum efficiency
-  G4double QuantumEfficiencyPMT[num]=
-    {0.001,0.002,0.004,0.007,0.011,0.015,0.020,0.026,0.033,0.040,0.045,
-     0.056,0.067,0.085,0.109,0.129,0.138,0.147,0.158,0.170,
-     0.181,0.188,0.196,0.203,0.206,0.212,0.218,0.219,0.225,0.230,
-     0.228,0.222,0.217,0.210,0.199,0.177};
-
   // hamamatsu H12700 quantum efficiency (as a function of photon E):	
   G4double QuantumEfficiencyPMT12700[num]=
 	{0.001,0.001,0.00118865,0.00511371,0.0104755,0.0174337,0.0259711,
@@ -396,46 +383,11 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
 
   // these quantum efficiencies have to be multiplied by geometry
   //   efficiency of given PMT's
-  //   for Hamamatsu by factor 0.7
-  //   for Burle by factor 0.45 
   for(G4int k=0;k<36;k++)
     {
-      QuantumEfficiencyB[k] =  QuantumEfficiencyB[k] * 0.45 ;
-      QuantumEfficiencyPMT[k] =  QuantumEfficiencyPMT[k] *.7;
 	  QuantumEfficiencyPMT12700[k] =  QuantumEfficiencyPMT12700[k] *.7;
   }
  
-  // G4double QuantumEfficiency[num]= 
-  //    { 1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,
-  //      1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,
-  //      1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.};
-
-  //  G4double QuantumEfficiencyPMT[num] =
-  //    { 1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,
-  //      1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,
-  //      1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.};
-  
-  /* define quantum efficiency for burle PMT's - the same efficiency is 
-     assigned to pads and also to slots !!!! */
-    
-  //burle pmt - bigger slots => logicPad
-  G4MaterialPropertiesTable* PhotocatodBurleMPT = new G4MaterialPropertiesTable();
-  PhotocatodBurleMPT->AddProperty("EFFICIENCY",  PhotonEnergy,QuantumEfficiencyB,num);
-  PhotocatodBurleMPT->AddProperty("REFLECTIVITY",PhotonEnergy,PMTReflectivity,num);
-
- 
-  G4OpticalSurface* BurlePMTOpSurface= 
-    new G4OpticalSurface("BurlePMTOpSurface",glisur,polished,
-			 dielectric_metal);
-  BurlePMTOpSurface->SetMaterialPropertiesTable(PhotocatodBurleMPT);
-
-  // // assignment for pad
-  // if(burle)
-  //   new G4LogicalSkinSurface("BurlePMTSurface",logicBurPad,BurlePMTOpSurface); 
-
-  // if(burle1)
-  //   new G4LogicalSkinSurface("Burle1PMTSurface",logicBur1Pad,BurlePMTOpSurface); 
-
   /* hamamatsu pmt's - smaller slots => quantum efficiency again
      assign to slot and pad */
   
@@ -444,7 +396,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   PhotocatodHamamatsuMPT->AddProperty("EFFICIENCY",  PhotonEnergy,fQuantumEfficiency,num);
   PhotocatodHamamatsuMPT->AddProperty("REFLECTIVITY",PhotonEnergy,PMTReflectivity,num);
 
- 
+ /*
   G4OpticalSurface* HamamatsuPMTOpSurface= 
     new G4OpticalSurface("HamamatsuPMTOpSurface",glisur,polished,dielectric_metal);
   HamamatsuPMTOpSurface->SetMaterialPropertiesTable(PhotocatodHamamatsuMPT);
@@ -452,7 +404,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   // // assignment to pad
   // if(hamamatsu8500)
   new G4LogicalSkinSurface("HamamatsuPMTSurface",lPixel,HamamatsuPMTOpSurface);
-
+*/
   // Mirror
   G4OpticalSurface* MirrorOpSurface= 
     new G4OpticalSurface("MirrorOpSurface",glisur,polished,dielectric_metal);
@@ -650,6 +602,14 @@ void GlxDetectorConstruction::DefineMaterials(){
 	19.99915, 16.96846, 11.79734, 5.92869, 2.21841, 0.95961, 
 	0.56005};
 
+	// attenuation length [mm] for silicon TSE3032 (Belle II)
+	G4double TSE3032Absorption[num] = {600., 600., 600., 600., 600., 600., 600., 
+	543.94067, 449.09940, 449.09940, 449.09940, 449.09940, 449.09940, 
+	449.09940, 449.09940, 427.27090, 363.86901, 298.58176, 270.61618, 
+	241.43470, 210.95626, 195.13213, 188.52083, 181.59472, 175.53499, 
+	169.83431, 163.84128, 149.70061, 133.03941, 115.88306, 99.48690, 
+	82.49526, 66.61316, 60.08292, 50.51054, 37.39791};
+
   //water
   const G4int nEntries = 32;
   G4double photonEnergyH2O[nEntries] =
@@ -761,7 +721,7 @@ void GlxDetectorConstruction::DefineMaterials(){
   // Silicon material
   G4MaterialPropertiesTable* SiliconMPT = new G4MaterialPropertiesTable();
   SiliconMPT->AddProperty("RINDEX",       PhotonEnergy, SiliconRefractiveIndex,num);
-  SiliconMPT->AddProperty("ABSLENGTH",    PhotonEnergy, Absorption,num);
+  SiliconMPT->AddProperty("ABSLENGTH",    PhotonEnergy, TSE3032Absorption,num);
   SiliconMaterial->SetMaterialPropertiesTable(SiliconMPT);
 
   // Grease material
