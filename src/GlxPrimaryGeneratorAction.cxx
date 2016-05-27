@@ -68,11 +68,31 @@ void GlxPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
     fParticleGun->SetParticleMomentumDirection(vec);
 	fParticleGun->SetParticlePosition(G4ThreeVector(radiatorL/2.-0.1,arr[radid/12]+0.5*425-0.5*35-(11-radid%12)*35,0));
   }
-  if(GlxManager::Instance()->GetRunType() == 0){
+  if(GlxManager::Instance()->GetRunType() == 3){ // laser calibration
+
+    G4int radid = 47-GlxManager::Instance()->GetRadiator();
+	//G4int radid = 48.*G4UniformRand();
+	G4int arr[]={-795,-365,365,795};
+    //G4double angle = -G4UniformRand()*M_PI;
     G4ThreeVector vec(0,0,1);
-    vec.rotateY(M_PI/10.);
+    vec.rotateY((180.-42.13)/180.*3.1415);
+    fParticleGun->SetParticleMomentumDirection(vec);
+	//fParticleGun->SetParticlePosition(G4ThreeVector(radiatorL/2.-0.1,arr[radid/12]+0.5*425-0.5*35-(11-radid%12)*35,0));
+	fParticleGun->SetParticlePosition(G4ThreeVector(radiatorL/2.+200.,arr[radid/12]+0.5*425-0.5*35-(11-radid%12)*35,-502.));  
+  }
+	
+  if(GlxManager::Instance()->GetRunType() == 0){
+	//  std::cout<<"run type = 0"<<std::endl;
+    G4ThreeVector vec(0,0,1);
+	  vec.rotateY(M_PI/10.);
+	  /*
+    //added to compare with John:
+	vec.rotateY(4./180.*3.1415);// John's theta
+	vec.rotateZ(40./180.*3.1415);// John's phi
+	*/
     fParticleGun->SetParticleMomentumDirection(vec);
     fParticleGun->SetParticlePosition(G4ThreeVector(0,0,-4000));//-5600));
+	//fParticleGun->SetParticlePosition(G4ThreeVector(-140.,180.,-8.7)); // John's location  
   }
 
   if(GlxManager::Instance()->GetBeamDimension() < 0){ // random momentum
