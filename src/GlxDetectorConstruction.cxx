@@ -148,7 +148,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   lWindow = new G4LogicalVolume(gWindow,BarMaterial,"lWindow",0,0,0);
   // The tank box
   G4Box* gTankBox = new G4Box("gTankBox",fTankBox[0]/2.,fTankBox[1]/2.,fTankBox[2]/2.);
-  lTankBox = new G4LogicalVolume(gTankBox,H2OMaterial,"lTankBox",0,0,0); // OilMaterial //BarMaterial
+  lTankBox = new G4LogicalVolume(gTankBox,H2OMaterial/*defaultMaterial*/,"lTankBox",0,0,0); // OilMaterial //BarMaterial
   
   // Mirrors in tank
   G4Box* gTankMirror1 = new G4Box("gTankMirr1",fMirror1[0]/2.,fMirror1[1]/2.,fMirror1[2]/2.);
@@ -189,7 +189,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   // The Air/Cookie Gap
   if(fGap > 0.){
     G4Box* gGap = new G4Box("gGap",fFdp[0]/2.,fFdp[1]/2.,fGap/2.);
-    lGap = new G4LogicalVolume(gGap, /*EJ560Material*/SiliconMaterial,"lGap",0,0,0);
+    lGap = new G4LogicalVolume(gGap, /*EJ560Material*/SiliconMaterial/*defaultMaterial*/,"lGap",0,0,0);
   }
   // The FS wall of the EV
   G4Box* gWall = new G4Box("gWall",fFdp[0]/2.,fFdp[1]/2.,fWall/2.);

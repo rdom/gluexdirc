@@ -75,7 +75,7 @@ void GlxPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
 	G4int arr[]={-795,-365,365,795};
     //G4double angle = -G4UniformRand()*M_PI;
     G4ThreeVector vec(0,0,1);
-    vec.rotateY((180.-42.13)/180.*3.1415);
+    vec.rotateY((90.+42.13)/180.*3.1415);
     fParticleGun->SetParticleMomentumDirection(vec);
 	//fParticleGun->SetParticlePosition(G4ThreeVector(radiatorL/2.-0.1,arr[radid/12]+0.5*425-0.5*35-(11-radid%12)*35,0));
 	fParticleGun->SetParticlePosition(G4ThreeVector(radiatorL/2.+200.,arr[radid/12]+0.5*425-0.5*35-(11-radid%12)*35,-502.));  
