@@ -148,7 +148,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   lWindow = new G4LogicalVolume(gWindow,BarMaterial,"lWindow",0,0,0);
   // The tank box
   G4Box* gTankBox = new G4Box("gTankBox",fTankBox[0]/2.,fTankBox[1]/2.,fTankBox[2]/2.);
-  lTankBox = new G4LogicalVolume(gTankBox,H2OMaterial/*defaultMaterial*/,"lTankBox",0,0,0); // OilMaterial //BarMaterial
+  lTankBox = new G4LogicalVolume(gTankBox,BarMaterial/*H2OMaterial/defaultMaterial*/,"lTankBox",0,0,0); // OilMaterial //BarMaterial
   
   // Mirrors in tank
   G4Box* gTankMirror1 = new G4Box("gTankMirr1",fMirror1[0]/2.,fMirror1[1]/2.,fMirror1[2]/2.);
@@ -184,7 +184,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   
   // The FD plane
   G4Box* gFdp = new G4Box("gFdp",fFdp[0]/2.,fFdp[1]/2.,fFdp[2]/2.);
-  lFdp = new G4LogicalVolume(gFdp,BarMaterial,"lFdp",0,0,0);// BarMaterial
+  lFdp = new G4LogicalVolume(gFdp,BarMaterial,"lFdp",0,0,0);
 
   // The Air/Cookie Gap
   if(fGap > 0.){
@@ -316,7 +316,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   }
  }else{
    // for layout optimization 
-   gMcp = new G4Box("gMcp",fFdp[0]/2.,fFdp[1]/2.,fFdp[2]/2.);
+   gMcp = new G4Box("gMcp",fFdp[0]/2.,fFdp[1]/2.,fMcpTotal[2]/2.);
    lMcp = new G4LogicalVolume(gMcp,BarMaterial,"lMcp",0,0,0);
    
    // The MCP Pixel
