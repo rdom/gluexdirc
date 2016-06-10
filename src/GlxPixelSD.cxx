@@ -47,6 +47,7 @@ void GlxPixelSD::Initialize(G4HCofThisEvent* hce){
   // }
  
   //GlxManager::Instance()->AddEvent(GlxEvent());
+
 }
 
 G4bool GlxPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){  
@@ -99,7 +100,8 @@ G4bool GlxPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
 	}
     if(phit->GetTrackId()==track->GetTrackID()) {
       refl++;
-      pathId += phit->GetNormalId()*1000*refl;
+     // pathId += phit->GetNormalId()*1000*refl;
+		pathId = pathId*10 + phit->GetNormalId();
     }
   }
 

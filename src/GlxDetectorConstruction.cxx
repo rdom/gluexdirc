@@ -1,4 +1,3 @@
-
 #include "GlxDetectorConstruction.h"
 
 #include "G4Material.hh"
@@ -853,7 +852,7 @@ void GlxDetectorConstruction::ConstructSDandField(){
   //SetSensitiveDetector("lScan",pixelSD);
   
   GlxPrizmSD* prizmSD = new GlxPrizmSD("PrizmSD", "PrizmHitsCollection", 0);
-  SetSensitiveDetector("lWedge",prizmSD);
+  //SetSensitiveDetector("lWedge",prizmSD);
   SetSensitiveDetector("lMirror",prizmSD);
   SetSensitiveDetector("lFmirror",prizmSD);
   if(fLensId > 0){
