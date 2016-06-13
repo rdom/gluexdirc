@@ -58,7 +58,8 @@ G4bool GlxPrizmSD::ProcessHits(G4Step* aStep, G4TouchableHistory* hist){
   G4ThreeVector theLocalNormal = theNavigator->GetLocalExitNormal(&valid);
   if (valid ){
     G4ThreeVector theGlobalNormal = theNavigator->GetLocalToGlobalTransform().TransformAxis(theLocalNormal);
-   // normalId = theGlobalNormal.x() + 10*theGlobalNormal.y() + 100*theGlobalNormal.z();
+    normalId = theGlobalNormal.x() + 10*theGlobalNormal.y() + 100*theGlobalNormal.z();
+/*	  // to put into normalId the mirror number for inspection of photon reflections inside the optical box:
 	  if(theGlobalNormal.x() > 0. && theGlobalNormal.x() < 1. && theGlobalNormal.z() > 0.){ // wedge mirror inside EV
 		//if(newHit->GetPos.x() < GlxManager::Instance()->GetRadiatorL()/2. + 91. + 1.){ normalId = 8; } // wedge inside bar box
 		normalId = 1;
@@ -80,10 +81,9 @@ G4bool GlxPrizmSD::ProcessHits(G4Step* aStep, G4TouchableHistory* hist){
 	  }
 	  if(theGlobalNormal.y() == -1.){ // other side mirror
 		normalId = 6;
-	  }
+	  }*/
   }
   newHit->SetNormalId(normalId);
-	//std::cout<<"normal id = "<<normalId<<std::endl;
 
   G4StepPoint* preStepPoint = aStep->GetPreStepPoint();
   G4TouchableHandle theTouchable = preStepPoint->GetTouchableHandle();

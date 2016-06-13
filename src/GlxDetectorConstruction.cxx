@@ -147,7 +147,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   lWindow = new G4LogicalVolume(gWindow,BarMaterial,"lWindow",0,0,0);
   // The tank box
   G4Box* gTankBox = new G4Box("gTankBox",fTankBox[0]/2.,fTankBox[1]/2.,fTankBox[2]/2.);
-  lTankBox = new G4LogicalVolume(gTankBox,BarMaterial/*H2OMaterial/defaultMaterial*/,"lTankBox",0,0,0); // OilMaterial //BarMaterial
+  lTankBox = new G4LogicalVolume(gTankBox,/*BarMaterial*/H2OMaterial/*defaultMaterial*/,"lTankBox",0,0,0); // OilMaterial //BarMaterial
   
   // Mirrors in tank
   G4Box* gTankMirror1 = new G4Box("gTankMirr1",fMirror1[0]/2.,fMirror1[1]/2.,fMirror1[2]/2.);
@@ -467,6 +467,12 @@ void GlxDetectorConstruction::DefineMaterials(){
   SiO2->AddElement(Si, natoms=1);
   SiO2->AddElement(O , natoms=2);
 
+  // borofloat material
+  G4Material* Borofloat = new G4Material("borofloat",density= 2.200*g/cm3, ncomponents=2);
+  Borofloat->AddElement(Si, natoms=1);
+  Borofloat->AddElement(O , natoms=2);
+
+	
   Nlak33aMaterial  = new G4Material("Nlak33a",density= 4.220*g/cm3, ncomponents=2);
   Nlak33aMaterial->AddElement(Si, natoms=1);
   Nlak33aMaterial->AddElement(O , natoms=2);
@@ -609,6 +615,11 @@ void GlxDetectorConstruction::DefineMaterials(){
 	169.83431, 163.84128, 149.70061, 133.03941, 115.88306, 99.48690, 
 	82.49526, 66.61316, 60.08292, 50.51054, 37.39791};
 
+	// attenuation length [mm] for borosilicate glass BOROFLOAT33:
+	G4double BorofloatAbsorption[num] = {13.7, 13.7, 13.7, 13.7, 13.7, 13.7, 13.7,
+	13.7, 13.7, 13.7, 13.7, 13.7, 13.7, 13.7, 13.7, 13.7, 13.7, 13.7, 13.7, 13.7,
+	13.7, 13.7, 13.7, 13.7, 13.7, 13.7, 13.1, 12.2, 10.8, 8.4, 6.9, 5.2, 3.4, 2.0, 0.9, 0.45};
+
   //water
   const G4int nEntries = 32;
   G4double photonEnergyH2O[nEntries] =
@@ -695,6 +706,13 @@ void GlxDetectorConstruction::DefineMaterials(){
     1.450428,1.451976,1.453666,1.455513,1.45754,1.45977,1.462231,1.464958,
     1.467991,1.471377,1.475174};
 
+  G4double BorofloatRefractiveIndex[num]={1.536729, 1.536726, 1.536721, 1.536717,
+	1.536713, 1.536708, 1.536704, 1.536699, 1.536694, 1.536689, 1.536683,
+	1.536678, 1.536672, 1.536666, 1.536660, 1.536654, 1.536647, 1.536640,
+	1.536633, 1.536625, 1.536617, 1.536609, 1.536600, 1.536591, 1.536581,
+	1.536571, 1.536561, 1.536550, 1.536538, 1.536526, 1.536513, 1.536499,
+	1.536484, 1.488560, 1.488560, 1.488560};
+
   double Nlak33aRefractiveIndex[76]={1.73816,1.73836,1.73858,1.73881,1.73904,1.73928,1.73952,1.73976,1.74001,1.74026,1.74052,1.74078,1.74105,1.74132,1.7416,1.74189,1.74218,1.74249,1.74279,1.74311,1.74344,1.74378,1.74412,1.74448,1.74485,1.74522,1.74562,1.74602,1.74644,1.74687,1.74732,1.74779,1.74827,1.74878,1.7493,1.74985,1.75042,1.75101,1.75163,1.75228,1.75296,1.75368,1.75443,1.75521,1.75604,1.75692,1.75784,1.75882,1.75985,1.76095,1.76211,1.76335,1.76467,1.76608,1.76758,1.7692,1.77093,1.77279,1.7748,1.77698,1.77934,1.7819,1.7847,1.78775,1.79111,1.79481,1.79889,1.80343,1.8085,1.81419,1.82061,1.8279,1.83625,1.84589,1.85713,1.87039};
 
   G4double MirrorReflectivity[num] = 
@@ -716,6 +734,12 @@ void GlxDetectorConstruction::DefineMaterials(){
 
   // assign this parameter table to BAR material
   BarMaterial->SetMaterialPropertiesTable(QuartzMPT);
+
+  // Borofloat material
+  G4MaterialPropertiesTable* BorofloatMPT = new G4MaterialPropertiesTable();
+  BorofloatMPT->AddProperty("RINDEX",    PhotonEnergy, BorofloatRefractiveIndex, num);
+  BorofloatMPT->AddProperty("ABSLENGTH", PhotonEnergy, BorofloatAbsorption, num);
+  BorofloatMaterial->SetMaterialPropertiesTable(BorofloatMPT);
 
   // Silicon material
   G4MaterialPropertiesTable* SiliconMPT = new G4MaterialPropertiesTable();
@@ -852,7 +876,7 @@ void GlxDetectorConstruction::ConstructSDandField(){
   //SetSensitiveDetector("lScan",pixelSD);
   
   GlxPrizmSD* prizmSD = new GlxPrizmSD("PrizmSD", "PrizmHitsCollection", 0);
-  //SetSensitiveDetector("lWedge",prizmSD);
+  SetSensitiveDetector("lWedge",prizmSD);
   SetSensitiveDetector("lMirror",prizmSD);
   SetSensitiveDetector("lFmirror",prizmSD);
   if(fLensId > 0){

@@ -100,8 +100,8 @@ G4bool GlxPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
 	}
     if(phit->GetTrackId()==track->GetTrackID()) {
       refl++;
-     // pathId += phit->GetNormalId()*1000*refl;
-		pathId = pathId*10 + phit->GetNormalId();
+      pathId += phit->GetNormalId()*1000*refl;
+	//	pathId = pathId*10 + phit->GetNormalId(); // in case reflections sequence is used in GlxPrizmSD.cxx
     }
   }
 
