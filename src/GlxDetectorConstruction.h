@@ -66,7 +66,7 @@ private:
 
   G4Material*        defaultMaterial; // material for bars
   G4Material*        BarMaterial; // material for bars
-  G4Material*        BorofloatMaterial; // material for bars
+  G4Material*        GlassMaterial; // material for bars
   G4Material*		 SiliconMaterial; // cookies material
   G4Material*        OilMaterial;
   G4Material*        H2OMaterial;

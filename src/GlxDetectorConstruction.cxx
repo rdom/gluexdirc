@@ -192,7 +192,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   }
   // The FS wall of the EV
   G4Box* gWall = new G4Box("gWall",fFdp[0]/2.,fFdp[1]/2.,fWall/2.);
-  lWall = new G4LogicalVolume(gWall,BarMaterial,"lWall",0,0,0);
+  lWall = new G4LogicalVolume(gWall,GlassMaterial/*BarMaterial*/,"lWall",0,0,0);
 
   for(Int_t i=0; i<12; i++){
     G4double yshift = (fBar[1]+0.15)*i - fBarBox[1]/2. + fBar[1]/2.;
@@ -468,9 +468,9 @@ void GlxDetectorConstruction::DefineMaterials(){
   SiO2->AddElement(O , natoms=2);
 
   // borofloat material
-  G4Material* Borofloat = new G4Material("borofloat",density= 2.200*g/cm3, ncomponents=2);
-  Borofloat->AddElement(Si, natoms=1);
-  Borofloat->AddElement(O , natoms=2);
+  G4Material* BorofloatMaterial = new G4Material("borofloat",density= 2.200*g/cm3, ncomponents=2);
+  BorofloatMaterial->AddElement(Si, natoms=1);
+  BorofloatMaterial->AddElement(O , natoms=2);
 
 	
   Nlak33aMaterial  = new G4Material("Nlak33a",density= 4.220*g/cm3, ncomponents=2);
@@ -534,6 +534,7 @@ void GlxDetectorConstruction::DefineMaterials(){
   else defaultMaterial = Air; //Vacuum // material of world
   frontMaterial = CarbonFiber; 
   BarMaterial = SiO2; // material of all Bars, Quartz and Window
+  GlassMaterial = BorofloatMaterial;
   SiliconMaterial = Silicon; // material for cookies as for Belle II
   greaseMaterial = Eljen550;
   EJ560Material = EJ560; // pre-made cookies as for FCAL
@@ -616,9 +617,9 @@ void GlxDetectorConstruction::DefineMaterials(){
 	82.49526, 66.61316, 60.08292, 50.51054, 37.39791};
 
 	// attenuation length [mm] for borosilicate glass BOROFLOAT33:
-	G4double BorofloatAbsorption[num] = {13.7, 13.7, 13.7, 13.7, 13.7, 13.7, 13.7,
-	13.7, 13.7, 13.7, 13.7, 13.7, 13.7, 13.7, 13.7, 13.7, 13.7, 13.7, 13.7, 13.7,
-	13.7, 13.7, 13.7, 13.7, 13.7, 13.7, 13.1, 12.2, 10.8, 8.4, 6.9, 5.2, 3.4, 2.0, 0.9, 0.45};
+	G4double BorofloatAbsorption[num] = {137.15, 137.5, 137.5, 137.5, 137.5, 137.5, 137.5,
+	137.5, 137.5, 137.5, 137.5, 137.5, 137.5, 137.5, 137.5, 137.5, 137.5, 137.5, 137.5, 137.5,
+	137.5, 137.5, 137.5, 137.5, 137.5, 137.5, 131.7, 122.0, 107.9, 84.4, 69.3, 52.2, 34.1, 20.5, 9.24, 4.52};
 
   //water
   const G4int nEntries = 32;
@@ -739,7 +740,7 @@ void GlxDetectorConstruction::DefineMaterials(){
   G4MaterialPropertiesTable* BorofloatMPT = new G4MaterialPropertiesTable();
   BorofloatMPT->AddProperty("RINDEX",    PhotonEnergy, BorofloatRefractiveIndex, num);
   BorofloatMPT->AddProperty("ABSLENGTH", PhotonEnergy, BorofloatAbsorption, num);
-  BorofloatMaterial->SetMaterialPropertiesTable(BorofloatMPT);
+  GlassMaterial->SetMaterialPropertiesTable(BorofloatMPT);
 
   // Silicon material
   G4MaterialPropertiesTable* SiliconMPT = new G4MaterialPropertiesTable();
