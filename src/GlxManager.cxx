@@ -55,7 +55,7 @@ GlxManager::GlxManager(G4String outfile, G4int runtype){
   fShift = 150;
   fTest1 = 0;
   fTest2 = 0;
-  fLens = 3;
+  fLens = 3; // 3-segmented mirror
   fGap = 2.5;
   fMirrorGap = 0.;
   fMcpLayout = 2;

@@ -3,12 +3,14 @@
 #include "../src/GlxEvent.h"
 #include "glxtools.C"
 
+//void drawScan(TString infile="../../../data/pions_small.root"){
 void drawScan(TString infile="../build/hits.root"){
   if(infile=="") return;
-  fSavePath = "data/ang_mir";
+  fSavePath = "";
   GlxInit(infile,1); //digi
   TH1F *hTime = new TH1F("hTime","hTime",500,0,200);
-  TH2F *hHits = new TH2F("hHits",";x [mm];y [mm]",1000,-1100,1100,500,-150,150);
+  TH2F *hHits = new TH2F("hHits",";x [mm];y [mm]",461,-1500,1496.5,80,-200,196.5);
+  TH2F *hTraj = new TH2F("hTraj",";x [mm]; y[mm]", 461,-1500,1496.5,80,-200,196.5);
   hHits->SetStats(0);
 
   Int_t ntotal(0);
@@ -20,11 +22,15 @@ void drawScan(TString infile="../build/hits.root"){
       Int_t mcpid = fHit.GetMcpId();
       Int_t pixid = fHit.GetPixelId()-1;
       TVector3 gpos = fHit.GetGlobalPos();
-      
+      Double_t gtra = fHit.GetPathInPrizm();
       Double_t time = fHit.GetLeadTime();
+		
       hTime->Fill(time);
       hHits->Fill(gpos.Y(),gpos.X()); //-577.5
-      ntotal++;
+	  for(Int_t tt=0; tt<gtra;tt++){
+	    hTraj->Fill(gpos.Y(),gpos.X());
+	  }
+	  ntotal++;
       
       //fhDigi[mcpid]->Fill(7-pixid/8, pixid%8);
       //fhDigi[mcpid]->Fill(pixid%8, pixid/8); // for beam data
@@ -43,13 +49,19 @@ void drawScan(TString infile="../build/hits.root"){
   //TString name =  Form("%d_%d",thetaid,phiid);
   TString name =  Form("%d_%d",thetaid,rid);
 
-  hHits->SetTitle(Form("#theta=%2.2f, #varphi=%2.2f, R=%2.0f, T=%2.0f#circ, N=%d",glx_theta,glx_phi, glx_radius,glx_tilt,ntotal));
-  
-  // canvasAdd("time_"+name);  
-  // hTime->Draw();
+  //hHits->SetTitle(Form("#theta=%2.2f, #varphi=%2.2f, R=%2.0f, T=%2.0f#circ, N=%d",glx_theta,glx_phi, glx_radius,glx_tilt,ntotal));
+hHits->SetTitle(Form("#theta=%2.2f, #varphi=%2.2f, N=%d",glx_theta,glx_phi,ntotal));
+
+	//SetRootPalette(6);
+	canvasAdd("traj_"+name);
+	TH2F* hRatio = (TH2F*)hTraj->Clone();
+	hRatio->Divide(hHits);
+	hRatio->Draw("col2z");
+   canvasAdd("time_"+name);  
+   hTime->Draw();
   canvasAdd("hits_"+name,800,400);
   hHits->Draw("colz");
   canvasSave(1,0);
-  
+
 }
 

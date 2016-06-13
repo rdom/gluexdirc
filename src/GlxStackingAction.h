@@ -12,7 +12,7 @@
 
 #include "TGraph.h"
 #include "TRandom.h"
-
+#include "TVector3.h"
 
 class GlxStackingAction : public G4UserStackingAction
 {
@@ -30,6 +30,8 @@ class GlxStackingAction : public G4UserStackingAction
     G4int fCerenkovCounter; 
     TRandom* fRand;
     TGraph* fDetEff;
+	Double_t FindOutPoint(Double_t, Double_t, Double_t, Double_t *, Bool_t);
+		void NumberOfBounces(TVector3, TVector3, Int_t*, Int_t*, Double_t*, Double_t*);
 };
 
 #endif

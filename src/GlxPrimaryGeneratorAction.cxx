@@ -75,7 +75,7 @@ void GlxPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
 	G4int arr[]={-795,-365,365,795};
     //G4double angle = -G4UniformRand()*M_PI;
     G4ThreeVector vec(0,0,1);
-    vec.rotateY((180.-42.13)/180.*3.1415);
+    vec.rotateY((90.+42.13)/180.*3.1415);
     fParticleGun->SetParticleMomentumDirection(vec);
 	//fParticleGun->SetParticlePosition(G4ThreeVector(radiatorL/2.-0.1,arr[radid/12]+0.5*425-0.5*35-(11-radid%12)*35,0));
 	fParticleGun->SetParticlePosition(G4ThreeVector(radiatorL/2.+200.,arr[radid/12]+0.5*425-0.5*35-(11-radid%12)*35,-502.));  
@@ -84,15 +84,15 @@ void GlxPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
   if(GlxManager::Instance()->GetRunType() == 0){
 	//  std::cout<<"run type = 0"<<std::endl;
     G4ThreeVector vec(0,0,1);
-	  vec.rotateY(M_PI/10.);
-	  /*
+	//  vec.rotateY(M_PI/10.);
+	 
     //added to compare with John:
 	vec.rotateY(4./180.*3.1415);// John's theta
 	vec.rotateZ(40./180.*3.1415);// John's phi
-	*/
+	
     fParticleGun->SetParticleMomentumDirection(vec);
-    fParticleGun->SetParticlePosition(G4ThreeVector(0,0,-4000));//-5600));
-	//fParticleGun->SetParticlePosition(G4ThreeVector(-140.,180.,-8.7)); // John's location  
+    //fParticleGun->SetParticlePosition(G4ThreeVector(0,0,4000));//5600));// changed the sign according to mechanical design
+	fParticleGun->SetParticlePosition(G4ThreeVector(-140.,180.,-8.7)); // John's location  
   }
 
   if(GlxManager::Instance()->GetBeamDimension() < 0){ // random momentum
@@ -100,19 +100,19 @@ void GlxPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
 
     Double_t xpos = -50 + 1220*2*(1-2*G4UniformRand()); // [-2490,2390]
     Double_t ypos = 5 + (365 - 420/2.) + 420*2*G4UniformRand(); //[160,1000]
-    Double_t vertex = 5600;
+    Double_t vertex = 4000;//5600;
 
     if(GlxManager::Instance()->GetBeamDimension() == -2){
       xpos = GlxManager::Instance()->GetBeamX();
       ypos = GlxManager::Instance()->GetBeamZ();
     }
     
-    G4ThreeVector vec(xpos,ypos,vertex);
+    G4ThreeVector vec(xpos,ypos,-vertex);
     Double_t phi = atan(ypos/xpos);
     Double_t theta =  atan(sqrt(xpos*xpos+ypos*ypos)/vertex);
     
     fParticleGun->SetParticleMomentumDirection(vec);
-    fParticleGun->SetParticlePosition(G4ThreeVector(0,0,-vertex));
+    fParticleGun->SetParticlePosition(G4ThreeVector(0,0,vertex));//chaged sign according to mechanical design
   }
   
   fParticleGun->GeneratePrimaryVertex(anEvent);
