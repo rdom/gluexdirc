@@ -85,12 +85,10 @@ GlxDetectorConstruction::GlxDetectorConstruction()
   
   fMcpTotal[0] = fMcpTotal[1] = 52+6; fMcpTotal[2]=0.5;
   fMcpActive[0] = fMcpActive[1] = 52; fMcpActive[2]=0.5;
-
- 
    
-  GlxManager::Instance()->SetRadiatorL(fBarBox[2]-2*fPrizm[1]);
+  GlxManager::Instance()->SetRadiatorL(fBarBox[2]-fPrizm[1]-fMirror[2]);
   GlxManager::Instance()->SetRadiatorW(fBar[1]);
-  GlxManager::Instance()->SetRadiatorH(fBar[0]);			  
+  GlxManager::Instance()->SetRadiatorH(fBar[0]);
 
   fGeomMessenger = new GlxDetectorConstructionMessenger(this);
   GlxManager::Instance()->AddInfo("Initialization done");

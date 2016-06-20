@@ -40,7 +40,7 @@ GlxStackingAction::GlxStackingAction()
     }
   }   
   fRand = new TRandom();
-  //fDetEff = new TGraph(1000, fLambda,fEfficiencyR); 
+  fDetEff = new TGraph(1000, fLambda,fEfficiencyR); 
 
   // quantum efficiency of H12700:
   // collection efficiency for H12700 = 100%
@@ -118,7 +118,6 @@ void GlxStackingAction::NumberOfBounces(TVector3 start, TVector3 dir, Int_t *n1,
   // calculates the number of bounces in x and y direction and reflection angles in these directions.
 
   // Find coordinates of X0, Y0:
-  G4double radiatorL = GlxManager::Instance()->GetRadiatorL();
   G4double radiatorW = GlxManager::Instance()->GetRadiatorW();
   G4double radiatorH = GlxManager::Instance()->GetRadiatorH();
   Double_t fzup = 2400.;
