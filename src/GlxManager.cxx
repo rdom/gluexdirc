@@ -65,7 +65,7 @@ GlxManager::GlxManager(G4String outfile, G4int runtype){
   fBeamX=0;
   fBeamZ=-1;
   fMirrorR = 800;//1200;
-  fMirrorT = 16.;//16 - Roman's value, 15.89 - John's value
+  fMirrorT = 15.89;//16 - Roman's value, 15.89 - John's value
   fMcpT = 42.13;
   fInfo="";
   

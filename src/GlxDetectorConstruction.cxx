@@ -78,7 +78,7 @@ GlxDetectorConstruction::GlxDetectorConstruction()
   
   fMirror1[0]=190-fMirrorGap;/*197;*/ fMirror1[1]=fTankBox[1]-25;  fMirror1[2]=1;  // bottom mirror, 2 cm gap between it and bar box window
   fMirror2[0]=66.97; fMirror2[1]=fTankBox[1]-25;  fMirror2[2]=1; // new wedge mirror, 2 cm gap between it and bar box window
-  fMirror3[0]=429;/*422.9;*/ fMirror3[1]=fTankBox[1]-25;  fMirror3[2]=1; // vertical mirror
+  fMirror3[0]=430;/*422.9;*/ fMirror3[1]=fTankBox[1]-25;  fMirror3[2]=1; // vertical mirror
   fMirror4[0]=580;   fMirror4[1]=300;  fMirror4[2]=1; // side mirrors
 
   fFdp[0]=314.5;/*312;*/ fFdp[1]=fTankBox[1]-25;  fFdp[2]=1;  

@@ -87,7 +87,7 @@ void GlxPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
 	//  vec.rotateY(M_PI/10.);
 	 
     //added to compare with John:
-	vec.rotateY(4./180.*3.1415);// John's theta
+	vec.rotateY(10./180.*3.1415);// John's theta
 	vec.rotateZ(40./180.*3.1415);// John's phi
 	
     fParticleGun->SetParticleMomentumDirection(vec);

@@ -69,7 +69,8 @@ G4bool GlxPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   G4ThreeVector localpos = touchable->GetHistory()->GetTopTransform().TransformPoint(globalpos);
   G4ThreeVector translation = touchable->GetHistory()->GetTopTransform().Inverse().TransformPoint(G4ThreeVector(0,0,0));
   G4ThreeVector inPrismpos = touchable->GetHistory()->GetTransform( 3 ).TransformPoint(globalpos);
-  G4ThreeVector g4mom = track->GetVertexMomentumDirection(); //track->GetMomentum();//
+  G4ThreeVector g4mom = track->GetMomentum();//
+  G4ThreeVector g4idi = track->GetVertexMomentumDirection();
   G4ThreeVector g4pos = track->GetVertexPosition();
   
  
@@ -78,6 +79,7 @@ G4bool GlxPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   TVector3 localPos(localpos.x(),localpos.y(),localpos.z());
   TVector3 digiPos(translation.x(),translation.y(),translation.z());
   TVector3 momentum(g4mom.x(),g4mom.y(),g4mom.z());
+  TVector3 initdir(g4idi.x(), g4idi.y(), g4idi.z());
   TVector3 position(g4pos.x(),g4pos.y(),g4pos.z());
 
   // information form prizm
@@ -114,6 +116,7 @@ G4bool GlxPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   hit.SetDigiPos(digiPos);
   hit.SetPosition(position);
   hit.SetMomentum(momentum);
+  hit.SetInitDir(initdir);
   if(GlxManager::Instance()->GetRunType()==6){
     G4ThreeVector mominend = step->GetPostStepPoint()->GetMomentum();
     TVector3 mominendv(mominend.x(),mominend.y(),mominend.z());
