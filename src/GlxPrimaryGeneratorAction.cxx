@@ -69,16 +69,20 @@ void GlxPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
 	fParticleGun->SetParticlePosition(G4ThreeVector(radiatorL/2.-0.1,arr[radid/12]+0.5*425-0.5*35-(11-radid%12)*35,0));
   }
   if(GlxManager::Instance()->GetRunType() == 3){ // laser calibration
-
     G4int radid = 47-GlxManager::Instance()->GetRadiator();
-	//G4int radid = 48.*G4UniformRand();
 	G4int arr[]={-795,-365,365,795};
     //G4double angle = -G4UniformRand()*M_PI;
     G4ThreeVector vec(0,0,1);
-    vec.rotateY((90.+42.13)/180.*3.1415);
+    //vec.rotateY((90.+42.13)/180.*3.1415);
+	  vec.rotateY(125.*deg);
+	//  vec.rotateZ(5./180.*3.1415);
     fParticleGun->SetParticleMomentumDirection(vec);
-	//fParticleGun->SetParticlePosition(G4ThreeVector(radiatorL/2.-0.1,arr[radid/12]+0.5*425-0.5*35-(11-radid%12)*35,0));
-	fParticleGun->SetParticlePosition(G4ThreeVector(radiatorL/2.+200.,arr[radid/12]+0.5*425-0.5*35-(11-radid%12)*35,-502.));  
+	 //this position is in the middle of the op box:
+	//  fParticleGun->SetParticlePosition(G4ThreeVector(2650.,arr[radid/12]+0.5*425-0.5*35-(11-radid%12)*35,0.));
+	//this position is at the bar end:
+	  std::cout<<"position of the primary generator = "<<radiatorL/2.-0.001-91./2.+0.5<<std::endl;
+	fParticleGun->SetParticlePosition(G4ThreeVector(radiatorL/2.-0.001-91./2.+0.5,arr[radid/12]+0.5*425-0.5*35-(11-radid%12)*35,0.));
+	//fParticleGun->SetParticlePosition(G4ThreeVector(radiatorL/2.+200.,arr[radid/12]+0.5*425-0.5*35-(11-radid%12)*35,-502.));  
   }
 	
   if(GlxManager::Instance()->GetRunType() == 0){
@@ -92,7 +96,7 @@ void GlxPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
 	
     fParticleGun->SetParticleMomentumDirection(vec);
     //fParticleGun->SetParticlePosition(G4ThreeVector(0,0,4000));//5600));// changed the sign according to mechanical design
-	fParticleGun->SetParticlePosition(G4ThreeVector(-140.,180.,-8.7)); // John's location  
+	fParticleGun->SetParticlePosition(G4ThreeVector(-50.,180.,-8.7)); // John's location  
   }
 
   if(GlxManager::Instance()->GetBeamDimension() < 0){ // random momentum

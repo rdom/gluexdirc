@@ -4,13 +4,14 @@
 #include "glxtools.C"
 
 //void drawScan(TString infile="../../../data/pions_small.root"){
-void drawScan(TString infile="../build/hits.root"){
+//void drawScan(TString infile="../build/hits.root"){
+void drawScan(TString infile="pions_SLAC_traj_small.root"){
   if(infile=="") return;
   fSavePath = "";
   GlxInit(infile,1); //digi
   TH1F *hTime = new TH1F("hTime","hTime",500,0,200);
-  TH2F *hHits = new TH2F("hHits",";x [mm];y [mm]",461,-1500,1496.5,80,-200,196.5);
-  TH2F *hTraj = new TH2F("hTraj",";x [mm]; y[mm]", 461,-1500,1496.5,80,-200,196.5);
+  TH2F *hHits = new TH2F("hHits",";x [mm];y [mm]",500,-1500,1500.,67,-150,252.);
+  TH2F *hTraj = new TH2F("hTraj",";x [mm]; y[mm]", 500,-1500,1500.,67,-150,252.);
   hHits->SetStats(0);
 
   Int_t ntotal(0);
@@ -26,10 +27,15 @@ void drawScan(TString infile="../build/hits.root"){
       Double_t time = fHit.GetLeadTime();
 		
       hTime->Fill(time);
-      hHits->Fill(gpos.Y(),gpos.X()); //-577.5
+      hHits->Fill(-gpos.Y(),gpos.X()+100.); //-577.5
+		if(gpos.Y() > 556. && gpos.Y() < 573. && gpos.X() > 43. && gpos.X() < 52.){
+		cout <<"gtra = "<<gtra<<endl;
+		}
+		if(gtra < 100000){
 	  for(Int_t tt=0; tt<gtra;tt++){
 	    hTraj->Fill(gpos.Y(),gpos.X());
 	  }
+		}
 	  ntotal++;
       
       //fhDigi[mcpid]->Fill(7-pixid/8, pixid%8);

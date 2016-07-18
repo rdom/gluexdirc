@@ -59,7 +59,11 @@ G4bool GlxPrizmSD::ProcessHits(G4Step* aStep, G4TouchableHistory* hist){
   if (valid ){
     G4ThreeVector theGlobalNormal = theNavigator->GetLocalToGlobalTransform().TransformAxis(theLocalNormal);
     normalId = theGlobalNormal.x() + 10*theGlobalNormal.y() + 100*theGlobalNormal.z();
-/*	  // to put into normalId the mirror number for inspection of photon reflections inside the optical box:
+	  TVector3 normalToMirror;
+	  normalToMirror.SetXYZ(theGlobalNormal.x(),theGlobalNormal.y(),theGlobalNormal.z());
+	  TVector3 PhoMomentum;
+	  PhoMomentum.SetXYZ(aStep->GetPostStepPoint()->GetMomentum().x(), aStep->GetPostStepPoint()->GetMomentum().y(), aStep->GetPostStepPoint()->GetMomentum().z());
+	  /*	  // to put into normalId the mirror number for inspection of photon reflections inside the optical box:
 	  if(theGlobalNormal.x() > 0. && theGlobalNormal.x() < 1. && theGlobalNormal.z() > 0.){ // wedge mirror inside EV
 		//if(newHit->GetPos.x() < GlxManager::Instance()->GetRadiatorL()/2. + 91. + 1.){ normalId = 8; } // wedge inside bar box
 		normalId = 1;

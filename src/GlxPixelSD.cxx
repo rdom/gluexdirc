@@ -69,11 +69,10 @@ G4bool GlxPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   G4ThreeVector localpos = touchable->GetHistory()->GetTopTransform().TransformPoint(globalpos);
   G4ThreeVector translation = touchable->GetHistory()->GetTopTransform().Inverse().TransformPoint(G4ThreeVector(0,0,0));
   G4ThreeVector inPrismpos = touchable->GetHistory()->GetTransform( 3 ).TransformPoint(globalpos);
-  G4ThreeVector g4mom = track->GetMomentum();//
+  G4ThreeVector g4mom =track->GetVertexMomentumDirection();// track->GetMomentum();//
   G4ThreeVector g4idi = track->GetVertexMomentumDirection();
   G4ThreeVector g4pos = track->GetVertexPosition();
-  
- 
+
   TVector3 globalPos(inPrismpos.x(),inPrismpos.y(),inPrismpos.z());
   //TVector3 globalPos(globalpos.x(),globalpos.y(),globalpos.z());
   TVector3 localPos(localpos.x(),localpos.y(),localpos.z());
