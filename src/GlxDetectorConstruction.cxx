@@ -59,7 +59,7 @@ GlxDetectorConstruction::GlxDetectorConstruction()
   fMShift = (fWall+fGap)/cos(42.13*deg)/2. + 1.;//
 	  
   fTankBox0[0]=582; fTankBox0[1]=2205+20; fTankBox0[2]=350; //240
-  fTankBox1[0]=582; fTankBox1[1]=900; fTankBox1[2]=350; //240 
+  fTankBox1[0]=582; fTankBox1[1]=901+25; fTankBox1[2]=350; //240 
 
   if(fGeomId==0){
     fNRow = 5;
@@ -69,8 +69,8 @@ GlxDetectorConstruction::GlxDetectorConstruction()
     fTankBox[2]=fTankBox0[2];
   }
   if(fGeomId==1){
-    fNRow = 5;
-    fNCol = 14;
+    fNRow = 6;
+    fNCol = 17;
     fTankBox[0]=fTankBox1[0];
     fTankBox[1]=fTankBox1[1];
     fTankBox[2]=fTankBox1[2];
@@ -83,8 +83,8 @@ GlxDetectorConstruction::GlxDetectorConstruction()
 
   fFdp[0]=314.5;/*312;*/ fFdp[1]=fTankBox[1]-25;  fFdp[2]=1;  
   
-  fMcpTotal[0] = fMcpTotal[1] = 52+6; fMcpTotal[2]=0.5;
-  fMcpActive[0] = fMcpActive[1] = 52; fMcpActive[2]=0.5;
+  fMcpTotal[0] = fMcpTotal[1] = 52; fMcpTotal[2]=0.5;
+  fMcpActive[0] = fMcpActive[1] = 48.48; fMcpActive[2]=0.5;
    
   GlxManager::Instance()->SetRadiatorL(fBarBox[2]-fPrizm[1]-fMirror[2]);
   GlxManager::Instance()->SetRadiatorW(fBar[1]);
@@ -295,8 +295,8 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
 
   int pixelId = 0;
   for(int i=0; i<mcpDimx; i++){
+	double shiftx = i*(fMcpActive[0]/(double)mcpDimx)-fMcpActive[0]/2.+fMcpActive[0]/(2*(double)mcpDimx);
     for(int j=mcpDimy-1; j>=0; j--){
-      double shiftx = i*(fMcpActive[0]/(double)mcpDimx)-fMcpActive[0]/2.+fMcpActive[0]/(2*(double)mcpDimx);
       double shifty = j*(fMcpActive[0]/(double)mcpDimy)-fMcpActive[0]/2.+fMcpActive[0]/(2*(double)mcpDimy);
       new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,0),lPixel,"wPixel", lMcp,false,64-pixelId++);      
     }
@@ -304,11 +304,11 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
 
   int mcpId = 0;
   for(int j=0; j<fNCol; j++){
+	double shifty = (fMcpTotal[0]+3)*(j-1);
+    if(fGeomId==0) shifty = shifty-0.5*fFdp[1]+110;	 
+    if(fGeomId==1) shifty = shifty-0.5*fFdp[1]+97;	
     for(int i=0; i<fNRow; i++){
-      double shiftx = i*(fMcpTotal[0]+3)-fFdp[0]/2.+fMcpTotal[0]/2.; 
-      double shifty = (fMcpTotal[0]+3)*(j-1);
-      if(fGeomId==0) shifty = shifty-0.5*fFdp[1]+110;	 
-      if(fGeomId==1) shifty = shifty-0.5*fFdp[1]+97;	      
+      double shiftx = i*(fMcpTotal[0]+3)-fFdp[0]/2.+fMcpTotal[0]/2.;       
 
       new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,0),lMcp,"wMcp", lFdp,false,mcpId);
       mcpId++;
