@@ -45,7 +45,7 @@ GlxManager::GlxManager(G4String outfile, G4int runtype){
   // fHist = new TH1F("id", "name", 100, 0., 100);
 
   fPhysList = 0;
-  fParticle = 0;
+  fParticle = -211;
   fMomentum = TVector3(0,0,0);
   fGeometry = 1;
   fAngle = 0;

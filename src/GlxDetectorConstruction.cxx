@@ -43,8 +43,8 @@ GlxDetectorConstruction::GlxDetectorConstruction()
   fNsil = 1.406;
   fNgr = 1.46;
   fNej560 = 1.43;
- 
-  fNRow = 5;
+
+  fNRow = 6; // 5
   fNCol = 35;
   
   fHall[0] = 3000; fHall[1] = 2000; fHall[2] = 6000;
@@ -59,18 +59,18 @@ GlxDetectorConstruction::GlxDetectorConstruction()
   fMShift = (fWall+fGap)/cos(42.13*deg)/2. + 1.;//
 	  
   fTankBox0[0]=582; fTankBox0[1]=2205+20; fTankBox0[2]=350; //240
-  fTankBox1[0]=582; fTankBox1[1]=900; fTankBox1[2]=350; //240 
+  fTankBox1[0]=582; fTankBox1[1]=901+25; fTankBox1[2]=350; //240 
 
   if(fGeomId==0){
-    fNRow = 5;
+    fNRow = 6;
     fNCol = 35;
     fTankBox[0]=fTankBox0[0];
     fTankBox[1]=fTankBox0[1];
     fTankBox[2]=fTankBox0[2];
   }
   if(fGeomId==1){
-    fNRow = 5;
-    fNCol = 14;
+    fNRow = 6;
+    fNCol = 17;
     fTankBox[0]=fTankBox1[0];
     fTankBox[1]=fTankBox1[1];
     fTankBox[2]=fTankBox1[2];
@@ -83,8 +83,8 @@ GlxDetectorConstruction::GlxDetectorConstruction()
 
   fFdp[0]=314.5;/*312;*/ fFdp[1]=fTankBox[1]-25;  fFdp[2]=1;  
   
-  fMcpTotal[0] = fMcpTotal[1] = 52+6; fMcpTotal[2]=0.5;
-  fMcpActive[0] = fMcpActive[1] = 52; fMcpActive[2]=0.5;
+  fMcpTotal[0] = fMcpTotal[1] = 52;/*52+6*/ fMcpTotal[2]=0.5;
+  fMcpActive[0] = fMcpActive[1] = 48.48; fMcpActive[2]=0.5;
    
   GlxManager::Instance()->SetRadiatorL(fBarBox[2]-fPrizm[1]-fMirror[2]);
   GlxManager::Instance()->SetRadiatorW(fBar[1]);
@@ -123,13 +123,13 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   // The Mirror
   G4Box* gMirror = new G4Box("gMirror",fMirror[0]/2.,fMirror[1]/2.,fMirror[2]/2.);
   lMirror = new G4LogicalVolume(gMirror,MirrorMaterial,"lMirror",0,0,0);
-
-/* // The Wedge
+/*
+ // The Wedge
   G4Trap* gWedge = new G4Trap("gWedge",fPrizm[0],fPrizm[1],fPrizm[2],fPrizm[3]);
   lWedge = new G4LogicalVolume(gWedge, BarMaterial,"lWedge",0,0,0);
   G4RotationMatrix* xRot = new G4RotationMatrix();
-  xRot->rotateX(-M_PI/2.*rad);*/
-	
+  xRot->rotateX(-M_PI/2.*rad);
+	*/
   // The Wedge with 6 mrad angle of the bottom side:
   fTilt = 0.006; // 6 mrad
   fdH = fPrizm[1]*tan(fTilt);
@@ -140,7 +140,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   G4RotationMatrix* xRot = new G4RotationMatrix();
   xRot->rotateY(M_PI*rad);
   xRot->rotateX(M_PI*rad);
-	
+
   // The Window
   G4Box* gWindow = new G4Box("gWindow",fWindow[0]/2.,fWindow[1]/2.,fWindow[2]/2.);
   lWindow = new G4LogicalVolume(gWindow,BarMaterial,"lWindow",0,0,0);
@@ -198,8 +198,9 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
     new G4PVPlacement(0,G4ThreeVector(0,yshift,0.5*(fBar[2]+fPrizm[1])),lMirror,"wMirror", lBarBox,false,1);
     new G4PVPlacement(0,G4ThreeVector(0,yshift,0.5*(fPrizm[1]-fMirror[2])),lBar,"wBar", lBarBox,false,i); 
 	  //placement of the prizm
-    new G4PVPlacement(xRot,G4ThreeVector((fPrizm[2]+fPrizm[3]+2.*fdH)/4.-fBar[0]/2.,(fPrizm[0]-fBar[1])/2.+yshift,0.5*(-fBar[2]-fMirror[2])),lWedge,"wWedge", lBarBox,false,i);
-  }
+    //new G4PVPlacement(xRot,G4ThreeVector((fPrizm[2]+fPrizm[3]+2.*fdH)/4.-fBar[0]/2.,(fPrizm[0]-fBar[1])/2.+yshift,0.5*(-fBar[2]-fMirror[2])),lWedge,"wWedge", lBarBox,false,i);
+	  new G4PVPlacement(xRot,G4ThreeVector((fPrizm[2]+fPrizm[3])/4.-fBar[0]/2.,(fPrizm[0]-fBar[1])/2.+yshift,0.5*(-fBar[2]-fMirror[2])),lWedge,"wWedge", lBarBox,false,i);
+ }
 
   new G4PVPlacement(0,G4ThreeVector(0,-795,0),lBarBox,"wBarBox",lDirc,false,0);
   new G4PVPlacement(0,G4ThreeVector(47.75,-795,0.5*(-fBarBox[2]-fWindow[2])),lWindow,"wWindow",lDirc,false,0);
@@ -295,21 +296,21 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
 
   int pixelId = 0;
   for(int i=0; i<mcpDimx; i++){
+	double shiftx = i*(fMcpActive[0]/(double)mcpDimx)-fMcpActive[0]/2.+fMcpActive[0]/(2*(double)mcpDimx);
     for(int j=mcpDimy-1; j>=0; j--){
-      double shiftx = i*(fMcpActive[0]/(double)mcpDimx)-fMcpActive[0]/2.+fMcpActive[0]/(2*(double)mcpDimx);
       double shifty = j*(fMcpActive[0]/(double)mcpDimy)-fMcpActive[0]/2.+fMcpActive[0]/(2*(double)mcpDimy);
       new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,0),lPixel,"wPixel", lMcp,false,64-pixelId++);      
     }
   }
 
   int mcpId = 0;
-  for(int j=0; j<fNCol; j++){
-    for(int i=0; i<fNRow; i++){
-      double shiftx = i*(fMcpTotal[0]+3)-fFdp[0]/2.+fMcpTotal[0]/2.; 
-      double shifty = (fMcpTotal[0]+3)*(j-1);
-      if(fGeomId==0) shifty = shifty-0.5*fFdp[1]+110;	 
-      if(fGeomId==1) shifty = shifty-0.5*fFdp[1]+97;	      
-
+  for(int j=0; j<fNCol; j++){ // 17
+	double shifty = (fMcpTotal[1]+1)*(j-1);
+    if(fGeomId==0) shifty = shifty-fFdp[1]/2.+110;	 
+    if(fGeomId==1) shifty = shifty-fFdp[1]/2.+3.*fMcpTotal[1]/2.;//97;
+    for(int i=0; i<fNRow; i++){ // 6
+      double shiftx = i*(fMcpTotal[0]+1)-fFdp[0]/2.+fMcpTotal[0]/2.; 
+		
       new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,0),lMcp,"wMcp", lFdp,false,mcpId);
       mcpId++;
     }
