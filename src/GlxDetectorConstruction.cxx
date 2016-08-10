@@ -308,8 +308,8 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
     if(fGeomId==0) shifty = shifty-0.5*fFdp[1]+110;	 
     if(fGeomId==1) shifty = shifty-0.5*fFdp[1]+97;	
     for(int i=0; i<fNRow; i++){
-      double shiftx = i*(fMcpTotal[0]+3)-fFdp[0]/2.+fMcpTotal[0]/2.;       
-
+      double shiftx = i*(fMcpTotal[0]+3)-fFdp[0]/2.+fMcpTotal[0]/2.; 
+    
       new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,0),lMcp,"wMcp", lFdp,false,mcpId);
       mcpId++;
     }

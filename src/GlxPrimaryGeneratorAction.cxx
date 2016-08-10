@@ -87,16 +87,17 @@ void GlxPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
 	
   if(GlxManager::Instance()->GetRunType() == 0){
 	//  std::cout<<"run type = 0"<<std::endl;
-    G4ThreeVector vec(0,0,1);
+    G4ThreeVector vec(0,0,-1);
 	//  vec.rotateY(M_PI/10.);
 	 
     //added to compare with John:
-	vec.rotateY(10./180.*3.1415);// John's theta
+	vec.rotateY(4./180.*3.1415);// John's theta
 	vec.rotateZ(40./180.*3.1415);// John's phi
 	
     fParticleGun->SetParticleMomentumDirection(vec);
     //fParticleGun->SetParticlePosition(G4ThreeVector(0,0,4000));//5600));// changed the sign according to mechanical design
-	fParticleGun->SetParticlePosition(G4ThreeVector(-50.,180.,-8.7)); // John's location  
+	fParticleGun->SetParticlePosition(G4ThreeVector(-140.,175.,8.7)); // John's location  
+	//fParticleGun->SetParticlePosition(G4ThreeVector(1000.,175.,-8.7));   
   }
 
   if(GlxManager::Instance()->GetBeamDimension() < 0){ // random momentum

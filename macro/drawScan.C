@@ -3,7 +3,7 @@
 #include "../src/GlxEvent.h"
 #include "glxtools.C"
 
-//void drawScan(TString infile="../../../data/pions_small.root"){
+//void drawScan(TString infile="../../../data/pions_SLAC_t4_phi40_x0_lam.root"){
 //void drawScan(TString infile="../build/hits.root"){
 void drawScan(TString infile="pions_SLAC_traj_small.root"){
   if(infile=="") return;
@@ -28,14 +28,14 @@ void drawScan(TString infile="pions_SLAC_traj_small.root"){
 		
       hTime->Fill(time);
       hHits->Fill(-gpos.Y(),gpos.X()+100.); //-577.5
-		if(gpos.Y() > 556. && gpos.Y() < 573. && gpos.X() > 43. && gpos.X() < 52.){
+	/*	if(gpos.Y() > 556. && gpos.Y() < 573. && gpos.X() > 43. && gpos.X() < 52.){
 		cout <<"gtra = "<<gtra<<endl;
 		}
 		if(gtra < 100000){
 	  for(Int_t tt=0; tt<gtra;tt++){
 	    hTraj->Fill(gpos.Y(),gpos.X());
 	  }
-		}
+		}*/
 	  ntotal++;
       
       //fhDigi[mcpid]->Fill(7-pixid/8, pixid%8);
@@ -58,11 +58,11 @@ void drawScan(TString infile="pions_SLAC_traj_small.root"){
   //hHits->SetTitle(Form("#theta=%2.2f, #varphi=%2.2f, R=%2.0f, T=%2.0f#circ, N=%d",glx_theta,glx_phi, glx_radius,glx_tilt,ntotal));
 hHits->SetTitle(Form("#theta=%2.2f, #varphi=%2.2f, N=%d",glx_theta,glx_phi,ntotal));
 
-	//SetRootPalette(6);
-	canvasAdd("traj_"+name);
+	SetRootPalette(6);
+	/*canvasAdd("traj_"+name);
 	TH2F* hRatio = (TH2F*)hTraj->Clone();
 	hRatio->Divide(hHits);
-	hRatio->Draw("col2z");
+	hRatio->Draw("col2z");*/
    canvasAdd("time_"+name);  
    hTime->Draw();
   canvasAdd("hits_"+name,800,400);
