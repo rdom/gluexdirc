@@ -146,7 +146,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   lWindow = new G4LogicalVolume(gWindow,BarMaterial,"lWindow",0,0,0);
   // The tank box
   G4Box* gTankBox = new G4Box("gTankBox",fTankBox[0]/2.,fTankBox[1]/2.,fTankBox[2]/2.);
-  lTankBox = new G4LogicalVolume(gTankBox,BarMaterial/*H2OMaterial/*defaultMaterial*/,"lTankBox",0,0,0); // OilMaterial //BarMaterial
+  lTankBox = new G4LogicalVolume(gTankBox,/*BarMaterial*/H2OMaterial/*defaultMaterial*/,"lTankBox",0,0,0); // OilMaterial //BarMaterial
   
   // Mirrors in tank
   G4Box* gTankMirror1 = new G4Box("gTankMirr1",fMirror1[0]/2.,fMirror1[1]/2.,fMirror1[2]/2.);
