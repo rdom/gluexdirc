@@ -31,6 +31,7 @@ public:
   TVector3 GetGlobalPos()     { return fGlobalPos; }
   TVector3 GetDigiPos()     { return fDigiPos; }
   TVector3 GetMomentum()     { return fMomentum; }
+  TVector3 GetInitDir()     { return fInitDir; }
   TVector3 GetPosition()     { return fPosition; }
   Double_t GetCherenkovMC()  { return fCherenkovMC;}
   
@@ -53,6 +54,7 @@ public:
   void SetGlobalPos(TVector3 val)  { fGlobalPos = val; }
   void SetDigiPos(TVector3 val)    { fDigiPos = val; }
   void SetMomentum(TVector3 val)    { fMomentum = val; }
+  void SetInitDir(TVector3 val)    { fInitDir = val; }
   void SetPosition(TVector3 val)    { fPosition = val; }
   void SetCherenkovMC(Double_t val)    { fCherenkovMC = val; }
 
@@ -77,6 +79,7 @@ protected:
   TVector3 fGlobalPos;
   TVector3 fDigiPos;
   TVector3 fMomentum;
+  TVector3 fInitDir;
   TVector3 fPosition;
   Double_t fCherenkovMC;
   

@@ -88,3 +88,6 @@ simulation:
 
 reconstruction:
 ./glxdirc -s 2 -u lut_all.root -i hits.root -f -1 -t1 10. -e 0 -v 4
+or 
+./glxdirc -s 2 -u lut_all.root -i hits.root -f 0 -t1 10. -e 0 -v 2
+
