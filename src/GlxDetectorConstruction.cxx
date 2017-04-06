@@ -304,11 +304,11 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
 
   int mcpId = 0;
   for(int j=0; j<fNCol; j++){
-	double shifty = (fMcpTotal[0]+3)*(j-1);
+    double shifty = (fMcpTotal[0]+1)*(j-1);
     if(fGeomId==0) shifty = shifty-0.5*fFdp[1]+110;	 
-    if(fGeomId==1) shifty = shifty-0.5*fFdp[1]+97;	
+    if(fGeomId==1) shifty = shifty-0.5*fFdp[1]+3*fMcpTotal[0]/2.;	
     for(int i=0; i<fNRow; i++){
-      double shiftx = i*(fMcpTotal[0]+3)-fFdp[0]/2.+fMcpTotal[0]/2.; 
+      double shiftx = i*(fMcpTotal[0]+1)-fFdp[0]/2.+fMcpTotal[0]/2.; 
     
       new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,0),lMcp,"wMcp", lFdp,false,mcpId);
       mcpId++;
