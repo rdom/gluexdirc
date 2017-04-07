@@ -22,7 +22,7 @@ GlxManager::GlxManager(G4String outfile, G4int runtype){
   }
 
   if(fRunType==1 || fRunType==5 || fRunType==3){
-    Int_t Nnodes = 20000;
+    Int_t Nnodes = 21000;
     fTree = new TTree("glxlut","Look-up table for the geometrical reconstruction.");
     for(Int_t b=0; b<48; b++){
       

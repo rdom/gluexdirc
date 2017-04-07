@@ -105,7 +105,7 @@ G4bool GlxPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
 	//	pathId = pathId*10 + phit->GetNormalId(); // in case reflections sequence is used in GlxPrizmSD.cxx
     }
   }
-
+  
   // for the 6x17 mcp layout
   Int_t mcpid = 6*17*touchable->GetReplicaNumber(3) + touchable->GetReplicaNumber(1);
   
