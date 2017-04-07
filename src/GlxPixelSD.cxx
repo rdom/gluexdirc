@@ -55,7 +55,7 @@ G4bool GlxPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
  
   //G4ThreeVector translation = hist->GetTranslation();
   //G4ThreeVector localpos = step->GetPreStepPoint()->GetPhysicalVolume()->GetObjectTranslation();
-  G4TouchableHistory* touchable = (G4TouchableHistory*)(step->GetPostStepPoint()->GetTouchable());
+  G4TouchableHistory* touchable = (G4TouchableHistory*)(step->GetPreStepPoint()->GetTouchable());
 
   // Get cell id 
   G4int layerNumber = touchable->GetReplicaNumber(0);
@@ -106,9 +106,12 @@ G4bool GlxPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
     }
   }
 
+  // for the 6x17 mcp layout
+  Int_t mcpid = 6*17*touchable->GetReplicaNumber(3) + touchable->GetReplicaNumber(1);
+  
   GlxHit hit;
   hit.SetType(barId);
-  hit.SetMcpId(touchable->GetReplicaNumber(1));
+  hit.SetMcpId(mcpid);
   hit.SetPixelId(touchable->GetReplicaNumber(0));
   hit.SetGlobalPos(globalPos);
   hit.SetLocalPos(localPos);
