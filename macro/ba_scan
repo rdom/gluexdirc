@@ -1,0 +1,138 @@
+#!/bin/bash
+
+show_help(){
+  help="  NAME
+    ba_scan - script to run sim/reco for glxdirc
+
+  SYNOPSIS
+    ba_scan [OPTION]
+
+  DESCRIPTION 
+     -r 
+        run type
+        0 - run lut
+        1 - run sim
+        2 - run reco
+        3 - sim + reco
+     -j
+        number of threads 
+     -q 
+        run -a option on claster 
+        one needs to be logged in on hera 
+        not implemented yet 
+     -e 
+        # of events per thread
+     -s 
+        angle step 
+     -v 
+        verbose level
+        0 - print nothing (default)
+        1 - print text messages
+        2 - draw plots
+     -t 
+        test value
+     -n 
+        silent run"
+    echo "$help" 
+}
+
+waitForMe (){
+    while : 
+    do 
+	activth=$(ps aux | grep "[g]lxdirc" | grep "h_b" | wc -l)
+	printf "\r$statusline [$activth] ---- [$(($(date +%s) - start_time)) s] "
+	sleep .1
+	if [ "$activth" -lt "$1" ]; then 
+	    break  
+	fi
+    done
+}  
+threads=
+run=
+clastermode=
+astep=
+nevents=
+verbose=
+test1=
+silent=
+OPTIND=1 
+while getopts "h?r:j:qs:e:v:t:n" opt; do
+    case "$opt" in
+	h|\?)
+            show_help
+            exit 0
+            ;;
+	j)  threads=$OPTARG
+            ;;
+	r)  run=$OPTARG
+            ;;
+	q)  clastermode=1
+            ;;
+	s)  astep=$OPTARG
+            ;;
+	e)  nevents=$OPTARG
+            ;;
+	v)  verbose=$OPTARG
+            ;;
+	t)  test1=$OPTARG
+            ;;
+	n)  silent=1
+            ;;
+    esac
+done
+
+option=${option:-0}
+nevents=${nevents:-10}
+endEvent=${endEvent:-100000000} 
+threads=${threads:-6}
+astep=${astep:-2}
+run=${run:-0}
+verbose=${verbose:-0}
+test1=${test1:-0}
+silent=${silent:-0}
+
+shift "$((OPTIND-1))"
+
+glx="../build/glxdirc"
+tseed=$(($(date +%s%N)/1000000-1393400000000))
+printf "====== Run GLXDIRC with $tseed seed base ======\n"
+
+#simopt="-p 10 -z -2 -gx 2000 -gy 200 -mr 800 -mt 16 -c 0 -w 0"
+simopt="-p 4 -z 0 -c 2 -g 1 -b 1"
+echo ${silent}
+if [ ${silent} -eq "1" ]; then
+    glx=echo
+fi
+
+if [ ${run} == "0" ]; then
+    $glx -s 1 -x "opticalphoton" -p "3.18 eV"  12-mr 800 -mt 16 -c 4 -w 0  -e 500000 -g 1 -b 1
+fi
+
+if [ ${run} == "1" ] || [ ${run} == "3" ]  ; then
+    mkdir -p hdata
+    start_time=$(date +%s)
+    statusline="sim"
+    for t in $(eval echo {0..11..5}); do
+	for p in $(eval echo {0..180..20}); do
+            $glx -s 0 -o hdata/h_b${t}_${p}.root -e 100 -x "proton"  $simopt -theta $t -phi $p  > /dev/null  &
+	    waitForMe $threads
+	done
+    done
+    waitForMe "1"
+    printf "\r$statusline [-] done [$(($(date +%s) - start_time)) s]     \n"
+fi
+
+if [ ${run} == "2" ] || [ ${run} == "3" ]  ; then
+    start_time=$(date +%s)
+    statusline="reco"
+
+    #$glx -i hdata/h_b$i.root -o r_b${tseed}_$i.root -s 2 -t $test1 -v $verbose > /dev/null 2> /dev/null &
+
+    waitForMe "1"
+    printf "\r$statusline [-] done [$(($(date +%s) - start_time)) s]         \n"
+    
+    sleep 2
+    hadd r_spr${tseed}.root r_b${tseed}_*_spr.root
+    rm r_b${tseed}_*.root
+fi
+
