@@ -58,46 +58,55 @@ void GlxPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
   if(GlxManager::Instance()->GetRunType() == 1){ // LUT generation
 
     G4int radid = 47-GlxManager::Instance()->GetRadiator();
-	//G4int radid = 48.*G4UniformRand();
-	G4int arr[]={-795,-365,365,795};
+    //G4int radid = 48.*G4UniformRand();
+    G4int arr[]={-795,-365,365,795};
     G4double angle = -G4UniformRand()*M_PI;
     G4ThreeVector vec(0,0,1);
     vec.setTheta(acos(G4UniformRand()));
     vec.setPhi(2*M_PI*G4UniformRand());
     vec.rotateY(M_PI/2.);
     fParticleGun->SetParticleMomentumDirection(vec);
-	fParticleGun->SetParticlePosition(G4ThreeVector(radiatorL/2.-0.1,arr[radid/12]+0.5*425-0.5*35-(11-radid%12)*35,0));
+    fParticleGun->SetParticlePosition(G4ThreeVector(radiatorL/2.-0.1,arr[radid/12]+0.5*425-0.5*35-(11-radid%12)*35,0));
   }
   if(GlxManager::Instance()->GetRunType() == 3){ // laser calibration
     G4int radid = 47-GlxManager::Instance()->GetRadiator();
-	G4int arr[]={-795,-365,365,795};
+    G4int arr[]={-795,-365,365,795};
     //G4double angle = -G4UniformRand()*M_PI;
     G4ThreeVector vec(0,0,1);
     //vec.rotateY((90.+42.13)/180.*3.1415);
-	  vec.rotateY(125.*deg);
-	//  vec.rotateZ(5./180.*3.1415);
+    vec.rotateY(125.*deg);
+    //  vec.rotateZ(5./180.*3.1415);
     fParticleGun->SetParticleMomentumDirection(vec);
-	 //this position is in the middle of the op box:
-	//  fParticleGun->SetParticlePosition(G4ThreeVector(2650.,arr[radid/12]+0.5*425-0.5*35-(11-radid%12)*35,0.));
-	//this position is at the bar end:
-	  std::cout<<"position of the primary generator = "<<radiatorL/2.-0.001-91./2.+0.5<<std::endl;
-	fParticleGun->SetParticlePosition(G4ThreeVector(radiatorL/2.-0.001-91./2.+0.5,arr[radid/12]+0.5*425-0.5*35-(11-radid%12)*35,0.));
-	//fParticleGun->SetParticlePosition(G4ThreeVector(radiatorL/2.+200.,arr[radid/12]+0.5*425-0.5*35-(11-radid%12)*35,-502.));  
+    //this position is in the middle of the op box:
+    //  fParticleGun->SetParticlePosition(G4ThreeVector(2650.,arr[radid/12]+0.5*425-0.5*35-(11-radid%12)*35,0.));
+    //this position is at the bar end:
+    std::cout<<"position of the primary generator = "<<radiatorL/2.-0.001-91./2.+0.5<<std::endl;
+    fParticleGun->SetParticlePosition(G4ThreeVector(radiatorL/2.-0.001-91./2.+0.5,arr[radid/12]+0.5*425-0.5*35-(11-radid%12)*35,0.));
+    //fParticleGun->SetParticlePosition(G4ThreeVector(radiatorL/2.+200.,arr[radid/12]+0.5*425-0.5*35-(11-radid%12)*35,-502.));  
   }
 	
   if(GlxManager::Instance()->GetRunType() == 0){
-	//  std::cout<<"run type = 0"<<std::endl;
-    G4ThreeVector vec(0,0,-1);
-	//  vec.rotateY(M_PI/10.);
+
+    // G4ThreeVector vec(0,0,-1);
+    // //  vec.rotateY(M_PI/10.);
 	 
-    //added to compare with John:
-	vec.rotateY(4./180.*3.1415);// John's theta
-	vec.rotateZ(40./180.*3.1415);// John's phi
+    // //added to compare with John:
+    // vec.rotateY(4./180.*3.1415);// John's theta
+    // vec.rotateZ(40./180.*3.1415);// John's phi
+	
+    // fParticleGun->SetParticleMomentumDirection(vec);
+    // //fParticleGun->SetParticlePosition(G4ThreeVector(0,0,4000));//5600));// changed the sign according to mechanical design
+    // fParticleGun->SetParticlePosition(G4ThreeVector(-140.,175.,8.7)); // John's location  
+    // //fParticleGun->SetParticlePosition(G4ThreeVector(1000.,175.,-8.7));
+
+    auto theta = GlxManager::Instance()->GetBeamTheta();
+    auto phi = GlxManager::Instance()->GetBeamPhi();
+    G4ThreeVector vec(0,0,-1);
+    vec.rotateY(theta/180.*M_PI);
+    vec.rotateZ(phi/180.*M_PI);
 	
     fParticleGun->SetParticleMomentumDirection(vec);
-    //fParticleGun->SetParticlePosition(G4ThreeVector(0,0,4000));//5600));// changed the sign according to mechanical design
-	fParticleGun->SetParticlePosition(G4ThreeVector(-140.,175.,8.7)); // John's location  
-	//fParticleGun->SetParticlePosition(G4ThreeVector(1000.,175.,-8.7));   
+    fParticleGun->SetParticlePosition(G4ThreeVector(0,0,4000));
   }
 
   if(GlxManager::Instance()->GetBeamDimension() < 0){ // random momentum

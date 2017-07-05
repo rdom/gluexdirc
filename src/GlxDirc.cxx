@@ -51,7 +51,7 @@ int main(int argc,char** argv)
 
   G4String macro, events, geometry, radiator, physlist, outfile, 
     session,geomAng,batchmode,lensId,gap,mgap,particle,momentum,testVal1,testVal2,
-    prismStep,beamZ,beamX,mirrorR,mirrorT,mcpT,
+    prismStep,beamZ,beamX,mirrorR,mirrorT,mcpT,beamTheta,beamPhi,
     beamDimension, mcpLayout, infile = "hits.root", lutfile = "../data/lut.root";
   G4int firstevent(0), runtype(0), verbose(0);
 
@@ -83,6 +83,8 @@ int main(int argc,char** argv)
     else if ( G4String(argv[i]) == "-gs" ) prismStep   = argv[i+1];
     else if ( G4String(argv[i]) == "-gy" ) beamZ   = argv[i+1];
     else if ( G4String(argv[i]) == "-gx" ) beamX   = argv[i+1];
+    else if ( G4String(argv[i]) == "-theta" ) beamTheta   = argv[i+1];
+    else if ( G4String(argv[i]) == "-phi" ) beamPhi   = argv[i+1];
     else if ( G4String(argv[i]) == "-mr" ) mirrorR   = argv[i+1];
     else if ( G4String(argv[i]) == "-mt" ) mirrorT   = argv[i+1];
     else if ( G4String(argv[i]) == "-dt" ) mcpT   = argv[i+1];
@@ -121,6 +123,8 @@ int main(int argc,char** argv)
   if(prismStep.size())   GlxManager::Instance()->SetPrismStep(atof(prismStep));
   if(beamX.size())   GlxManager::Instance()->SetBeamX(atof(beamX));
   if(beamZ.size())   GlxManager::Instance()->SetBeamZ(atof(beamZ));
+  if(beamTheta.size())   GlxManager::Instance()->SetBeamTheta(atof(beamTheta));
+  if(beamPhi.size())   GlxManager::Instance()->SetBeamPhi(atof(beamPhi));
   if(mirrorR.size())   GlxManager::Instance()->SetMirrorR(atof(mirrorR));
   if(mirrorT.size())   GlxManager::Instance()->SetMirrorT(atof(mirrorT));
   if(mcpT.size())   GlxManager::Instance()->SetMcpT(atof(mcpT));

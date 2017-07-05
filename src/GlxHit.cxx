@@ -12,7 +12,7 @@ GlxHit::GlxHit(){
   // fDigiPos = TVector3(0,0,0);
   // fMomentum = TVector3(0,0,0);
 
-  fMcpId=-1;
+  fPmtId=-1;
   fPixelId=-1;
   fChannel= -1;
   fTdc = -1;

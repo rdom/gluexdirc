@@ -32,7 +32,7 @@ public:
 
   Double_t GetAngle()      const { return fAngle; }
   Int_t GetPhysList()      const { return fPhysList; }
-  Int_t GetParticle()      const { return fParticle; }
+  Int_t GetPdg()      const { return fParticle; }
   TVector3 GetMomentum()   const { return fMomentum; }
   TVector3 GetPosition()   const { return fPosition; }
   Int_t GetHitSize()       const { return fHitSize; }
@@ -59,7 +59,7 @@ public:
 
   void SetPhysList(Int_t val) { fPhysList = val; }
   void SetAngle(Double_t val) { fAngle = val; }
-  void SetParticle(Int_t val) { fParticle = val; }
+  void SetPdg(Int_t val) { fParticle = val; }
   void SetMomentum(TVector3 val) { fMomentum = val; }
   void SetPosition(TVector3 val) { fPosition = val; }
   void SetGeometry(Int_t val) { fGeometry = val; }
@@ -107,6 +107,6 @@ private:
   Double_t fMcpT;
   TString  fInfo;
   
-  ClassDef(GlxEvent, 3);
+  ClassDef(GlxEvent, 4);
 };
 #endif

@@ -44,6 +44,10 @@ example:
 
 -gy   y position of the hit in the radiator [160,1000]   [mm]
 
+-phi  athimuthal angle of the charge track [0,360] degree
+ 
+-theta polar angle of the charge track [0,11] degree
+
 -z    track direction
                 -1 random track (always hits the radiator) 
                 -2 use gx, gy to calculate track angle

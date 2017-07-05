@@ -1,5 +1,8 @@
-// prttools - useful functions for hld* 
-// original author: Roman Dzhygadlo - GSI Darmstadt 
+// glxtools.C - useful functions for glx*
+// created on: 07.04.2017
+// initial author: r.dzhygadlo at gsi.de
+// -----------------------------------------
+
 
 #include "TROOT.h"
 #include "TSystem.h"
@@ -32,84 +35,67 @@
 #include "TApplication.h"
 #include <TLegend.h>
 #include <TAxis.h>
+#include <TPaletteAxis.h>
+#include <TRandom.h>
+#include <TCutG.h>
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
 #ifdef glx__sim
- class GlxEvent;
- class GlxHit;
- GlxEvent* fEvent = 0;
+class GlxEvent;
+class GlxHit;
+GlxEvent* glx_event(0);
 #endif
 
-TChain*  fCh = 0;
-Int_t    fNEntries(0), fMomentum(0),fAngle(0),fParticle(0),fTest1(0),fTest2(0);
-Double_t  glx_theta(0),glx_phi(0), glx_radius(0), glx_tilt(0), glx_hitx(0), glx_hity(0);
-TString  fSavePath = "";
-TString  fInfo = "", fPath;
-TH2F*    fhDigi[15];
-TPad*    fhPads[15];
-TPad*    fhPglobal;
-TCanvas* cDigi;
+const Int_t  glx_nrow(6),glx_ncol(17);
+const Int_t  glx_npmt(glx_nrow*glx_ncol);
 
+TChain*  glx_ch(0);
+Int_t    glx_entries(0), glx_momentum(0),glx_pdg(0),glx_test1(0),glx_test2(0);
+Double_t glx_theta(0),glx_phi(0);
+TString  glx_savepath(""), glx_info("");
+TH2F*    glx_hdigi[glx_npmt];
+TPad*    glx_hpads[glx_npmt];
+TPad*    glx_hpglobal;
+TCanvas* glx_cdigi;
 
-TString drawDigi(TString digidata="", Int_t layoutId = 0, Double_t maxz = 0, Double_t minz = 0){
-  if(!cDigi) cDigi = new TCanvas("cDigi","cDigi",0,0,800,400);
-  cDigi->cd();
-  // TPad * pp = new TPad("P","T",0.06,0.135,0.93,0.865);
-  if(!fhPglobal){
-    Double_t tt =(layoutId==3)? 0.88: 0.96; 
-    fhPglobal = new TPad("P","T",0.04,0.04,tt,0.96);
-    fhPglobal->SetFillStyle(0);
-    fhPglobal->Draw();
+TString glx_drawDigi(TString digidata="", Int_t layoutId = 0, Double_t maxz = 0, Double_t minz = 0){
+  if(!glx_cdigi) glx_cdigi = new TCanvas("glx_cdigi","glx_cdigi",800,350);
+  glx_cdigi->cd();
+  if(!glx_hpglobal){
+    glx_hpglobal = new TPad("P","T",0.005,0.04,0.95,0.96);
+    glx_hpglobal->SetFillStyle(0);
+    glx_hpglobal->Draw();
   }
-  fhPglobal->cd();
+  glx_hpglobal->cd();
   
-  Int_t nrow = 3, ncol = 5;
+  Int_t nrow(glx_nrow), ncol(glx_ncol);
  
-  if(layoutId > 1){
-    float bw = 0.02, bh = 0.01, shift = 0,shiftw=0.02;
-    float tbw = bw, tbh = bh;
-    Int_t padi = 0;
-    if(!fhPads[0]){
-      for(int ii=0; ii<ncol; ii++){
-	for(int j=0; j<nrow; j++){
-	  if(j==1) shift = -0.028;
-	  else shift = 0;
-	  fhPads[padi] =  new TPad(Form("P%Double_t",ii*10+j),"T", ii/(Double_t)ncol+tbw+shift+shiftw , j/(Double_t)nrow+tbh, (ii+1)/(Double_t)ncol-tbw+shift+shiftw, (1+j)/(Double_t)nrow-tbh, 21);
-	  fhPads[padi]->SetFillColor(kCyan-8);
-	  fhPads[padi]->SetMargin(0.04,0.04,0.04,0.04);
-	  fhPads[padi]->Draw();
-	  padi++;
-	}
-      }
-    }
+  if(layoutId > 0){
   }else{
-    float bw = 0.02, bh = 0.01, shift = 0,shiftw=-0.02;
-    float tbw = bw, tbh = bh;
+    float bw = 0.001, bh = 0.005;
     Int_t padi = 0;
-    if(!fhPads[0]){
-      for(int ii=0; ii<ncol; ii++){
+    if(!glx_hpads[0]){
+      for(int i=0; i<ncol; i++){
 	for(int j=0; j<nrow; j++){
-	  if(j==1) shift = 0.04;
-	  else shift = 0;
-	  fhPads[padi] =  new TPad(Form("P%d",ii*10+j),"T", ii/(Double_t)ncol+tbw+shift+shiftw , j/(Double_t)nrow+tbh, (ii+1)/(Double_t)ncol-tbw+shift+shiftw, (1+j)/(Double_t)nrow-tbh, 21);
-	  fhPads[padi]->SetFillColor(kCyan-8);
-	  fhPads[padi]->SetMargin(0.04,0.04,0.04,0.04);
-	  fhPads[padi]->Draw(); 
+	  glx_hpads[padi] =  new TPad(Form("P%d",i*10+j),"T", i/(Double_t)ncol+bw, j/(Double_t)nrow+bh, (i+1)/(Double_t)ncol-bw, (1+j)/(Double_t)nrow-bh, 21);
+	  glx_hpads[padi]->SetFillColor(kCyan-8);
+	  glx_hpads[padi]->SetMargin(0.04,0.04,0.04,0.04);
+	  glx_hpads[padi]->Draw(); 
 	  padi++;
 	}
       }
     }
 
   }
-  
-  Int_t np,tmax;
+    
+  Int_t tmax;
   Double_t max=0;
   if(maxz==0){
     for(Int_t p=0; p<nrow*ncol;p++){
-      tmax = fhDigi[p]->GetMaximum();
+      tmax = glx_hdigi[p]->GetMaximum();
       if(max<tmax) max = tmax;
     }
   }else{
@@ -118,7 +104,7 @@ TString drawDigi(TString digidata="", Int_t layoutId = 0, Double_t maxz = 0, Dou
 
   if(maxz==-2 && minz==-2){ // optimize range
     for(Int_t p=0; p<nrow*ncol;p++){
-      tmax = fhDigi[p]->GetMaximum();
+      tmax = glx_hdigi[p]->GetMaximum();
       if(max<tmax) max = tmax;
     }
     if(max < 100) max = 100;
@@ -126,7 +112,7 @@ TString drawDigi(TString digidata="", Int_t layoutId = 0, Double_t maxz = 0, Dou
     TH1F *h = new TH1F("","",tbins,0,max);
     for(Int_t p=0; p<nrow*ncol;p++){
       for(Int_t i=0; i<64; i++){
-	Double_t val = fhDigi[p]->GetBinContent(i);
+	Double_t val = glx_hdigi[p]->GetBinContent(i);
 	if(val!=0) h->Fill(val);
       }
     }
@@ -147,49 +133,59 @@ TString drawDigi(TString digidata="", Int_t layoutId = 0, Double_t maxz = 0, Dou
       } 
     }
   }
+  
+  Int_t nnmax(0);
+  glx_hdigi[nnmax]->GetZaxis()->SetLabelSize(0.06);
 
-  for(Int_t p=0; p<nrow*ncol;p++){
-    if(layoutId == 1 || layoutId == 4)  np =p%3*5 + p/3;
-    else np = p;
-    
-    fhPads[p]->cd();
-    fhDigi[np]->Draw("col");
-    if(maxz==-1)  max = fhDigi[np]->GetBinContent(fhDigi[np]->GetMaximumBin());
-    fhDigi[np]->SetMaximum(max);
-    fhDigi[np]->SetMinimum(minz);
+  for(Int_t m=0; m<nrow*ncol;m++){
+    Int_t nm=(5-m%6)*17 + m/6;
+    glx_hpads[m]->cd();
+    glx_hdigi[nm]->Draw("col");
+    if(maxz==-1)  max = glx_hdigi[nm]->GetBinContent(glx_hdigi[nm]->GetMaximumBin());
+    if(nnmax<glx_hdigi[nm]->GetEntries()) nnmax=nm;
+    glx_hdigi[nm]->SetMaximum(max);
+    glx_hdigi[nm]->SetMinimum(minz);
     for(Int_t i=1; i<=8; i++){
       for(Int_t j=1; j<=8; j++){
-  	Double_t weight = (double)(fhDigi[np]->GetBinContent(i,j))/(double)max *255;
-  	if(weight > 0) digidata += Form("%d,%d,%d\n", np, (j-1)*8+i-1, (Int_t)weight);
+  	Double_t weight = (double)(glx_hdigi[nm]->GetBinContent(i,j))/(double)max *255;
+  	if(weight > 0) digidata += Form("%d,%d,%d\n", nm, (j-1)*8+i-1, (Int_t)weight);
       }
     }
   }
-  cDigi->Modified();
-  cDigi->Update();
+
+  glx_cdigi->Modified();
+  glx_cdigi->Update();
+
+  glx_cdigi->cd();
+  glx_hdigi[nnmax]->GetZaxis()->SetLabelSize(0.04);
+  glx_hdigi[nnmax]->GetZaxis()->SetTickLength(0.01);
+  (new TPaletteAxis(0.955,0.1,0.97,0.90,((TH1 *)(glx_hdigi[nnmax])->Clone())))->Draw();
+  
+  glx_cdigi->Modified();
+  glx_cdigi->Update();
   return digidata;
 }
-
-void initDigi(Int_t type=0){
+void glx_initDigi(Int_t type=0){
   if(type == 0){
-    for(Int_t m=0; m<3*5;m++){	
-      fhDigi[m] = new TH2F( Form("mcp%d", m),Form("mcp%d", m),8,0.,8.,8,0.,8.);
-      fhDigi[m]->SetStats(0);
-      fhDigi[m]->SetTitle(0);
-      fhDigi[m]->GetXaxis()->SetNdivisions(10);
-      fhDigi[m]->GetYaxis()->SetNdivisions(10);
-      fhDigi[m]->GetXaxis()->SetLabelOffset(100);
-      fhDigi[m]->GetYaxis()->SetLabelOffset(100);
-      fhDigi[m]->GetXaxis()->SetTickLength(1);
-      fhDigi[m]->GetYaxis()->SetTickLength(1);
-      fhDigi[m]->GetXaxis()->SetAxisColor(15);
-      fhDigi[m]->GetYaxis()->SetAxisColor(15);
+    for(Int_t m=0; m<glx_npmt;m++){	
+      glx_hdigi[m] = new TH2F( Form("pmt%d", m),Form("pmt%d", m),8,0.,8.,8,0.,8.);
+      glx_hdigi[m]->SetStats(0);
+      glx_hdigi[m]->SetTitle(0);
+      glx_hdigi[m]->GetXaxis()->SetNdivisions(10);
+      glx_hdigi[m]->GetYaxis()->SetNdivisions(10);
+      glx_hdigi[m]->GetXaxis()->SetLabelOffset(100);
+      glx_hdigi[m]->GetYaxis()->SetLabelOffset(100);
+      glx_hdigi[m]->GetXaxis()->SetTickLength(1);
+      glx_hdigi[m]->GetYaxis()->SetTickLength(1);
+      glx_hdigi[m]->GetXaxis()->SetAxisColor(15);
+      glx_hdigi[m]->GetYaxis()->SetAxisColor(15);
     }
   }
 }
 
-void resetDigi(){
-    for(Int_t m=0; m<3*5;m++){	
-      fhDigi[m]->Reset("M");
+void glx_resetDigi(){
+    for(Int_t m=0; m<glx_npmt;m++){	
+      glx_hdigi[m]->Reset("M");
     }
 }
 
@@ -247,7 +243,7 @@ void axisTime800x500(TH1 * hist, TString xtitle = "time, [ns]"){
   hist->SetLineColor(1);
 }
 
-void SetPrettyStyle(){
+void glx_setPrettyStyle(){
   // Canvas printing details: white bg, no borders.
   gStyle->SetCanvasColor(0);
   gStyle->SetCanvasBorderMode(0);
@@ -280,7 +276,7 @@ void SetPrettyStyle(){
   // gStyle->SetOptStat(0);
 }
 
-void SetRootPalette(Int_t pal = 0){
+void glx_setRootPalette(Int_t pal = 0){
 
  // pal =  1: rainbow\n"
  // pal =  2: reverse-rainbow\n"
@@ -357,52 +353,45 @@ void SetRootPalette(Int_t pal = 0){
 }
 
 #ifdef glx__sim
-void GlxInit(TString inFile="../build/hits.root", Int_t bdigi=0){
+bool glx_init(TString inFile="../build/hits.root", Int_t bdigi=0, TString savepath=""){
+  if(inFile=="") return false;
+  if(savepath!="") glx_savepath=savepath;
+  glx_setRootPalette(1);
+  delete glx_ch;
 
-  SetRootPalette(1);
-  gSystem->Load("../build/libGlxDirc.so");
-  delete fCh;
+  glx_ch = new TChain("dirc");
 
-  fCh = new TChain("data");
-
-  fCh->Add(inFile);
-  fCh->SetBranchAddress("GlxEvent", &fEvent);
-  fNEntries = fCh->GetEntries();
-  std::cout<<"Entries in chain:  "<<fNEntries <<std::endl;
-  if(bdigi == 1) initDigi();
+  glx_ch->Add(inFile);
+  glx_ch->SetBranchAddress("DrcEvent", &glx_event);
+  glx_entries = glx_ch->GetEntries();
+  std::cout<<"Entries in chain:  "<<glx_entries <<std::endl;
+  if(bdigi == 1) glx_initDigi();
+  return true;
 }
 
-void GlxNextEvent(Int_t ievent, Int_t printstep){
-  fCh->GetEntry(ievent);
-  if(ievent%printstep==0 && ievent!=0) cout<<"Event # "<<ievent<< " # hits "<<fEvent->GetHitSize()<<endl;
+void glx_nextEvent(Int_t ievent, Int_t printstep){
+  glx_ch->GetEntry(ievent);
+  if(ievent%printstep==0 && ievent!=0) cout<<"Event # "<<ievent<< " # hits "<<glx_event->GetHitSize()<<endl;
   if(ievent == 0){
     if(gROOT->GetApplication()){
       TIter next(gROOT->GetApplication()->InputFiles());
       TObjString *os=0;
-      while(os = (TObjString*)next()){
-	fInfo += os->GetString()+" ";
+      while((os = (TObjString*)next())){
+	glx_info += os->GetString()+" ";
       }
-      fInfo += "\n";
+      glx_info += "\n";
     }
-    fInfo += fEvent->PrintInfo();
-    fMomentum = fEvent->GetMomentum().Mag() +0.01;
-    
-    fAngle = fEvent->GetAngle() + 0.01;
-    fParticle =  fEvent->GetParticle();
-    fTest1 = fEvent->GetTest1();
-    fTest2 = fEvent->GetTest2();
-
-    glx_theta=fEvent->GetMomentum().Theta()*180/TMath::Pi();
-    glx_phi=fEvent->GetMomentum().Phi()*180/TMath::Pi();
-    glx_radius = fEvent->GetMirrorR();
-    glx_tilt = fEvent->GetMirrorT();
-    glx_hitx = fEvent->GetBeamX();
-    glx_hity = fEvent->GetBeamZ();
+    glx_momentum = glx_event->GetMomentum().Mag() +0.01;    
+    glx_pdg =  glx_event->GetPdg();
+    glx_test1 = glx_event->GetTest1();
+    glx_test2 = glx_event->GetTest2();
+    glx_theta=glx_event->GetMomentum().Theta()*180/TMath::Pi();
+    glx_phi=glx_event->GetMomentum().Phi()*180/TMath::Pi();
   }
 }
 #endif
 
-TString randstr(Int_t len = 10){
+TString glx_randStr(Int_t len = 10){
   gSystem->Sleep(1500);
   srand (time(NULL));
   TString str = ""; 
@@ -417,7 +406,7 @@ TString randstr(Int_t len = 10){
   return str;
 }
 
-Int_t getColorId(Int_t ind, Int_t style =0){
+Int_t glx_getColorId(Int_t ind, Int_t style =0){
   Int_t cid = 1;
   if(style==0) {
     cid=ind+1;
@@ -428,13 +417,13 @@ Int_t getColorId(Int_t ind, Int_t style =0){
   return cid;
 }
 
-void waitPrimitive(TCanvas *c){
+void glx_waitPrimitive(TCanvas *c){
   c->Modified(); 
   c->Update(); 
   c->WaitPrimitive();
 }
 
-Int_t shiftHist(TH1F *hist, Double_t double_shift){
+Int_t glx_shiftHist(TH1F *hist, Double_t double_shift){
   Int_t bins=hist->GetXaxis()->GetNbins();
   Double_t xmin=hist->GetXaxis()->GetBinLowEdge(1);
   Double_t xmax=hist->GetXaxis()->GetBinUpEdge(bins);
@@ -460,26 +449,26 @@ Int_t shiftHist(TH1F *hist, Double_t double_shift){
   return 1;
 } 
 
-void writeInfo(TString filename){
+void glx_writeInfo(TString filename){
   ofstream myfile;
   myfile.open (filename);
-  myfile << fInfo+"\n";
+  myfile << glx_info+"\n";
   myfile.close();
 }
 
-void writeString(TString filename, TString str){
+void glx_writeString(TString filename, TString str){
   ofstream myfile;
   myfile.open (filename);
   myfile << str+"\n";
   myfile.close();
 }
 
-TString createDir(){
-  TString finalpath = fSavePath;
+TString glx_createDir(){
+  TString finalpath = glx_savepath;
 
   if(finalpath =="") return "";
   
-  if(fSavePath == "auto") {
+  if(glx_savepath == "auto") {
     TString dir = "data";
     gSystem->mkdir(dir);
     TDatime *time = new TDatime();
@@ -493,13 +482,13 @@ TString createDir(){
     gSystem->Symlink(path, dir+"/last");
     finalpath = dir+"/"+path;
   }else{
-    gSystem->mkdir(fSavePath,kTRUE);
+    gSystem->mkdir(glx_savepath,kTRUE);
   }
-  writeInfo(finalpath+"/readme");
+  glx_writeInfo(finalpath+"/readme");
   return finalpath;
 }
 
-void save(TPad *c= NULL,TString path="", TString name="", Int_t what=0, Int_t style=0){
+void glx_save(TPad *c= NULL,TString path="", TString name="", Int_t what=0, Int_t style=0){
   if(c && path != "") {
     gROOT->SetBatch(1);
     Int_t w = 800, h = 400;
@@ -512,16 +501,19 @@ void save(TPad *c= NULL,TString path="", TString name="", Int_t what=0, Int_t st
 	w = ((TCanvas*)c)->GetWindowWidth();
 	h = ((TCanvas*)c)->GetWindowHeight();
       }
-      	std::cout<<"w "<<w <<std::endl;
-	std::cout<<"h "<<h <<std::endl;
 
-      TCanvas *cc = new TCanvas(TString(c->GetName())+"exp","cExport",0,0,w,h);
-      cc = (TCanvas*) c->DrawClone();
-      cc->SetCanvasSize(w,h);
-      if(style == 0) cc->SetBottomMargin(0.12);
+      TCanvas *cc;
+      if(TString(c->GetName()).Contains("cdigi")) cc = (TCanvas*) c;
+      else {
+	cc = new TCanvas(TString(c->GetName())+"exp","cExport",0,0,w,h);
+	cc = (TCanvas*) c->DrawClone();      
+	cc->SetCanvasSize(w,h);
+	if(fabs(cc->GetBottomMargin()-0.1)<0.001) cc->SetBottomMargin(0.12);
+      }
+      
       cc->Modified();
       cc->Update();
-    
+      
       cc->Print(path+"/"+name+".png");
       if(what==0) cc->Print(path+"/"+name+".pdf");
       if(what==0) cc->Print(path+"/"+name+".root");
@@ -529,37 +521,37 @@ void save(TPad *c= NULL,TString path="", TString name="", Int_t what=0, Int_t st
       c->Print(path+"/"+name+".png");
       if(what==0) c->Print(path+"/"+name+".pdf");
       if(what==0) c->Print(path+"/"+name+".root");
-    }		    
+    }
     gROOT->SetBatch(0);
   }
 }
 
-TString createSubDir(TString dir="dir"){
+TString glx_createSubDir(TString dir="dir"){
   gSystem->mkdir(dir);
   return dir;
 }
 
-TList *gg_canvasList;
-void canvasAdd(TString name="c",Int_t w=800, Int_t h=600){
-  if(!gg_canvasList) gg_canvasList = new TList();
+TList *glx_canvasList;
+void glx_canvasAdd(TString name="c",Int_t w=800, Int_t h=600){
+  if(!glx_canvasList) glx_canvasList = new TList();
   TCanvas *c = new TCanvas(name,name,0,0,w,h); 
-  gg_canvasList->Add(c);
+  glx_canvasList->Add(c);
 }
 
-void canvasAdd(TCanvas *c){
-  if(!gg_canvasList) gg_canvasList = new TList();
-  gg_canvasList->Add(c);
+void glx_canvasAdd(TCanvas *c){
+  if(!glx_canvasList) glx_canvasList = new TList();
+  glx_canvasList->Add(c);
 }
 
-void canvasCd(TString name="c"){
+void glx_canvasCd(TString name="c"){
   
 }
 
-void canvasDel(TString name="c"){
-  TIter next(gg_canvasList);
+void glx_canvasDel(TString name="c"){
+  TIter next(glx_canvasList);
   TCanvas *c=0;
-  while((c = (TCanvas*) next())){
-    if(c->GetName()==name) gg_canvasList->Remove(c);
+  while(((c = (TCanvas*) next()))){
+    if(c->GetName()==name) glx_canvasList->Remove(c);
   }
 }
 
@@ -567,16 +559,16 @@ void canvasDel(TString name="c"){
 // style = 1 - for talk 
 // what = 0 - save in png, pdf, root formats
 // what = 1 - save in png format
-void canvasSave(Int_t what=0, Int_t style=0){
-  TIter next(gg_canvasList);
+void glx_canvasSave(Int_t what=0, Int_t style=0){
+  TIter next(glx_canvasList);
   TCanvas *c=0;
-  TString path = createDir();
+  TString path = glx_createDir();
   while((c = (TCanvas*) next())){
-    save(c, path, c->GetName(), what,style);
+    glx_save(c, path, c->GetName(), what,style);
   }
 }  
 
-void normalize(TH1F* hists[],Int_t size){
+void glx_normalize(TH1F* hists[],Int_t size){
   Double_t max = 0;
   Double_t min = 0;
   for(Int_t i=0; i<size; i++){

@@ -111,7 +111,7 @@ G4bool GlxPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   
   GlxHit hit;
   hit.SetType(barId);
-  hit.SetMcpId(mcpid);
+  hit.SetPmtId(mcpid);
   hit.SetPixelId(touchable->GetReplicaNumber(0));
   hit.SetGlobalPos(globalPos);
   hit.SetLocalPos(localPos);

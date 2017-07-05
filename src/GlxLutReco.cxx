@@ -151,7 +151,7 @@ void GlxLutReco::Run(Int_t start, Int_t end){
       Double_t theta0 = cd.Theta();      
       fHist5->Fill(theta0*TMath::Sin(phi0),theta0*TMath::Cos(phi0));
       
-      Int_t sensorId = 100*fHit.GetMcpId()+fHit.GetPixelId();
+      Int_t sensorId = 100*fHit.GetPmtId()+fHit.GetPixelId();
       //std::cout<<"sensorId "<<sensorId <<std::endl;
       if(sensorId>20000) {
 	std::cout<<"=================== sensorId "<<sensorId <<std::endl;

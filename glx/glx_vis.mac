@@ -123,7 +123,7 @@
 # /vis/viewer/zoomTo 30
 # /vis/viewer/scaleTo 1 1 1
 # /vis/viewer/set/targetPoint 2.60163 -0.0764011 -0.088712 m
-/vis/viewer/set/background white
+#/vis/viewer/set/background white
 
 
 #/vis/scene/notifyHandlers

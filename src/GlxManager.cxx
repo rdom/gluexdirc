@@ -16,9 +16,9 @@ GlxManager::GlxManager(G4String outfile, G4int runtype){
   fRootFile = new TFile(filename,"RECREATE");
 
   if(fRunType==0 || fRunType==6){
-    fTree = new TTree("data","Prototype hits tree");
+    fTree = new TTree("dirc","Prototype hits tree");
     fEvent = new GlxEvent();
-    fTree->Branch("GlxEvent", "GlxEvent", &fEvent, 64000, 2);
+    fTree->Branch("DrcEvent", "GlxEvent", &fEvent, 64000, 2);
   }
 
   if(fRunType==1 || fRunType==5 || fRunType==3){
@@ -64,6 +64,8 @@ GlxManager::GlxManager(G4String outfile, G4int runtype){
   fPrismStep=0;
   fBeamX=0;
   fBeamZ=-1;
+  fBeamTheta=0;
+  fBeamPhi=0;
   fMirrorR = 800;//1200;
   fMirrorT = 15.89;//16 - Roman's value, 15.89 - John's value
   fMcpT = 42.13;
@@ -85,7 +87,7 @@ void GlxManager::AddEvent(GlxEvent event){
     fEvent = new GlxEvent(event);
     fEvent->SetPhysList(fPhysList);
     fEvent->SetAngle((180*deg-fAngle)/deg);
-    fEvent->SetParticle(fParticle);
+    fEvent->SetPdg(fParticle);
     fEvent->SetMomentum(fMomentum);
     fEvent->SetGeometry(fGeometry);
     fEvent->SetLens(fLens);
@@ -113,7 +115,7 @@ void GlxManager::AddHit(GlxHit hit){
     }
   }
   if(fRunType==1 || fRunType==5 || fRunType==3){
-    int id = 100*hit.GetMcpId() + hit.GetPixelId();
+    int id = 100*hit.GetPmtId() + hit.GetPixelId();
     ((GlxLutNode*)(fLut[hit.GetType()]->At(id)))->
       AddEntry(id, fMomentum, hit.GetPathInPrizm(),
 	       hit.GetNreflectionsInPrizm(),
