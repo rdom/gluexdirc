@@ -58,8 +58,8 @@ GlxDetectorConstruction::GlxDetectorConstruction()
   fWall = 12.7; // [mm]  = 0.5 inch thickness of the EV wall, which is actually a window
   fMShift = (fWall+fGap)/cos(42.13*deg)/2. + 1.;//
 	  
-  fTankBox0[0]=582; fTankBox0[1]=2205+20; fTankBox0[2]=350; //240
-  fTankBox1[0]=582; fTankBox1[1]=901+25; fTankBox1[2]=350; //240 
+  fTankBox0[0]=600; fTankBox0[1]=2205+20; fTankBox0[2]=350; //240
+  fTankBox1[0]=600; fTankBox1[1]=901+25; fTankBox1[2]=350; //240 
 
   if(fGeomId==0){
     fNRow = 5;
@@ -76,9 +76,9 @@ GlxDetectorConstruction::GlxDetectorConstruction()
     fTankBox[2]=fTankBox1[2];
   }
   
-  fMirror1[0]=190-fMirrorGap;/*197;*/ fMirror1[1]=fTankBox[1]-25;  fMirror1[2]=1;  // bottom mirror, 2 cm gap between it and bar box window
-  fMirror2[0]=66.97; fMirror2[1]=fTankBox[1]-25;  fMirror2[2]=0.001; // new wedge mirror, 2 cm gap between it and bar box window
-  fMirror3[0]=430;/*422.9;*/ fMirror3[1]=fTankBox[1]-25;  fMirror3[2]=1; // vertical mirror
+  fMirror1[0]=185.6; /* 185.6;*/ fMirror1[1]=fTankBox[1]-25;  fMirror1[2]=1;  // bottom mirror, 2 cm gap between it and bar box window
+  fMirror2[0]=66.6; fMirror2[1]=fTankBox[1]-25;  fMirror2[2]=0.001; // new wedge mirror, 2 cm gap between it and bar box window
+  fMirror3[0]=402;   fMirror3[1]=fTankBox[1]-25;  fMirror3[2]=1; // vertical mirror
   fMirror4[0]=580;   fMirror4[1]=300;  fMirror4[2]=1; // side mirrors
 
   fFdp[0]=314.5;/*312;*/ fFdp[1]=fTankBox[1]-25;  fFdp[2]=1;  
@@ -124,11 +124,11 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   G4Box* gMirror = new G4Box("gMirror",fMirror[0]/2.,fMirror[1]/2.,fMirror[2]/2.);
   lMirror = new G4LogicalVolume(gMirror,MirrorMaterial,"lMirror",0,0,0);
 
-/* // The Wedge
-  G4Trap* gWedge = new G4Trap("gWedge",fPrizm[0],fPrizm[1],fPrizm[2],fPrizm[3]);
-  lWedge = new G4LogicalVolume(gWedge, BarMaterial,"lWedge",0,0,0);
-  G4RotationMatrix* xRot = new G4RotationMatrix();
-  xRot->rotateX(-M_PI/2.*rad);*/
+  /* // The Wedge
+     G4Trap* gWedge = new G4Trap("gWedge",fPrizm[0],fPrizm[1],fPrizm[2],fPrizm[3]);
+     lWedge = new G4LogicalVolume(gWedge, BarMaterial,"lWedge",0,0,0);
+     G4RotationMatrix* xRot = new G4RotationMatrix();
+     xRot->rotateX(-M_PI/2.*rad);*/
 	
   // The Wedge with 6 mrad angle of the bottom side:
   fTilt = 0.006; // 6 mrad
@@ -155,7 +155,7 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   G4Box* gTankMirror2 = new G4Box("gTankMirr2",fMirror2[0]/2.,fMirror2[1]/2.,fMirror2[2]/2.);
   lTankMirror2 = new G4LogicalVolume(gTankMirror2,MirrorMaterial,"lTankMirror2",0,0,0);
 
-  G4Box* gTankMirror3 = new G4Box("gTankMirr3",fMirror3[0]/2.-fMShift,fMirror3[1]/2.,fMirror3[2]/2.);
+  G4Box* gTankMirror3 = new G4Box("gTankMirr3",fMirror3[0]/2.,fMirror3[1]/2.,fMirror3[2]/2.);
   lTankMirror3 = new G4LogicalVolume(gTankMirror3,MirrorMaterial,"lTankMirror3",0,0,0);
 
   G4Box* gTankMirror4 = new G4Box("gTankMirr3",fMirror4[0]/2.,fMirror4[1]/2.,fMirror4[2]/2.);
@@ -171,8 +171,8 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   // focusing mirror made of flat segments:
   if(fLensId > 0){
     fMirrorS[0] = 2*fradius*sin(seg*deg/2/fLensId);
-	fMirrorS[1] = fTankBox[1]-25;
-	fMirrorS[2] = 1;
+    fMirrorS[1] = fTankBox[1]-25;
+    fMirrorS[2] = 1;
     G4Box* gSmirror = new G4Box("gSmirror",fMirrorS[0]/2.,fMirrorS[1]/2.,fMirrorS[2]/2.);
     lSmirror = new G4LogicalVolume(gSmirror, MirrorMaterial, "lSmirror", 0,0,0);
   }
@@ -197,18 +197,20 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
     G4double yshift = (fBar[1]+0.15)*i - fBarBox[1]/2. + fBar[1]/2.;
     new G4PVPlacement(0,G4ThreeVector(0,yshift,0.5*(fBar[2]+fPrizm[1])),lMirror,"wMirror", lBarBox,false,1);
     new G4PVPlacement(0,G4ThreeVector(0,yshift,0.5*(fPrizm[1]-fMirror[2])),lBar,"wBar", lBarBox,false,i); 
-	  //placement of the prizm
+    //placement of the prizm
     new G4PVPlacement(xRot,G4ThreeVector((fPrizm[2]+fPrizm[3]+2.*fdH)/4.-fBar[0]/2.,(fPrizm[0]-fBar[1])/2.+yshift,0.5*(-fBar[2]-fMirror[2])),lWedge,"wWedge", lBarBox,false,i);
   }
 
-  new G4PVPlacement(0,G4ThreeVector(0,-795,0),lBarBox,"wBarBox",lDirc,false,0);
-  new G4PVPlacement(0,G4ThreeVector(47.75,-795,0.5*(-fBarBox[2]-fWindow[2])),lWindow,"wWindow",lDirc,false,0);
-  new G4PVPlacement(0,G4ThreeVector(0,-365,0),lBarBox,"wBarBox",lDirc,false,1);
-  new G4PVPlacement(0,G4ThreeVector(47.75,-365,0.5*(-fBarBox[2]-fWindow[2])),lWindow,"wWindow",lDirc,false,1);
-  new G4PVPlacement(0,G4ThreeVector(0, 365,0),lBarBox,"wBarBox",lDirc,false,2);
-  new G4PVPlacement(0,G4ThreeVector(47.75, 365,0.5*(-fBarBox[2]-fWindow[2])),lWindow,"wWindow",lDirc,false,2);
-  new G4PVPlacement(0,G4ThreeVector(0, 795,0),lBarBox,"wBarBox",lDirc,false,3);
-  new G4PVPlacement(0,G4ThreeVector(47.75, 795,0.5*(-fBarBox[2]-fWindow[2])),lWindow,"wWindow",lDirc,false,3);
+  new G4PVPlacement(0,G4ThreeVector(0,795,0),lBarBox,"wBarBox",lDirc,false,0);
+  new G4PVPlacement(0,G4ThreeVector(47.75,795,0.5*(-fBarBox[2]-fWindow[2])),lWindow,"wWindow",lDirc,false,0);
+  new G4PVPlacement(0,G4ThreeVector(0,365,0),lBarBox,"wBarBox",lDirc,false,1);
+  new G4PVPlacement(0,G4ThreeVector(47.75,365,0.5*(-fBarBox[2]-fWindow[2])),lWindow,"wWindow",lDirc,false,1);
+
+  G4RotationMatrix* rotm180= new G4RotationMatrix; rotm180->rotateX(180.*deg);
+  new G4PVPlacement(rotm180,G4ThreeVector(0, -365,0),lBarBox,"wBarBox",lDirc,false,2);
+  new G4PVPlacement(0,G4ThreeVector(47.75, -365,-0.5*(-fBarBox[2]-fWindow[2])),lWindow,"wWindow",lDirc,false,2);
+  new G4PVPlacement(rotm180,G4ThreeVector(0, -795,0),lBarBox,"wBarBox",lDirc,false,3);
+  new G4PVPlacement(0,G4ThreeVector(47.75, -795,-0.5*(-fBarBox[2]-fWindow[2])),lWindow,"wWindow",lDirc,false,3);
   
   Double_t redge = 0.5*fWindow[0]-47.75;
   
@@ -217,18 +219,17 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   }
   if(fGeomId==1){
     new G4PVPlacement(0,G4ThreeVector(0.5*fTankBox[0]-redge, 365+0.5*fBarBox[1],-0.5*fBarBox[2]-fWindow[2]-0.5*fTankBox[2] ),lTankBox,"wTankBox",lDirc,false,0);
-    new G4PVPlacement(0,G4ThreeVector(0.5*fTankBox[0]-redge,-365-0.5*fBarBox[1],-0.5*fBarBox[2]-fWindow[2]-0.5*fTankBox[2] ),lTankBox,"wTankBox",lDirc,false,1);
+    new G4PVPlacement(rotm180,G4ThreeVector(0.5*fTankBox[0]-redge,-365-0.5*fBarBox[1],-1*(-0.5*fBarBox[2]-fWindow[2]-0.5*fTankBox[2]) ),lTankBox,"wTankBox",lDirc,false,1);
   }
 
   G4RotationMatrix* rotm1= new G4RotationMatrix; rotm1->rotateY(90.*deg);
-  new G4PVPlacement(rotm1,G4ThreeVector(redge-0.5*(fBar[0]+fMirror1[2]+fTankBox[0]),0,0.5*(fTankBox[2]-fMirror1[0])-20),lTankMirror1,"wMirror1",lTankBox,false,0);
+  double egap=14;
+  new G4PVPlacement(rotm1,G4ThreeVector(redge-0.5*(fBar[0]+fMirror1[2]+fTankBox[0]),0,0.5*(fTankBox[2]-fMirror1[0])-egap),lTankMirror1,"wMirror1",lTankBox,false,0);
   G4RotationMatrix* rotm2= new G4RotationMatrix; rotm2->rotateY(-60.*deg);
- // new G4PVPlacement(rotm2,G4ThreeVector(redge-0.5*(fBar[0]+fMirror2[2]+fTankBox[0])+130-0.5*fMirror2[0]*cos(60*pi/180.),0,0.5*fTankBox[2]-78+0.5*fMirror2[0]*sin(60*pi/180.)),lTankMirror2,"wMirror2",lTankBox,false,0);
-	new G4PVPlacement(rotm2,G4ThreeVector(redge-0.5*(fBar[0]+fMirror2[2]/2./sin(60./180.*M_PI)+fTankBox[0])+130-0.5*fMirror2[0]*cos(60*pi/180.),0,0.5*fTankBox[2]-78+fMirror2[2]/2./cos(60./180.*M_PI)+0.5*fMirror2[0]*sin(60*pi/180.)),lTankMirror2,"wMirror2",lTankBox,false,0);
- G4RotationMatrix* rotm3= new G4RotationMatrix; rotm3->rotateY(0.*deg);
+  new G4PVPlacement(rotm2,G4ThreeVector(redge-0.5*(fBar[0]+fMirror2[2]/2./sin(60./180.*M_PI)+fTankBox[0])+130-0.5-0.5*fMirror2[0]*cos(60*pi/180.),0,0.5*fTankBox[2]-egap-59.5 +fMirror2[2]/2./cos(60./180.*M_PI)+0.5*fMirror2[0]*sin(60*pi/180.)),lTankMirror2,"wMirror2",lTankBox,false,0);
+  G4RotationMatrix* rotm3= new G4RotationMatrix; rotm3->rotateY(0.*deg);
 
-  //new G4PVPlacement(rotm3,G4ThreeVector(redge-0.5*(fBar[0]+fMirror3[2]+fTankBox[0]-fMirror3[0])+130,0,0.5*fTankBox[2]-78),lTankMirror3,"wMirror3",lTankBox,false,0);
-  new G4PVPlacement(rotm3,G4ThreeVector(redge-0.5*(fBar[0]+fMirror3[2]+fTankBox[0]-fMirror3[0])+130 -fMShift,0,0.5*fTankBox[2]-78),lTankMirror3,"wMirror3",lTankBox,false,0);
+  new G4PVPlacement(rotm3,G4ThreeVector(redge-0.5*(fBar[0]+fMirror3[2]+fTankBox[0]-fMirror3[0])+130+8,0,0.5*fTankBox[2]-egap-58-6),lTankMirror3,"wMirror3",lTankBox,false,0);
 
   G4RotationMatrix* rotm4= new G4RotationMatrix; rotm4->rotateX(90.*deg);
   new G4PVPlacement(rotm4,G4ThreeVector(0, 0.5*fTankBox[1]-12,0),lTankMirror4,"wMirror3",lTankBox,false,0);
@@ -240,22 +241,22 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   G4ThreeVector Ta(0.5*fmx,0,fmy);
 
   if(fLensId == 0){
-	Ra->rotateX(90.*deg);  
+    Ra->rotateX(90.*deg);  
     assemblyFMirror->AddPlacedVolume(lFmirror,Ta,Ra);
   }
   if(fLensId > 0){ 
-	G4ThreeVector c(0.,0.,fradius*cos(seg*deg/fLensId/2.));
- 	c.rotateY(-seg*deg/2. + seg*deg/fLensId/2.);
- 	G4ThreeVector a(0.,0.,fmy);
- 	G4ThreeVector b(0.,0.,0.);
+    G4ThreeVector c(0.,0.,fradius*cos(seg*deg/fLensId/2.));
+    c.rotateY(-seg*deg/2. + seg*deg/fLensId/2.);
+    G4ThreeVector a(0.,0.,fmy);
+    G4ThreeVector b(0.,0.,0.);
     Ra->rotateY(+seg*deg/2. - seg*deg/2./fLensId);
- 	for(int isec=0; isec<fLensId; isec++){
+    for(int isec=0; isec<fLensId; isec++){
       b = c - a;
- 	  Ta.setX(0.5*fmx + b.getX());
- 	  Ta.setZ(-b.getZ());
- 	  assemblyFMirror->AddPlacedVolume(lSmirror,Ta,Ra);
- 	  c.rotateY(seg*deg/fLensId);
- 	  Ra->rotateY(-seg*deg/fLensId);
+      Ta.setX(0.5*fmx + b.getX());
+      Ta.setZ(-b.getZ());
+      assemblyFMirror->AddPlacedVolume(lSmirror,Ta,Ra);
+      c.rotateY(seg*deg/fLensId);
+      Ra->rotateY(-seg*deg/fLensId);
     }	
   }
 
@@ -268,8 +269,8 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   
   // Now instantiate the layers
   // for(int i = 0; i < layers; i++ ){
-     // Translation of the assembly inside the world
-  G4ThreeVector Tm = G4ThreeVector(-0.5*fTankBox[0]+20,0,0.5*fTankBox[2]-(fMirror1[0]+fMirrorGap)-20);
+  // Translation of the assembly inside the world
+  G4ThreeVector Tm = G4ThreeVector(-0.5*fTankBox[0]+20,0,0.5*fTankBox[2]-(fMirror1[0]+fMirrorGap)-egap);
   G4RotationMatrix *Rm = new G4RotationMatrix; Rm->rotateY(rot_fm);
   assemblyFMirror->MakeImprint(lTankBox,Tm,Rm,0);
   // }
@@ -278,74 +279,74 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   G4Box* gMcp;
   G4Box* gPixel;
   
- if(fMcpLayout>1){
-  // The MCP
-  gMcp = new G4Box("gMcp",fMcpTotal[0]/2.,fMcpTotal[1]/2.,fMcpTotal[2]/2.);
-  lMcp = new G4LogicalVolume(gMcp,BarMaterial,"lMcp",0,0,0);// BarMaterial
+  if(fMcpLayout>1){
+    // The MCP
+    gMcp = new G4Box("gMcp",fMcpTotal[0]/2.,fMcpTotal[1]/2.,fMcpTotal[2]/2.);
+    lMcp = new G4LogicalVolume(gMcp,BarMaterial,"lMcp",0,0,0);// BarMaterial
   
-  // The MCP Pixel
-  int mcpDimx = 8;
-  int mcpDimy = 8;
-  if(fGeomId>101) {
-    mcpDimx = fGeomId/100;
-    mcpDimy = fGeomId%100;
-  }
-  gPixel = new G4Box("gPixel",fMcpActive[0]/(2*(double)mcpDimx),fMcpActive[1]/(2*(double)mcpDimy),fMcpActive[2]/20.);
-  lPixel = new G4LogicalVolume(gPixel,BarMaterial,"lPixel",0,0,0);
-
-  int pixelId = 0;
-  for(int i=0; i<mcpDimx; i++){
-	double shiftx = i*(fMcpActive[0]/(double)mcpDimx)-fMcpActive[0]/2.+fMcpActive[0]/(2*(double)mcpDimx);
-    for(int j=mcpDimy-1; j>=0; j--){
-      double shifty = j*(fMcpActive[0]/(double)mcpDimy)-fMcpActive[0]/2.+fMcpActive[0]/(2*(double)mcpDimy);
-      new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,0),lPixel,"wPixel", lMcp,false,64-pixelId++);      
+    // The MCP Pixel
+    int mcpDimx = 8;
+    int mcpDimy = 8;
+    if(fGeomId>101) {
+      mcpDimx = fGeomId/100;
+      mcpDimy = fGeomId%100;
     }
-  }
+    gPixel = new G4Box("gPixel",fMcpActive[0]/(2*(double)mcpDimx),fMcpActive[1]/(2*(double)mcpDimy),fMcpActive[2]/20.);
+    lPixel = new G4LogicalVolume(gPixel,BarMaterial,"lPixel",0,0,0);
 
-  // int mcpId = 0;
-  // for(int j=0; j<fNCol; j++){
-  //   double shifty = (fMcpTotal[0]+1)*(j-1);
-  //   if(fGeomId==0) shifty = shifty-0.5*fFdp[1]+110;	 
-  //   if(fGeomId==1) shifty = shifty-0.5*fFdp[1]+3*fMcpTotal[0]/2.;	
-  //   for(int i=0; i<fNRow; i++){
-  //     double shiftx = i*(fMcpTotal[0]+1)-fFdp[0]/2.+fMcpTotal[0]/2.; 
+    int pixelId = 0;
+    for(int i=0; i<mcpDimx; i++){
+      double shiftx = i*(fMcpActive[0]/(double)mcpDimx)-fMcpActive[0]/2.+fMcpActive[0]/(2*(double)mcpDimx);
+      for(int j=mcpDimy-1; j>=0; j--){
+	double shifty = j*(fMcpActive[0]/(double)mcpDimy)-fMcpActive[0]/2.+fMcpActive[0]/(2*(double)mcpDimy);
+	new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,0),lPixel,"wPixel", lMcp,false,64-pixelId++);      
+      }
+    }
+
+    // int mcpId = 0;
+    // for(int j=0; j<fNCol; j++){
+    //   double shifty = (fMcpTotal[0]+1)*(j-1);
+    //   if(fGeomId==0) shifty = shifty-0.5*fFdp[1]+110;	 
+    //   if(fGeomId==1) shifty = shifty-0.5*fFdp[1]+3*fMcpTotal[0]/2.;	
+    //   for(int i=0; i<fNRow; i++){
+    //     double shiftx = i*(fMcpTotal[0]+1)-fFdp[0]/2.+fMcpTotal[0]/2.; 
     
-  //     new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,0),lMcp,"wMcp", lFdp,false,mcpId);
-  //     mcpId++;
-  //   }
-  // }
+    //     new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,0),lMcp,"wMcp", lFdp,false,mcpId);
+    //     mcpId++;
+    //   }
+    // }
 
-  int mcpId = 0;
+    int mcpId = 0;
 
   	
-  for(int i=fNRow-1; i>=0; i--){
-    double shiftx = i*(fMcpTotal[0]+1)-fFdp[0]/2.+fMcpTotal[0]/2.; 
+    for(int i=fNRow-1; i>=0; i--){
+      double shiftx = i*(fMcpTotal[0]+1)-fFdp[0]/2.+fMcpTotal[0]/2.; 
 
-    for(int j=fNCol-1; j>=0; j--){
-      double shifty = (fMcpTotal[0]+1)*(j-1);
-      if(fGeomId==0) shifty = shifty-0.5*fFdp[1]+110;	 
-      if(fGeomId==1) shifty = shifty-0.5*fFdp[1]+3*fMcpTotal[0]/2.;
+      for(int j=fNCol-1; j>=0; j--){
+	double shifty = (fMcpTotal[0]+1)*(j-1);
+	if(fGeomId==0) shifty = shifty-0.5*fFdp[1]+110;	 
+	if(fGeomId==1) shifty = shifty-0.5*fFdp[1]+3*fMcpTotal[0]/2.;
       
-      new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,0),lMcp,"wMcp", lFdp,false,mcpId);
-      mcpId++;
+	new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,0),lMcp,"wMcp", lFdp,false,mcpId);
+	mcpId++;
+      }
     }
-  }
 
 
   
- }else{
-   // for layout optimization 
-   gMcp = new G4Box("gMcp",fFdp[0]/2.,fFdp[1]/2.,fMcpTotal[2]/2.);
-   lMcp = new G4LogicalVolume(gMcp,BarMaterial,"lMcp",0,0,0);
+  }else{
+    // for layout optimization 
+    gMcp = new G4Box("gMcp",fFdp[0]/2.,fFdp[1]/2.,fMcpTotal[2]/2.);
+    lMcp = new G4LogicalVolume(gMcp,BarMaterial,"lMcp",0,0,0);
    
-   // The MCP Pixel
-   if(fMcpLayout==0){ //one prism-size mcp with one pixel
-     gPixel = new G4Box("gPixel",fFdp[0]/2.,fFdp[1]/2.,fMcpActive[2]/16.);
-     lPixel = new G4LogicalVolume(gPixel,BarMaterial,"lPixel",0,0,0);
-     new G4PVPlacement(0,G4ThreeVector(0,0,0),lPixel,"wPixel", lMcp,false,1);
-   }
-   new G4PVPlacement(0,G4ThreeVector(0,0,0),lMcp,"wMcp", lFdp,false,1);
- }
+    // The MCP Pixel
+    if(fMcpLayout==0){ //one prism-size mcp with one pixel
+      gPixel = new G4Box("gPixel",fFdp[0]/2.,fFdp[1]/2.,fMcpActive[2]/16.);
+      lPixel = new G4LogicalVolume(gPixel,BarMaterial,"lPixel",0,0,0);
+      new G4PVPlacement(0,G4ThreeVector(0,0,0),lPixel,"wPixel", lMcp,false,1);
+    }
+    new G4PVPlacement(0,G4ThreeVector(0,0,0),lMcp,"wMcp", lFdp,false,1);
+  }
  
   G4RotationMatrix* rotmm= new G4RotationMatrix; rotmm->rotateY(42.13*deg);
 
@@ -354,21 +355,19 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   Rp->rotateY(0.);
   G4ThreeVector Tpd(0.,0.,0.);
   assemblyPD->AddPlacedVolume(lFdp,Tpd,Rp);
-  if(fGap > 0.){	
+  if(fGap > 0.){
     G4ThreeVector Tgap(0.,0.,(fGap+fFdp[2])/2.);
     assemblyPD->AddPlacedVolume(lGap,Tgap,Rp);
   }
   G4ThreeVector Twa(0.,0.,(fWall+2.*fGap+fFdp[2])/2.);
   assemblyPD->AddPlacedVolume(lWall,Twa,Rp);
 	
-  double pdShiftX = redge-0.5*(fBar[0]+fMirror3[2]+fTankBox[0]-2*fMirror3[0])+130-0.5*fFdp[0]*cos(42.13*deg);
-  double pdShiftZ = 0.5*fTankBox[2]-185;
+  double pdShiftX = redge-0.5*(fBar[0]+fMirror3[2]+fTankBox[0]-2*fMirror3[0])+130-0.5*fFdp[0]*cos(42.13*deg)+28.5+8;
+  double pdShiftZ = 0.5*fTankBox[2]-185-17.6;
   G4ThreeVector pdShift(pdShiftX,0,pdShiftZ);	
   G4RotationMatrix *rotmm1 = new G4RotationMatrix;
   rotmm1->rotateY((-42.13)*deg);
   assemblyPD->MakeImprint(lTankBox, pdShift, rotmm1, 0);
-
- // new G4PVPlacement(rotmm,G4ThreeVector(redge-0.5*(fBar[0]+fMirror3[2]+fTankBox[0]-2*fMirror3[0])+130-0.5*fFdp[0]*cos(42.13*deg),0,0.5*fTankBox[2]-185),lFdp,"wFdp", lTankBox,false,0);
 
   const G4int num = 36; 
   G4double WaveLength[num];
@@ -394,18 +393,18 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
 
   // hamamatsu H12700 quantum efficiency (as a function of photon E):	
   G4double QuantumEfficiencyPMT12700[num]=
-	{0.001,0.001,0.00118865,0.00511371,0.0104755,0.0174337,0.0259711,
-	0.0358296,0.046982,0.0593714,0.0729143,0.0875043,0.103016,0.119306,
-	0.13622,0.153591,0.171246,0.188889,0.206372,0.223528,0.239941,0.255526,
-	0.269913,0.283034,0.294369,0.303953,0.31158,0.317117,0.320523,0.321858,
-	0.321271,0.31895,0.315347,0.310875,0.306056,0.301365};
+    {0.001,0.001,0.00118865,0.00511371,0.0104755,0.0174337,0.0259711,
+     0.0358296,0.046982,0.0593714,0.0729143,0.0875043,0.103016,0.119306,
+     0.13622,0.153591,0.171246,0.188889,0.206372,0.223528,0.239941,0.255526,
+     0.269913,0.283034,0.294369,0.303953,0.31158,0.317117,0.320523,0.321858,
+     0.321271,0.31895,0.315347,0.310875,0.306056,0.301365};
 
   // these quantum efficiencies have to be multiplied by geometry
   //   efficiency of given PMT's
   for(G4int k=0;k<36;k++)
     {
-	  QuantumEfficiencyPMT12700[k] =  QuantumEfficiencyPMT12700[k] *.7;
-  }
+      QuantumEfficiencyPMT12700[k] =  QuantumEfficiencyPMT12700[k] *.7;
+    }
  
   /* hamamatsu pmt's - smaller slots => quantum efficiency again
      assign to slot and pad */
@@ -415,15 +414,15 @@ G4VPhysicalVolume* GlxDetectorConstruction::Construct(){
   PhotocatodHamamatsuMPT->AddProperty("EFFICIENCY",  PhotonEnergy,fQuantumEfficiency,num);
   PhotocatodHamamatsuMPT->AddProperty("REFLECTIVITY",PhotonEnergy,PMTReflectivity,num);
 
- /*
-  G4OpticalSurface* HamamatsuPMTOpSurface= 
+  /*
+    G4OpticalSurface* HamamatsuPMTOpSurface= 
     new G4OpticalSurface("HamamatsuPMTOpSurface",glisur,polished,dielectric_metal);
-  HamamatsuPMTOpSurface->SetMaterialPropertiesTable(PhotocatodHamamatsuMPT);
+    HamamatsuPMTOpSurface->SetMaterialPropertiesTable(PhotocatodHamamatsuMPT);
 
-  // // assignment to pad
-  // if(hamamatsu8500)
-  new G4LogicalSkinSurface("HamamatsuPMTSurface",lPixel,HamamatsuPMTOpSurface);
-*/
+    // // assignment to pad
+    // if(hamamatsu8500)
+    new G4LogicalSkinSurface("HamamatsuPMTSurface",lPixel,HamamatsuPMTOpSurface);
+  */
   // Mirror
   G4OpticalSurface* MirrorOpSurface= 
     new G4OpticalSurface("MirrorOpSurface",glisur,polished,dielectric_metal);
@@ -523,7 +522,7 @@ void GlxDetectorConstruction::DefineMaterials(){
   Epotek->AddElement(H,natoms=5);
   Epotek->AddElement(O,natoms=2);
 
-	 /* as I don't know the exact material composition,
+  /* as I don't know the exact material composition,
      I will use Epoxyd material composition and add
      the optical property of Epotek to this material */
 
@@ -532,7 +531,7 @@ void GlxDetectorConstruction::DefineMaterials(){
   Eljen550->AddElement(H,natoms=5);
   Eljen550->AddElement(O,natoms=2);
 
-	/* as I don't know the exact material composition,
+  /* as I don't know the exact material composition,
      I will use Epoxyd material composition and add
      the optical property of Silicon to this material, I'll use the density of Silicon = 1.02 */
   G4Material* Silicon = new G4Material("Silicon",density=1.02*g/cm3,ncomponents=3);
@@ -540,7 +539,7 @@ void GlxDetectorConstruction::DefineMaterials(){
   Silicon->AddElement(H,natoms=5);
   Silicon->AddElement(O,natoms=2);
 
-	/* as I don't know the exact material composition,
+  /* as I don't know the exact material composition,
      I will use Epoxyd material composition and add
      the optical property of Silicon to this material, I'll use the density from data sheet = 1.03 */
   G4Material* EJ560 = new G4Material("EJ560",density=1.03*g/cm3,ncomponents=3);
@@ -611,34 +610,34 @@ void GlxDetectorConstruction::DefineMaterials(){
      0.9999,0.9998,0.9995,0.999,0.998,0.997,0.996,0.9955,0.993,
      0.9871,0.9745};
 
-	// attenuation length [mm] of Eljen optical grease based on 1mm data from Erik (Giessen)
-	G4double GreaseAbsorption[num] = 
-	{50., 50., 50., 50., 50., 50., 50., 50., 49.88634, 26.90170, 
-	22.97563, 21.61372, 20., 20., 20.40140, 21.93315, 20.14751, 
-	21.53648, 20., 21.69406, 23.21625, 25.03214, 24.25420, 25.42272, 
-	24.48681, 24.96419, 26.39470, 22.07220, 18.66685, 15.09632, 
-	12.35643, 9.67075, 7.31461, 5.38345, 3.88385, 2.74928};
+  // attenuation length [mm] of Eljen optical grease based on 1mm data from Erik (Giessen)
+  G4double GreaseAbsorption[num] = 
+    {50., 50., 50., 50., 50., 50., 50., 50., 49.88634, 26.90170, 
+     22.97563, 21.61372, 20., 20., 20.40140, 21.93315, 20.14751, 
+     21.53648, 20., 21.69406, 23.21625, 25.03214, 24.25420, 25.42272, 
+     24.48681, 24.96419, 26.39470, 22.07220, 18.66685, 15.09632, 
+     12.35643, 9.67075, 7.31461, 5.38345, 3.88385, 2.74928};
 
-	// attenuation length [mm] of EJ560 silicone rubber - data adopted from EJ560 data sheet
-	G4double EJ560Absorption[num] = {30., 30., 30., 30., 30., 30., 
-	30., 30., 30., 30., 30., 30., 30., 30., 30., 30., 29.71075, 
-	29.71075, 29.39202, 29.13124, 29.11231, 28.78580, 28.41403, 
-	28.01492, 27.51400, 26.85130, 25.76112, 24.30155, 22.51917, 
-	19.99915, 16.96846, 11.79734, 5.92869, 2.21841, 0.95961, 
-	0.56005};
+  // attenuation length [mm] of EJ560 silicone rubber - data adopted from EJ560 data sheet
+  G4double EJ560Absorption[num] = {30., 30., 30., 30., 30., 30., 
+				   30., 30., 30., 30., 30., 30., 30., 30., 30., 30., 29.71075, 
+				   29.71075, 29.39202, 29.13124, 29.11231, 28.78580, 28.41403, 
+				   28.01492, 27.51400, 26.85130, 25.76112, 24.30155, 22.51917, 
+				   19.99915, 16.96846, 11.79734, 5.92869, 2.21841, 0.95961, 
+				   0.56005};
 
-	// attenuation length [mm] for silicon TSE3032 (Belle II)
-	G4double TSE3032Absorption[num] = {600., 600., 600., 600., 600., 600., 600., 
-	543.94067, 449.09940, 449.09940, 449.09940, 449.09940, 449.09940, 
-	449.09940, 449.09940, 427.27090, 363.86901, 298.58176, 270.61618, 
-	241.43470, 210.95626, 195.13213, 188.52083, 181.59472, 175.53499, 
-	169.83431, 163.84128, 149.70061, 133.03941, 115.88306, 99.48690, 
-	82.49526, 66.61316, 60.08292, 50.51054, 37.39791};
+  // attenuation length [mm] for silicon TSE3032 (Belle II)
+  G4double TSE3032Absorption[num] = {600., 600., 600., 600., 600., 600., 600., 
+				     543.94067, 449.09940, 449.09940, 449.09940, 449.09940, 449.09940, 
+				     449.09940, 449.09940, 427.27090, 363.86901, 298.58176, 270.61618, 
+				     241.43470, 210.95626, 195.13213, 188.52083, 181.59472, 175.53499, 
+				     169.83431, 163.84128, 149.70061, 133.03941, 115.88306, 99.48690, 
+				     82.49526, 66.61316, 60.08292, 50.51054, 37.39791};
 
-	// attenuation length [mm] for borosilicate glass BOROFLOAT33:
-	G4double BorofloatAbsorption[num] = {137.15, 137.5, 137.5, 137.5, 137.5, 137.5, 137.5,
-	137.5, 137.5, 137.5, 137.5, 137.5, 137.5, 137.5, 137.5, 137.5, 137.5, 137.5, 137.5, 137.5,
-	137.5, 137.5, 137.5, 137.5, 137.5, 137.5, 131.7, 122.0, 107.9, 84.4, 69.3, 52.2, 34.1, 20.5, 9.24, 4.52};
+  // attenuation length [mm] for borosilicate glass BOROFLOAT33:
+  G4double BorofloatAbsorption[num] = {137.15, 137.5, 137.5, 137.5, 137.5, 137.5, 137.5,
+				       137.5, 137.5, 137.5, 137.5, 137.5, 137.5, 137.5, 137.5, 137.5, 137.5, 137.5, 137.5, 137.5,
+				       137.5, 137.5, 137.5, 137.5, 137.5, 137.5, 131.7, 122.0, 107.9, 84.4, 69.3, 52.2, 34.1, 20.5, 9.24, 4.52};
 
   //water
   const G4int nEntries = 32;
@@ -680,12 +679,12 @@ void GlxDetectorConstruction::DefineMaterials(){
     Absorption[i]= 100*m; // not true, just due to definiton -> not absorb any
     AirAbsorption[i] = 4.*cm; // if photon in the air -> kill it immediately
     AirRefractiveIndex[i] = 1.; 
-	SiliconRefractiveIndex[i] = fNsil;
-	GreaseRefractiveIndex[i] = fNgr;
-	EJ560RefractiveIndex[i] = fNej560;
+    SiliconRefractiveIndex[i] = fNsil;
+    GreaseRefractiveIndex[i] = fNgr;
+    EJ560RefractiveIndex[i] = fNej560;
     PhotonEnergy[num-(i+1)]= LambdaE/WaveLength[i];
 
-	  //std::cout<<"photon energy = "<<PhotonEnergy[num-(i+1)]<<std::endl;
+    //std::cout<<"photon energy = "<<PhotonEnergy[num-(i+1)]<<std::endl;
 
     /* as the absorption is given per length and G4 needs 
        mean free path length, calculate it here
@@ -695,9 +694,9 @@ void GlxDetectorConstruction::DefineMaterials(){
     EpotekAbsorption[i] = (-1)/log(EpotekAbsorption[i])*EpotekThickness;
     QuartzAbsorption[i] = (-1)/log(QuartzAbsorption[i])*100*cm;
     KamLandOilAbsorption[i] = (-1)/log(KamLandOilAbsorption[i])*50*cm;
-	//fAbsorption[i] = (-1)/log(GreaseAbsorption[i]);
+    //fAbsorption[i] = (-1)/log(GreaseAbsorption[i]);
 
-	  //std::cout<<"e = "<<PhotonEnergy[num-i-1]<<", quartz abs = "<<QuartzAbsorption[i]<<std::endl;
+    //std::cout<<"e = "<<PhotonEnergy[num-i-1]<<", quartz abs = "<<QuartzAbsorption[i]<<std::endl;
   }
 
   /**************************** REFRACTIVE INDEXES ****************************/
@@ -713,11 +712,11 @@ void GlxDetectorConstruction::DefineMaterials(){
 
   G4double EpotekRefractiveIndex[num]={
     1.554034,1.555575,1.55698,1.558266,1.559454,1.56056,1.561604,
-     1.562604,1.563579,1.564547,1.565526,1.566536,1.567595,
-     1.568721,1.569933,1.57125,1.57269,1.574271,1.576012,
-     1.577932,1.580049,1.582381,1.584948,1.587768,1.590859,
-     1.59424,1.597929,1.601946,1.606307,1.611033,1.616141,1.621651,1.62758,
-     1.633947,1.640771,1.64807};
+    1.562604,1.563579,1.564547,1.565526,1.566536,1.567595,
+    1.568721,1.569933,1.57125,1.57269,1.574271,1.576012,
+    1.577932,1.580049,1.582381,1.584948,1.587768,1.590859,
+    1.59424,1.597929,1.601946,1.606307,1.611033,1.616141,1.621651,1.62758,
+    1.633947,1.640771,1.64807};
 
   G4double KamLandOilRefractiveIndex[num]={
     1.433055,1.433369,1.433698,1.434045,1.434409,1.434793,1.435198,
@@ -727,11 +726,11 @@ void GlxDetectorConstruction::DefineMaterials(){
     1.467991,1.471377,1.475174};
 
   G4double BorofloatRefractiveIndex[num]={1.536729, 1.536726, 1.536721, 1.536717,
-	1.536713, 1.536708, 1.536704, 1.536699, 1.536694, 1.536689, 1.536683,
-	1.536678, 1.536672, 1.536666, 1.536660, 1.536654, 1.536647, 1.536640,
-	1.536633, 1.536625, 1.536617, 1.536609, 1.536600, 1.536591, 1.536581,
-	1.536571, 1.536561, 1.536550, 1.536538, 1.536526, 1.536513, 1.536499,
-	1.536484, 1.488560, 1.488560, 1.488560};
+					  1.536713, 1.536708, 1.536704, 1.536699, 1.536694, 1.536689, 1.536683,
+					  1.536678, 1.536672, 1.536666, 1.536660, 1.536654, 1.536647, 1.536640,
+					  1.536633, 1.536625, 1.536617, 1.536609, 1.536600, 1.536591, 1.536581,
+					  1.536571, 1.536561, 1.536550, 1.536538, 1.536526, 1.536513, 1.536499,
+					  1.536484, 1.488560, 1.488560, 1.488560};
 
   double Nlak33aRefractiveIndex[76]={1.73816,1.73836,1.73858,1.73881,1.73904,1.73928,1.73952,1.73976,1.74001,1.74026,1.74052,1.74078,1.74105,1.74132,1.7416,1.74189,1.74218,1.74249,1.74279,1.74311,1.74344,1.74378,1.74412,1.74448,1.74485,1.74522,1.74562,1.74602,1.74644,1.74687,1.74732,1.74779,1.74827,1.74878,1.7493,1.74985,1.75042,1.75101,1.75163,1.75228,1.75296,1.75368,1.75443,1.75521,1.75604,1.75692,1.75784,1.75882,1.75985,1.76095,1.76211,1.76335,1.76467,1.76608,1.76758,1.7692,1.77093,1.77279,1.7748,1.77698,1.77934,1.7819,1.7847,1.78775,1.79111,1.79481,1.79889,1.80343,1.8085,1.81419,1.82061,1.8279,1.83625,1.84589,1.85713,1.87039};
 
@@ -741,7 +740,7 @@ void GlxDetectorConstruction::DefineMaterials(){
      0.99999999,0.99999999,0.99999999,0.99999999,0.99999999,
      0.99999999,0.99999999,0.99999999,0.99999999,0.99999999,
      0.99999999,0.99999999,0.99999999,0.99999999,0.99999999,
-      0.99999999,0.99999999,0.99999999,0.99999999,0.99999999,
+     0.99999999,0.99999999,0.99999999,0.99999999,0.99999999,
      0.99999999,0.99999999,0.99999999,0.99999999,0.99999999,0.99999999};
  
   
@@ -940,11 +939,11 @@ void GlxDetectorConstruction::SetQuantumEfficiency(G4int id){
 
   // hamamatsu H12700 quantum efficiency (as a function of photon E):	
   G4double QuantumEfficiencyPMT12700[num]=
-	{0.001,0.001,0.00118865,0.00511371,0.0104755,0.0174337,0.0259711,
-	0.0358296,0.046982,0.0593714,0.0729143,0.0875043,0.103016,0.119306,
-	0.13622,0.153591,0.171246,0.188889,0.206372,0.223528,0.239941,0.255526,
-	0.269913,0.283034,0.294369,0.303953,0.31158,0.317117,0.320523,0.321858,
-	0.321271,0.31895,0.315347,0.310875,0.306056,0.301365};
+    {0.001,0.001,0.00118865,0.00511371,0.0104755,0.0174337,0.0259711,
+     0.0358296,0.046982,0.0593714,0.0729143,0.0875043,0.103016,0.119306,
+     0.13622,0.153591,0.171246,0.188889,0.206372,0.223528,0.239941,0.255526,
+     0.269913,0.283034,0.294369,0.303953,0.31158,0.317117,0.320523,0.321858,
+     0.321271,0.31895,0.315347,0.310875,0.306056,0.301365};
   
   if(id == 0 ) fQuantumEfficiency = QuantumEfficiencyIdial;
   if(id == 1 ) fQuantumEfficiency = QuantumEfficiencyPMT12700;

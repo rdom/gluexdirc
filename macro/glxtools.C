@@ -159,7 +159,8 @@ TString glx_drawDigi(TString digidata="", Int_t layoutId = 0, Double_t maxz = 0,
   glx_cdigi->cd();
   glx_hdigi[nnmax]->GetZaxis()->SetLabelSize(0.04);
   glx_hdigi[nnmax]->GetZaxis()->SetTickLength(0.01);
-  (new TPaletteAxis(0.955,0.1,0.97,0.90,((TH1 *)(glx_hdigi[nnmax])->Clone())))->Draw();
+  //  (new TPaletteAxis(0.955,0.1,0.97,0.90,((TH1 *)(glx_hdigi[nnmax])->Clone())))->Draw();
+  (new TPaletteAxis(0.95,0.1,0.96,0.90,((TH1 *)(glx_hdigi[nnmax])->Clone())))->Draw();
   
   glx_cdigi->Modified();
   glx_cdigi->Update();

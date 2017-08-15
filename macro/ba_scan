@@ -99,7 +99,7 @@ printf "====== Run GLXDIRC with $tseed seed base ======\n"
 
 #simopt="-p 10 -z -2 -gx 2000 -gy 200 -mr 800 -mt 16 -c 0 -w 0"
 simopt="-p 4 -z 0 -c 2 -g 1 -b 1"
-echo ${silent}
+
 if [ ${silent} -eq "1" ]; then
     glx=echo
 fi
